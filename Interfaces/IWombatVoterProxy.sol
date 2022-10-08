@@ -5,7 +5,7 @@ pragma solidity ^0.6.0;
 interface IWombatVoterProxy {
     function getLpToken(uint256) external view returns (address);
 
-    function getBonusToken(uint256) external view returns (address);
+    function getBonusTokens(uint256) external view returns (address[] memory);
 
     function deposit(uint256, uint256) external;
 
@@ -33,9 +33,10 @@ interface IWombatVoterProxy {
 
     event Withdrawn(uint256 _pid, uint256 _amount);
 
-    event RewardsClaimed(
+    event RewardsClaimed(uint256 _pid, uint256 _amount);
+
+    event BonusRewardsClaimed(
         uint256 _pid,
-        uint256 _amount,
         address _bonusTokenAddress,
         uint256 _bonusTokenAmount
     );

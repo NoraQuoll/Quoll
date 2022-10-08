@@ -21,11 +21,15 @@ interface IRewards {
 
     function withdrawAll() external;
 
-    function donate(address, uint256) external;
+    function donate(address, uint256) external payable;
 
     function queueNewRewards(address, uint256) external;
 
     function earned(address, address) external view returns (uint256);
+
+    function getRewardTokens() external view returns (address[] memory);
+
+    function getRewardTokensLength() external view returns (uint256);
 
     function setAccess(address _address, bool _status) external;
 

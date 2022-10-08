@@ -45,10 +45,12 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "./Interfaces/IBaseRewardPool.sol";
 import "./Interfaces/IWombatBooster.sol";
+import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
 
 contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
+    using TransferHelper for address;
 
     address public operator;
     address public booster;
@@ -77,6 +79,8 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
 
     mapping(address => bool) public access;
 
+    mapping(address => bool) public grants;
+
     function initialize(address _operator) public initializer {
         __Ownable_init();
 
@@ -102,7 +106,7 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
 
         addRewardToken(_rewardToken);
 
-        setAccess(_booster, true);
+        access[_booster] = true;
 
         emit BoosterUpdated(_booster);
     }
@@ -137,7 +141,16 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         _;
     }
 
-    function getRewardTokensLength() external view returns (uint256) {
+    function getRewardTokens()
+        external
+        view
+        override
+        returns (address[] memory)
+    {
+        return rewardTokens;
+    }
+
+    function getRewardTokensLength() external view override returns (uint256) {
         return rewardTokens.length;
     }
 
@@ -191,36 +204,33 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         emit Staked(_for, _amount);
     }
 
-    function withdraw(uint256 amount) public override updateReward(msg.sender) {
-        require(amount > 0, "RewardPool : Cannot withdraw 0");
-
-        _totalSupply = _totalSupply.sub(amount);
-        _balances[msg.sender] = _balances[msg.sender].sub(amount);
-
-        stakingToken.safeTransfer(msg.sender, amount);
-        emit Withdrawn(msg.sender, amount);
-
-        getReward(msg.sender);
+    function withdraw(uint256 amount) external override {
+        _withdraw(msg.sender, amount);
     }
 
     function withdrawAll() external override {
-        withdraw(_balances[msg.sender]);
+        _withdraw(msg.sender, _balances[msg.sender]);
     }
 
-    function withdrawAndUnwrap(uint256 amount) public updateReward(msg.sender) {
-        _totalSupply = _totalSupply.sub(amount);
-        _balances[msg.sender] = _balances[msg.sender].sub(amount);
+    function withdrawFor(address _account, uint256 _amount) external override {
+        require(grants[msg.sender], "!auth");
 
-        //tell booster to withdraw from here directly to user
-        IWombatBooster(booster).withdrawTo(pid, amount, msg.sender);
-        emit Withdrawn(msg.sender, amount);
-
-        //get rewards too
-        getReward(msg.sender);
+        _withdraw(_account, _amount);
     }
 
-    function withdrawAllAndUnwrap() external {
-        withdrawAndUnwrap(_balances[msg.sender]);
+    function _withdraw(address _account, uint256 _amount)
+        internal
+        updateReward(_account)
+    {
+        require(_amount > 0, "RewardPool : Cannot withdraw 0");
+
+        _totalSupply = _totalSupply.sub(_amount);
+        _balances[_account] = _balances[_account].sub(_amount);
+
+        stakingToken.safeTransfer(_account, _amount);
+        emit Withdrawn(_account, _amount);
+
+        getReward(_account);
     }
 
     function getReward(address _account)
@@ -233,7 +243,7 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
             uint256 reward = earned(_account, rewardToken);
             if (reward > 0) {
                 userRewards[_account][rewardToken].rewards = 0;
-                IERC20(rewardToken).safeTransfer(_account, reward);
+                rewardToken.safeTransferToken(_account, reward);
                 IWombatBooster(booster).rewardClaimed(
                     pid,
                     _account,
@@ -245,13 +255,22 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         }
     }
 
-    function donate(address _rewardToken, uint256 _amount) external override {
+    function donate(address _rewardToken, uint256 _amount)
+        external
+        payable
+        override
+    {
         require(isRewardToken[_rewardToken], "invalid token");
-        IERC20(_rewardToken).safeTransferFrom(
-            msg.sender,
-            address(this),
-            _amount
-        );
+        if (AddressLib.isPlatformToken(_rewardToken)) {
+            require(_amount == msg.value, "invalid amount");
+        } else {
+            IERC20(_rewardToken).safeTransferFrom(
+                msg.sender,
+                address(this),
+                _amount
+            );
+        }
+
         rewards[_rewardToken].queuedRewards = rewards[_rewardToken]
             .queuedRewards
             .add(_amount);
@@ -281,8 +300,17 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         emit RewardAdded(_rewardToken, _rewards);
     }
 
-    function setAccess(address _address, bool _status) public override {
-        require(msg.sender == owner() || msg.sender == booster, "!auth");
+    function grant(address _address, bool _grant) external onlyOwner {
+        grants[_address] = _grant;
+    }
+
+    function setAccess(address _address, bool _status)
+        external
+        override
+        onlyOwner
+    {
         access[_address] = _status;
     }
+
+    receive() external payable {}
 }

@@ -41,4 +41,6 @@ interface IMasterWombat {
     function withdraw(uint256 _pid, uint256 _amount)
         external
         returns (uint256, uint256);
+
+    function updateFactor(address _user, uint256 _newVeWomBalance) external;
 }

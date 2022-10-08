@@ -8,26 +8,31 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./Interfaces/IWombatBooster.sol";
 import "./Interfaces/IWombatVoterProxy.sol";
 import "./Interfaces/IDepositToken.sol";
+import "./Interfaces/IWomDepositor.sol";
 import "./Interfaces/IQuollToken.sol";
 import "./Interfaces/IBaseRewardPool.sol";
+import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
 
 contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
+    using TransferHelper for address;
 
     address public wom;
 
-    uint256 public lockIncentive; //incentive to wom stakers
-    uint256 public stakerIncentive; //incentive to native token stakers
+    uint256 public vlQuoIncentive; // incentive to quo lockers
+    uint256 public qWomIncentive; //incentive to wom stakers
+    uint256 public quoIncentive; //incentive to quo stakers
     uint256 public platformFee; //possible fee to build treasury
-    uint256 public constant MaxFees = 2000;
+    uint256 public constant MaxFees = 2500;
     uint256 public constant FEE_DENOMINATOR = 10000;
 
     address public voterProxy;
     address public quo;
+    address public vlQuo;
     address public treasury;
-    address public stakerRewards; //quo rewards
-    address public lockRewards; //qWom rewards(wom)
+    address public quoRewardPool; //quo reward pool
+    address public qWomRewardPool; //qWom rewards(wom)
 
     bool public isShutdown;
 
@@ -42,6 +47,9 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     //index(pid) -> pool
     PoolInfo[] public override poolInfo;
 
+    address public womDepositor;
+    address public qWom;
+
     function initialize() public initializer {
         __Ownable_init();
     }
@@ -51,9 +59,12 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     function setParams(
         address _wom,
         address _voterProxy,
+        address _womDepositor,
+        address _qWom,
         address _quo,
-        address _stakerRewards,
-        address _lockRewards,
+        address _vlQuo,
+        address _quoRewardPool,
+        address _qWomRewardPool,
         address _treasury
     ) external onlyOwner {
         require(voterProxy == address(0), "params has already been set");
@@ -63,38 +74,56 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         wom = _wom;
 
         voterProxy = _voterProxy;
+        womDepositor = _womDepositor;
+        qWom = _qWom;
         quo = _quo;
+        vlQuo = _vlQuo;
 
-        stakerRewards = _stakerRewards;
-        lockRewards = _lockRewards;
+        quoRewardPool = _quoRewardPool;
+        qWomRewardPool = _qWomRewardPool;
 
         treasury = _treasury;
 
-        lockIncentive = 1000;
-        stakerIncentive = 450;
-        platformFee = 0;
+        vlQuoIncentive = 500;
+        qWomIncentive = 1000;
+        quoIncentive = 100;
+        platformFee = 100;
     }
 
     function setFees(
-        uint256 _lockFees,
-        uint256 _stakerFees,
-        uint256 _platform
+        uint256 _vlQuoIncentive,
+        uint256 _qWomIncentive,
+        uint256 _quoIncentive,
+        uint256 _platformFee
     ) external onlyOwner {
-        uint256 total = _lockFees.add(_stakerFees).add(_platform);
+        uint256 total = _qWomIncentive
+            .add(_vlQuoIncentive)
+            .add(_quoIncentive)
+            .add(_platformFee);
         require(total <= MaxFees, ">MaxFees");
 
         //values must be within certain ranges
-        if (
-            _lockFees >= 1000 &&
-            _lockFees <= 1500 &&
-            _stakerFees >= 300 &&
-            _stakerFees <= 600 &&
-            _platform <= 200
-        ) {
-            lockIncentive = _lockFees;
-            stakerIncentive = _stakerFees;
-            platformFee = _platform;
-        }
+        require(
+            _vlQuoIncentive >= 0 && _vlQuoIncentive <= 700,
+            "invalid _vlQuoIncentive"
+        );
+        require(
+            _qWomIncentive >= 800 && _qWomIncentive <= 1500,
+            "invalid _qWomIncentive"
+        );
+        require(
+            _quoIncentive >= 0 && _quoIncentive <= 500,
+            "invalid _quoIncentive"
+        );
+        require(
+            _platformFee >= 0 && _platformFee <= 1000,
+            "invalid _platformFee"
+        );
+
+        vlQuoIncentive = _vlQuoIncentive;
+        qWomIncentive = _qWomIncentive;
+        quoIncentive = _quoIncentive;
+        platformFee = _platformFee;
     }
 
     function setTreasury(address _treasury) external onlyOwner {
@@ -175,7 +204,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         uint256 _pid,
         uint256 _amount,
         bool _stake
-    ) public returns (bool) {
+    ) public override {
         require(!isShutdown, "shutdown");
         PoolInfo memory pool = poolInfo[_pid];
         require(pool.shutdown == false, "pool is closed");
@@ -204,7 +233,6 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         }
 
         emit Deposited(msg.sender, _pid, _amount);
-        return true;
     }
 
     //deposit all lp tokens and stake
@@ -247,57 +275,37 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     }
 
     //withdraw lp tokens
-    function withdraw(uint256 _pid, uint256 _amount) public returns (bool) {
+    function withdraw(uint256 _pid, uint256 _amount) public override {
         _withdraw(_pid, _amount, msg.sender, msg.sender);
-        return true;
     }
 
     //withdraw all lp tokens
-    function withdrawAll(uint256 _pid) public returns (bool) {
+    function withdrawAll(uint256 _pid) public {
         address token = poolInfo[_pid].token;
         uint256 userBal = IERC20(token).balanceOf(msg.sender);
         withdraw(_pid, userBal);
-        return true;
     }
 
-    //allow reward contracts to send here and withdraw to user
-    function withdrawTo(
-        uint256 _pid,
-        uint256 _amount,
-        address _to
-    ) external override {
-        address rewardContract = poolInfo[_pid].rewardPool;
-        require(msg.sender == rewardContract, "!auth");
-
-        _withdraw(_pid, _amount, msg.sender, _to);
-    }
-
-    //claim wom and extra rewards and disperse to reward contracts
+    // disperse wom and extra rewards to reward contracts
     function _earmarkRewards(uint256 _pid) internal {
         PoolInfo memory pool = poolInfo[_pid];
-        require(pool.shutdown == false, "pool is closed");
-
-        //claim wom and bonus token rewards
-        IWombatVoterProxy(voterProxy).claimRewards(_pid);
-
         //wom balance
         uint256 womBal = IERC20(wom).balanceOf(address(this));
         emit WomClaimed(_pid, womBal);
 
         if (womBal > 0) {
-            uint256 _lockIncentive = womBal.mul(lockIncentive).div(
+            uint256 vlQuoIncentiveAmount = womBal.mul(vlQuoIncentive).div(
                 FEE_DENOMINATOR
             );
-            uint256 _stakerIncentive = womBal.mul(stakerIncentive).div(
+            uint256 qWomIncentiveAmount = womBal.mul(qWomIncentive).div(
+                FEE_DENOMINATOR
+            );
+            uint256 quoIncentiveAmount = womBal.mul(quoIncentive).div(
                 FEE_DENOMINATOR
             );
 
             //send treasury
-            if (
-                treasury != address(0) &&
-                treasury != address(this) &&
-                platformFee > 0
-            ) {
+            if (platformFee > 0) {
                 //only subtract after address condition check
                 uint256 _platform = womBal.mul(platformFee).div(
                     FEE_DENOMINATOR
@@ -307,7 +315,10 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
             }
 
             //remove incentives from balance
-            womBal = womBal.sub(_lockIncentive).sub(_stakerIncentive);
+            womBal = womBal
+                .sub(vlQuoIncentiveAmount)
+                .sub(qWomIncentiveAmount)
+                .sub(quoIncentiveAmount);
 
             //send wom to lp provider reward contract
             address rewardContract = pool.rewardPool;
@@ -315,35 +326,70 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
             IRewards(rewardContract).queueNewRewards(wom, womBal);
 
             //check if there are extra rewards
-            address bonusToken = IWombatVoterProxy(voterProxy).getBonusToken(
-                pool.masterWombatPid
-            );
-            if (bonusToken != address(0) && bonusToken != wom) {
-                uint256 bonusTokenBalance = IERC20(bonusToken).balanceOf(
+            address[] memory bonusTokenAddresses = IWombatVoterProxy(voterProxy)
+                .getBonusTokens(pool.masterWombatPid);
+            for (uint256 i = 0; i < bonusTokenAddresses.length; i++) {
+                address bonusToken = bonusTokenAddresses[i];
+                if (bonusToken == wom) {
+                    // wom was dispersed above
+                    continue;
+                }
+                uint256 bonusTokenBalance = TransferHelper.balanceOf(
+                    bonusToken,
                     address(this)
                 );
-                IERC20(bonusToken).safeTransfer(
-                    rewardContract,
-                    bonusTokenBalance
-                );
-                IRewards(rewardContract).queueNewRewards(
-                    bonusToken,
-                    bonusTokenBalance
+                if (bonusTokenBalance > 0) {
+                    bonusToken.safeTransferToken(
+                        rewardContract,
+                        bonusTokenBalance
+                    );
+                    IRewards(rewardContract).queueNewRewards(
+                        bonusToken,
+                        bonusTokenBalance
+                    );
+                }
+            }
+
+            //send qWom to vlQuo
+            if (vlQuoIncentiveAmount > 0) {
+                IERC20(wom).safeApprove(womDepositor, 0);
+                IERC20(wom).safeApprove(womDepositor, vlQuoIncentiveAmount);
+                IWomDepositor(womDepositor).deposit(vlQuoIncentiveAmount);
+                IERC20(qWom).safeTransfer(vlQuo, vlQuoIncentiveAmount);
+                IRewards(vlQuo).queueNewRewards(qWom, vlQuoIncentiveAmount);
+            }
+
+            //send wom to qWom reward contract
+            if (qWomIncentiveAmount > 0) {
+                IERC20(wom).safeTransfer(qWomRewardPool, qWomIncentiveAmount);
+                IRewards(qWomRewardPool).queueNewRewards(
+                    wom,
+                    qWomIncentiveAmount
                 );
             }
 
-            //send lockers' share of wom to reward contract
-            IERC20(wom).safeTransfer(lockRewards, _lockIncentive);
-            IRewards(lockRewards).queueNewRewards(wom, _lockIncentive);
-
-            //send stakers's share of wom to reward contract
-            IERC20(wom).safeTransfer(stakerRewards, _stakerIncentive);
-            IRewards(stakerRewards).queueNewRewards(wom, _stakerIncentive);
+            //send qWom to quo reward contract
+            if (quoIncentiveAmount > 0) {
+                IERC20(wom).safeApprove(womDepositor, 0);
+                IERC20(wom).safeApprove(womDepositor, quoIncentiveAmount);
+                IWomDepositor(womDepositor).deposit(quoIncentiveAmount);
+                IERC20(qWom).safeTransfer(quoRewardPool, quoIncentiveAmount);
+                IRewards(quoRewardPool).queueNewRewards(
+                    qWom,
+                    quoIncentiveAmount
+                );
+            }
         }
     }
 
     function earmarkRewards(uint256 _pid) external returns (bool) {
         require(!isShutdown, "shutdown");
+        PoolInfo memory pool = poolInfo[_pid];
+        require(pool.shutdown == false, "pool is closed");
+
+        //claim wom and bonus token rewards
+        IWombatVoterProxy(voterProxy).claimRewards(_pid);
+
         _earmarkRewards(_pid);
         return true;
     }
@@ -357,7 +403,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     ) external override {
         address rewardContract = poolInfo[_pid].rewardPool;
         require(
-            msg.sender == rewardContract || msg.sender == lockRewards,
+            msg.sender == rewardContract || msg.sender == qWomRewardPool,
             "!auth"
         );
 
@@ -368,4 +414,6 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         //mint reward tokens
         IQuollToken(quo).mint(_account, _amount);
     }
+
+    receive() external payable {}
 }

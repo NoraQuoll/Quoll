@@ -14,6 +14,8 @@ interface IBaseRewardPool is IRewards {
 
     function getReward(address) external;
 
+    function withdrawFor(address _account, uint256 _amount) external;
+
     event BoosterUpdated(address _booster);
     event OperatorUpdated(address _operator);
 }

@@ -74,10 +74,13 @@ contract WomDepositor is IWomDepositor, OwnableUpgradeable {
     function deposit(uint256 _amount, address _stakeAddress) public {
         require(_amount > 0, "!>0");
 
-        //lock immediately, transfer directly to voterProxy to skip an erc20 transfer
-        IERC20(wom).safeTransferFrom(msg.sender, voterProxy, _amount);
         if (block.timestamp > lastLockTime.add(lockTimeInterval)) {
+            //lock immediately, transfer directly to voterProxy to skip an erc20 transfer
+            IERC20(wom).safeTransferFrom(msg.sender, voterProxy, _amount);
             _lockWom();
+        } else {
+            //move tokens here
+            IERC20(wom).safeTransferFrom(msg.sender, address(this), _amount);
         }
 
         if (_stakeAddress == address(0)) {

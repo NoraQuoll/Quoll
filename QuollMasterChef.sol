@@ -84,6 +84,11 @@ contract QuollMasterChef is IQuollMasterChef, OwnableUpgradeable {
         startBlock = _startBlock;
     }
 
+    function updateRewardPerBlock(uint256 _rewardPerBlock) public onlyOwner {
+        massUpdatePools();
+        rewardPerBlock = _rewardPerBlock;
+    }
+
     function poolLength() external view returns (uint256) {
         return poolInfo.length;
     }

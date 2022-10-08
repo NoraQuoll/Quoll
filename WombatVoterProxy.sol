@@ -1,20 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
+pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "./Interfaces/IWombatVoterProxy.sol";
-import "./Interfaces/Wombat/IMasterWombat.sol";
+import "./Interfaces/Wombat/IMasterWombatV2.sol";
 import "./Interfaces/Wombat/IVeWom.sol";
+import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
 
 contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
+    using TransferHelper for address;
 
     address public wom;
-    IMasterWombat public masterWombat;
+    IMasterWombatV2 public masterWombat;
     address public veWom;
 
     address public booster;
@@ -41,7 +44,7 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
     ) external onlyOwner {
         require(booster == address(0), "!init");
 
-        masterWombat = IMasterWombat(_masterWombat);
+        masterWombat = IMasterWombatV2(_masterWombat);
         wom = masterWombat.wom();
         veWom = masterWombat.veWom();
 
@@ -57,16 +60,21 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         return token;
     }
 
-    function getBonusToken(uint256 _pid)
-        external
+    function getBonusTokens(uint256 _pid)
+        public
         view
         override
-        returns (address)
+        returns (address[] memory)
     {
-        (address bonusTokenAddress, ) = masterWombat.rewarderBonusTokenInfo(
-            _pid
-        );
-        return bonusTokenAddress;
+        (address[] memory bonusTokenAddresses, ) = masterWombat
+            .rewarderBonusTokenInfo(_pid);
+        for (uint256 i = 0; i < bonusTokenAddresses.length; i++) {
+            if (bonusTokenAddresses[i] == address(0)) {
+                // bnb
+                bonusTokenAddresses[i] = AddressLib.PLATFORM_TOKEN_ADDRESS;
+            }
+        }
+        return bonusTokenAddresses;
     }
 
     function deposit(uint256 _pid, uint256 _amount)
@@ -81,6 +89,7 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         IERC20(token).safeApprove(address(masterWombat), 0);
         IERC20(token).safeApprove(address(masterWombat), balance);
         masterWombat.deposit(_pid, balance);
+        _claimRewards(_pid);
 
         emit Deposited(_pid, balance);
     }
@@ -95,6 +104,7 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         uint256 _balance = IERC20(token).balanceOf(address(this));
         if (_balance < _amount) {
             masterWombat.withdraw(_pid, _amount.sub(_balance));
+            _claimRewards(_pid);
         }
         IERC20(token).safeTransfer(booster, _amount);
 
@@ -110,29 +120,36 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
     }
 
     function claimRewards(uint256 _pid) external override onlyBooster {
-        (address bonusTokenAddress, ) = masterWombat.rewarderBonusTokenInfo(
-            _pid
-        );
         // call deposit with _amount == 0 to claim current rewards
         masterWombat.deposit(_pid, 0);
+
+        _claimRewards(_pid);
+    }
+
+    // send claimed rewards to booster
+    function _claimRewards(uint256 _pid) internal {
+        address[] memory bonusTokenAddresses = getBonusTokens(_pid);
         uint256 _balance = IERC20(wom).balanceOf(address(this));
         IERC20(wom).safeTransfer(booster, _balance);
+        emit RewardsClaimed(_pid, _balance);
 
-        uint256 bonusTokenBalance = 0;
-        if (bonusTokenAddress != address(0)) {
-            bonusTokenBalance = IERC20(bonusTokenAddress).balanceOf(
+        for (uint256 i = 0; i < bonusTokenAddresses.length; i++) {
+            address bonusTokenAddress = bonusTokenAddresses[i];
+            uint256 bonusTokenBalance = TransferHelper.balanceOf(
+                bonusTokenAddress,
                 address(this)
             );
+            if (bonusTokenBalance == 0) {
+                continue;
+            }
+            bonusTokenAddress.safeTransferToken(booster, bonusTokenBalance);
 
-            IERC20(bonusTokenAddress).safeTransfer(booster, bonusTokenBalance);
+            emit BonusRewardsClaimed(
+                _pid,
+                bonusTokenAddress,
+                bonusTokenBalance
+            );
         }
-
-        emit RewardsClaimed(
-            _pid,
-            _balance,
-            bonusTokenAddress,
-            bonusTokenBalance
-        );
     }
 
     function balanceOfPool(uint256 _pid)
@@ -141,12 +158,16 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         override
         returns (uint256)
     {
-        (uint256 amount, , ) = masterWombat.userInfo(_pid, address(this));
+        (uint256 amount, , , ) = masterWombat.userInfo(_pid, address(this));
         return amount;
     }
 
     function lockWom(uint256 _lockDays) external override onlyDepositor {
         uint256 balance = IERC20(wom).balanceOf(address(this));
+
+        if (balance == 0) {
+            return;
+        }
 
         IERC20(wom).safeApprove(veWom, 0);
         IERC20(wom).safeApprove(veWom, balance);
@@ -171,4 +192,6 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
 
         return (success, result);
     }
+
+    receive() external payable {}
 }

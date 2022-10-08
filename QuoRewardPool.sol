@@ -43,7 +43,6 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "./Interfaces/IWomDepositor.sol";
 import "./Interfaces/IRewards.sol";
 import "./Interfaces/IBaseRewardPool.sol";
 
@@ -100,7 +99,6 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
 
         stakingToken = IERC20(_stakingToken);
         wom = _wom;
-        addRewardToken(_wom);
         booster = _booster;
         womDepositor = _womDepositor;
         qWomRewards = _qWomRewards;
@@ -137,6 +135,19 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
         }
 
         _;
+    }
+
+    function getRewardTokens()
+        external
+        view
+        override
+        returns (address[] memory)
+    {
+        return rewardTokens;
+    }
+
+    function getRewardTokensLength() external view override returns (uint256) {
+        return rewardTokens.length;
     }
 
     function earned(address _account, address _rewardToken)
@@ -205,15 +216,15 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
         stakingToken.safeTransfer(msg.sender, _amount);
         emit Withdrawn(msg.sender, _amount);
 
-        getReward(msg.sender, false);
+        _getReward(msg.sender, false);
     }
 
     function withdrawAll() external override {
         withdraw(_balances[msg.sender]);
     }
 
-    function getReward(address _account, bool _stake)
-        public
+    function _getReward(address _account, bool _stake)
+        internal
         updateReward(_account)
     {
         for (uint256 i = 0; i < rewardTokens.length; i++) {
@@ -221,22 +232,13 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
             uint256 reward = earned(_account, rewardToken);
             if (reward > 0) {
                 userRewards[_account][rewardToken].rewards = 0;
-                if (rewardToken == wom) {
-                    // wom
-                    IERC20(rewardToken).safeApprove(womDepositor, 0);
-                    IERC20(rewardToken).safeApprove(womDepositor, reward);
-                    IWomDepositor(womDepositor).deposit(reward);
-
-                    uint256 qWomBalance = qWomToken.balanceOf(address(this));
+                if (rewardToken == address(qWomToken)) {
                     if (_stake) {
-                        IERC20(qWomToken).safeApprove(qWomRewards, 0);
-                        IERC20(qWomToken).safeApprove(qWomRewards, qWomBalance);
-                        IBaseRewardPool(qWomRewards).stakeFor(
-                            _account,
-                            qWomBalance
-                        );
+                        qWomToken.safeApprove(qWomRewards, 0);
+                        qWomToken.safeApprove(qWomRewards, reward);
+                        IBaseRewardPool(qWomRewards).stakeFor(_account, reward);
                     } else {
-                        qWomToken.safeTransfer(_account, qWomBalance);
+                        qWomToken.safeTransfer(_account, reward);
                     }
                 } else {
                     // other token
@@ -249,10 +251,14 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
     }
 
     function getReward(bool _stake) external {
-        getReward(msg.sender, _stake);
+        _getReward(msg.sender, _stake);
     }
 
-    function donate(address _rewardToken, uint256 _amount) external override {
+    function donate(address _rewardToken, uint256 _amount)
+        external
+        payable
+        override
+    {
         require(isRewardToken[_rewardToken], "invalid token");
         IERC20(_rewardToken).safeTransferFrom(
             msg.sender,
@@ -288,8 +294,11 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
         emit RewardAdded(_rewardToken, _rewards);
     }
 
-    function setAccess(address _address, bool _status) public override {
-        require(msg.sender == owner() || msg.sender == booster, "!auth");
+    function setAccess(address _address, bool _status)
+        public
+        override
+        onlyOwner
+    {
         access[_address] = _status;
     }
 }

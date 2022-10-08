@@ -13,17 +13,19 @@ interface IWombatBooster {
             bool
         );
 
+    function deposit(
+        uint256 _pid,
+        uint256 _amount,
+        bool _stake
+    ) external;
+
+    function withdraw(uint256 _pid, uint256 _amount) external;
+
     function rewardClaimed(
         uint256,
         address,
         address,
         uint256
-    ) external;
-
-    function withdrawTo(
-        uint256,
-        uint256,
-        address
     ) external;
 
     event Deposited(

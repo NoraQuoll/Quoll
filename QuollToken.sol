@@ -26,7 +26,7 @@ contract QuollToken is IQuollToken, ERC20Upgradeable, OwnableUpgradeable {
 
         access[msg.sender] = true;
 
-        maxSupply = 100 * 1000000 * 1e18; //100mil
+        maxSupply = 1e27; // 1e27 = 1e9 * 1e18, 1B
         totalCliffs = 1000;
         reductionPerCliff = maxSupply.div(totalCliffs);
 
