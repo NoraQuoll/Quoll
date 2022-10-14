@@ -207,7 +207,6 @@ contract QuollMasterChef is IQuollMasterChef, OwnableUpgradeable {
             .mul(rewardPerBlock)
             .mul(pool.allocPoint)
             .div(totalAllocPoint);
-        //quo.mint(address(this), quoReward);
         pool.accQuoPerShare = pool.accQuoPerShare.add(
             quoReward.mul(1e12).div(lpSupply)
         );

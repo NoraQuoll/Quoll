@@ -42,6 +42,7 @@ contract QuollZap is OwnableUpgradeable {
     function zapIn(
         uint256 _pid,
         uint256 _amount,
+        uint256 _minimumAmount,
         bool _stake
     ) external payable {
         (address lptoken, address token, , address rewardPool, ) = booster
@@ -52,6 +53,7 @@ contract QuollZap is OwnableUpgradeable {
             require(_amount == msg.value, "invalid amount");
             IWNative(wNative).deposit{value: _amount}();
         } else {
+            require(msg.value == 0, "invalid msg.value");
             IERC20(underlyingToken).safeTransferFrom(
                 msg.sender,
                 address(this),
@@ -69,7 +71,7 @@ contract QuollZap is OwnableUpgradeable {
             liquidity = IPool(pool).deposit(
                 underlyingToken,
                 _amount,
-                0,
+                _minimumAmount,
                 address(this),
                 block.timestamp,
                 false
@@ -101,6 +103,7 @@ contract QuollZap is OwnableUpgradeable {
     function zapOut(
         uint256 _pid,
         uint256 _amount,
+        uint256 _minimumAmount,
         bool _stake
     ) external {
         (address lptoken, address token, , address rewardPool, ) = booster
@@ -127,7 +130,7 @@ contract QuollZap is OwnableUpgradeable {
             uint256 underlyingTokenAmount = IPool(pool).withdraw(
                 underlyingToken,
                 lptokenAmount,
-                0,
+                _minimumAmount,
                 address(this),
                 block.timestamp
             );
@@ -140,7 +143,7 @@ contract QuollZap is OwnableUpgradeable {
             IPool(pool).withdraw(
                 underlyingToken,
                 lptokenAmount,
-                0,
+                _minimumAmount,
                 msg.sender,
                 block.timestamp
             );

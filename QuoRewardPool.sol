@@ -201,7 +201,7 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
         //take tokens from sender
         stakingToken.safeTransferFrom(msg.sender, address(this), _amount);
 
-        emit Staked(msg.sender, _amount);
+        emit Staked(_for, _amount);
     }
 
     function withdraw(uint256 _amount)
