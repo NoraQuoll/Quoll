@@ -14,12 +14,12 @@ contract DepositToken is IDepositToken, ERC20Upgradeable, OwnableUpgradeable {
         public
         initializer
     {
+        require(_operator != address(0), "invalid _operator!");
+
         __Ownable_init();
 
         __ERC20_init_unchained(
-            string(
-                abi.encodePacked(ERC20(_lptoken).name(), " Quoll Deposit")
-            ),
+            string(abi.encodePacked(ERC20(_lptoken).name(), " Quoll Deposit")),
             string(abi.encodePacked("quo", ERC20(_lptoken).symbol()))
         );
 

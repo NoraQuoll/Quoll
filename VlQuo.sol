@@ -76,6 +76,8 @@ contract VlQuo is OwnableUpgradeable {
         uint256 _reward
     );
 
+    event AccessSet(address indexed _address, bool _status);
+
     function initialize() public initializer {
         __Ownable_init();
     }
@@ -89,6 +91,13 @@ contract VlQuo is OwnableUpgradeable {
         address _booster
     ) external onlyOwner {
         require(address(quo) == address(0), "!init");
+
+        require(_quo != address(0), "invalid _quo!");
+        require(_wom != address(0), "invalid _wom!");
+        require(_womDepositor != address(0), "invalid _womDepositor!");
+        require(_qWomRewards != address(0), "invalid _qWomRewards!");
+        require(_qWomToken != address(0), "invalid _qWomToken!");
+        require(_booster != address(0), "invalid _booster!");
 
         quo = IERC20(_quo);
         wom = _wom;
@@ -192,6 +201,7 @@ contract VlQuo is OwnableUpgradeable {
         uint256 _amount,
         uint256 _weeks
     ) external {
+        require(_user != address(0), "invalid _user!");
         require(
             msg.sender == _user || !blockThirdPartyActions[_user],
             "Cannot lock on behalf of this account"
@@ -393,6 +403,12 @@ contract VlQuo is OwnableUpgradeable {
 
         _addRewardToken(_rewardToken);
 
+        IERC20(_rewardToken).safeTransferFrom(
+            msg.sender,
+            address(this),
+            _rewards
+        );
+
         if (totalWeight() == 0) {
             queuedRewards[_rewardToken] = queuedRewards[_rewardToken].add(
                 _rewards
@@ -412,5 +428,6 @@ contract VlQuo is OwnableUpgradeable {
 
     function setAccess(address _address, bool _status) public onlyOwner {
         access[_address] = _status;
+        emit AccessSet(_address, _status);
     }
 }

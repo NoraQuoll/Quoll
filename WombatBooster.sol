@@ -69,6 +69,16 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     ) external onlyOwner {
         require(voterProxy == address(0), "params has already been set");
 
+        require(_wom != address(0), "invalid _wom!");
+        require(_voterProxy != address(0), "invalid _voterProxy!");
+        require(_womDepositor != address(0), "invalid _womDepositor!");
+        require(_qWom != address(0), "invalid _qWom!");
+        require(_quo != address(0), "invalid _quo!");
+        require(_vlQuo != address(0), "invalid _vlQuo!");
+        require(_quoRewardPool != address(0), "invalid _quoRewardPool!");
+        require(_qWomRewardPool != address(0), "invalid _qWomRewardPool!");
+        require(_treasury != address(0), "invalid _treasury!");
+
         isShutdown = false;
 
         wom = _wom;
@@ -166,13 +176,14 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     }
 
     //shutdown pool
-    function shutdownPool(uint256 _pid) external onlyOwner returns (bool) {
+    function shutdownPool(uint256 _pid) public onlyOwner returns (bool) {
         PoolInfo storage pool = poolInfo[_pid];
+        require(!pool.shutdown, "already shutdown!");
 
         //withdraw from gauge
-        try
-            IWombatVoterProxy(voterProxy).withdrawAll(pool.masterWombatPid)
-        {} catch {}
+        IWombatVoterProxy(voterProxy).withdrawAll(pool.masterWombatPid);
+        // rewards are claimed when withdrawing
+        _earmarkRewards(_pid);
 
         pool.shutdown = true;
         return true;
@@ -190,12 +201,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
                 continue;
             }
 
-            //withdraw from gauge
-            try
-                IWombatVoterProxy(voterProxy).withdrawAll(pool.masterWombatPid)
-            {
-                pool.shutdown = true;
-            } catch {}
+            shutdownPool(i);
         }
     }
 
@@ -322,7 +328,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
             //send wom to lp provider reward contract
             address rewardContract = pool.rewardPool;
-            IERC20(wom).safeTransfer(rewardContract, womBal);
+            IERC20(wom).safeApprove(rewardContract, womBal);
             IRewards(rewardContract).queueNewRewards(wom, womBal);
 
             //check if there are extra rewards
@@ -339,14 +345,20 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
                     address(this)
                 );
                 if (bonusTokenBalance > 0) {
-                    bonusToken.safeTransferToken(
-                        rewardContract,
-                        bonusTokenBalance
-                    );
-                    IRewards(rewardContract).queueNewRewards(
-                        bonusToken,
-                        bonusTokenBalance
-                    );
+                    if (AddressLib.isPlatformToken(bonusToken)) {
+                        IRewards(rewardContract).queueNewRewards{
+                            value: bonusTokenBalance
+                        }(bonusToken, bonusTokenBalance);
+                    } else {
+                        IERC20(bonusToken).safeApprove(
+                            rewardContract,
+                            bonusTokenBalance
+                        );
+                        IRewards(rewardContract).queueNewRewards(
+                            bonusToken,
+                            bonusTokenBalance
+                        );
+                    }
                 }
             }
 
@@ -354,14 +366,17 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
             if (vlQuoIncentiveAmount > 0) {
                 IERC20(wom).safeApprove(womDepositor, 0);
                 IERC20(wom).safeApprove(womDepositor, vlQuoIncentiveAmount);
-                IWomDepositor(womDepositor).deposit(vlQuoIncentiveAmount);
-                IERC20(qWom).safeTransfer(vlQuo, vlQuoIncentiveAmount);
+                IWomDepositor(womDepositor).deposit(
+                    vlQuoIncentiveAmount,
+                    false
+                );
+                IERC20(qWom).safeApprove(vlQuo, vlQuoIncentiveAmount);
                 IRewards(vlQuo).queueNewRewards(qWom, vlQuoIncentiveAmount);
             }
 
             //send wom to qWom reward contract
             if (qWomIncentiveAmount > 0) {
-                IERC20(wom).safeTransfer(qWomRewardPool, qWomIncentiveAmount);
+                IERC20(wom).safeApprove(qWomRewardPool, qWomIncentiveAmount);
                 IRewards(qWomRewardPool).queueNewRewards(
                     wom,
                     qWomIncentiveAmount
@@ -372,8 +387,8 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
             if (quoIncentiveAmount > 0) {
                 IERC20(wom).safeApprove(womDepositor, 0);
                 IERC20(wom).safeApprove(womDepositor, quoIncentiveAmount);
-                IWomDepositor(womDepositor).deposit(quoIncentiveAmount);
-                IERC20(qWom).safeTransfer(quoRewardPool, quoIncentiveAmount);
+                IWomDepositor(womDepositor).deposit(quoIncentiveAmount, false);
+                IERC20(qWom).safeApprove(quoRewardPool, quoIncentiveAmount);
                 IRewards(quoRewardPool).queueNewRewards(
                     qWom,
                     quoIncentiveAmount

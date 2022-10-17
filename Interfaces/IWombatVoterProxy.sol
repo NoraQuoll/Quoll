@@ -19,12 +19,6 @@ interface IWombatVoterProxy {
 
     function lockWom(uint256) external;
 
-    function execute(
-        address _to,
-        uint256 _value,
-        bytes calldata _data
-    ) external returns (bool, bytes memory);
-
     // --- Events ---
     event BoosterUpdated(address _booster);
     event DepositorUpdated(address _depositor);

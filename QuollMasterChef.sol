@@ -78,13 +78,15 @@ contract QuollMasterChef is IQuollMasterChef, OwnableUpgradeable {
     ) external onlyOwner {
         require(address(quo) == address(0), "!init");
 
+        require(address(_quo) != address(0), "invalid _quo!");
+
         quo = _quo;
         rewardPerBlock = _rewardPerBlock;
         bonusEndBlock = _bonusEndBlock;
         startBlock = _startBlock;
     }
 
-    function updateRewardPerBlock(uint256 _rewardPerBlock) public onlyOwner {
+    function updateRewardPerBlock(uint256 _rewardPerBlock) external onlyOwner {
         massUpdatePools();
         rewardPerBlock = _rewardPerBlock;
     }
@@ -100,7 +102,8 @@ contract QuollMasterChef is IQuollMasterChef, OwnableUpgradeable {
         IERC20 _lpToken,
         IRewarder _rewarder,
         bool _withUpdate
-    ) public onlyOwner {
+    ) external onlyOwner {
+        require(address(_lpToken) != address(0), "invalid _lpToken!");
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -124,12 +127,9 @@ contract QuollMasterChef is IQuollMasterChef, OwnableUpgradeable {
         uint256 _pid,
         uint256 _allocPoint,
         IRewarder _rewarder,
-        bool _withUpdate,
         bool _updateRewarder
-    ) public onlyOwner {
-        if (_withUpdate) {
-            massUpdatePools();
-        }
+    ) external onlyOwner {
+        massUpdatePools();
         totalAllocPoint = totalAllocPoint.sub(poolInfo[_pid].allocPoint).add(
             _allocPoint
         );
@@ -249,7 +249,7 @@ contract QuollMasterChef is IQuollMasterChef, OwnableUpgradeable {
     }
 
     // Withdraw LP tokens from MasterChef.
-    function withdraw(uint256 _pid, uint256 _amount) public {
+    function withdraw(uint256 _pid, uint256 _amount) external {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
         require(user.amount >= _amount, "withdraw: not good");
@@ -299,7 +299,7 @@ contract QuollMasterChef is IQuollMasterChef, OwnableUpgradeable {
     }
 
     // Withdraw without caring about rewards. EMERGENCY ONLY.
-    function emergencyWithdraw(uint256 _pid) public {
+    function emergencyWithdraw(uint256 _pid) external {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][msg.sender];
         pool.lpToken.safeTransfer(address(msg.sender), user.amount);

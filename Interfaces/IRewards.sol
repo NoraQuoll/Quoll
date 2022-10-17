@@ -23,7 +23,7 @@ interface IRewards {
 
     function donate(address, uint256) external payable;
 
-    function queueNewRewards(address, uint256) external;
+    function queueNewRewards(address, uint256) external payable;
 
     function earned(address, address) external view returns (uint256);
 

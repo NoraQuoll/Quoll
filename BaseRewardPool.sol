@@ -97,7 +97,10 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
     ) external override {
         require(msg.sender == owner() || msg.sender == operator, "!auth");
 
-        require(address(booster) == address(0), "params has already been set");
+        require(booster == address(0), "params has already been set");
+        require(_booster != address(0), "invalid _booster!");
+        require(_stakingToken != address(0), "invalid _stakingToken!");
+        require(_rewardToken != address(0), "invalid _rewardToken!");
 
         booster = _booster;
 
@@ -112,6 +115,7 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
     }
 
     function addRewardToken(address _rewardToken) internal {
+        require(_rewardToken != address(0), "invalid _rewardToken!");
         if (isRewardToken[_rewardToken]) {
             return;
         }
@@ -193,6 +197,7 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         override
         updateReward(_for)
     {
+        require(_for != address(0), "invalid _for!");
         require(_amount > 0, "RewardPool : Cannot stake 0");
 
         //give to _for
@@ -264,6 +269,7 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         if (AddressLib.isPlatformToken(_rewardToken)) {
             require(_amount == msg.value, "invalid amount");
         } else {
+            require(msg.value == 0, "invalid msg.value");
             IERC20(_rewardToken).safeTransferFrom(
                 msg.sender,
                 address(this),
@@ -278,11 +284,23 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
 
     function queueNewRewards(address _rewardToken, uint256 _rewards)
         external
+        payable
         override
     {
         require(access[msg.sender], "!auth");
 
         addRewardToken(_rewardToken);
+
+        if (AddressLib.isPlatformToken(_rewardToken)) {
+            require(_rewards == msg.value, "invalid amount");
+        } else {
+            require(msg.value == 0, "invalid msg.value");
+            IERC20(_rewardToken).safeTransferFrom(
+                msg.sender,
+                address(this),
+                _rewards
+            );
+        }
 
         Reward storage rewardInfo = rewards[_rewardToken];
 
@@ -301,7 +319,10 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
     }
 
     function grant(address _address, bool _grant) external onlyOwner {
+        require(_address != address(0), "invalid _address!");
+
         grants[_address] = _grant;
+        emit Granted(_address, _grant);
     }
 
     function setAccess(address _address, bool _status)
@@ -309,7 +330,10 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         override
         onlyOwner
     {
+        require(_address != address(0), "invalid _address!");
+
         access[_address] = _status;
+        emit AccessSet(_address, _status);
     }
 
     receive() external payable {}

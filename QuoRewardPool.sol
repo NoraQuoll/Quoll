@@ -97,6 +97,13 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
             "params has already been set"
         );
 
+        require(_stakingToken != address(0), "invalid _stakingToken!");
+        require(_wom != address(0), "invalid _wom!");
+        require(_womDepositor != address(0), "invalid _womDepositor!");
+        require(_qWomRewards != address(0), "invalid _qWomRewards!");
+        require(_qWomToken != address(0), "invalid _qWomToken!");
+        require(_booster != address(0), "invalid _booster!");
+
         stakingToken = IERC20(_stakingToken);
         wom = _wom;
         booster = _booster;
@@ -108,6 +115,7 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
     }
 
     function addRewardToken(address _rewardToken) internal {
+        require(_rewardToken != address(0), "invalid _rewardToken!");
         if (isRewardToken[_rewardToken]) {
             return;
         }
@@ -272,11 +280,18 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
 
     function queueNewRewards(address _rewardToken, uint256 _rewards)
         external
+        payable
         override
     {
         require(access[msg.sender], "!authorized");
 
         addRewardToken(_rewardToken);
+
+        IERC20(_rewardToken).safeTransferFrom(
+            msg.sender,
+            address(this),
+            _rewards
+        );
 
         Reward storage rewardInfo = rewards[_rewardToken];
 
@@ -299,6 +314,8 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
         override
         onlyOwner
     {
+        require(_address != address(0), "invalid _address!");
         access[_address] = _status;
+        emit AccessSet(_address, _status);
     }
 }

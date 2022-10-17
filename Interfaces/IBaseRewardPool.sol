@@ -18,4 +18,5 @@ interface IBaseRewardPool is IRewards {
 
     event BoosterUpdated(address _booster);
     event OperatorUpdated(address _operator);
+    event Granted(address _address, bool _grant);
 }

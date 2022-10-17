@@ -25,12 +25,11 @@ contract QuollExternalToken is
 
         __ERC20_init_unchained(_name, _symbol);
 
-        operator = msg.sender;
-
         emit OperatorUpdated(msg.sender);
     }
 
     function setOperator(address _operator) external onlyOwner {
+        require(operator == address(0), "already set!");
         operator = _operator;
 
         emit OperatorUpdated(_operator);

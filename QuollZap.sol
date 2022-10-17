@@ -32,6 +32,10 @@ contract QuollZap is OwnableUpgradeable {
         address _wNativeRelayer,
         address _booster
     ) external onlyOwner {
+        require(_wNative != address(0), "invalid _wNative!");
+        require(_wNativeRelayer != address(0), "invalid _wNativeRelayer!");
+        require(_booster != address(0), "invalid _booster!");
+
         wNative = _wNative;
         wNativeRelayer = _wNativeRelayer;
         IERC20(wNative).safeApprove(wNativeRelayer, uint256(-1));

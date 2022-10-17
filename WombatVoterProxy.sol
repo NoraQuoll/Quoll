@@ -44,6 +44,10 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
     ) external onlyOwner {
         require(booster == address(0), "!init");
 
+        require(_masterWombat != address(0), "invalid _masterWombat!");
+        require(_booster != address(0), "invalid _booster!");
+        require(_depositor != address(0), "invalid _depositor!");
+
         masterWombat = IMasterWombatV2(_masterWombat);
         wom = masterWombat.wom();
         veWom = masterWombat.veWom();
@@ -181,16 +185,6 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         IVeWom(veWom).burn(_slot);
 
         emit WomUnlocked(_slot);
-    }
-
-    function execute(
-        address _to,
-        uint256 _value,
-        bytes calldata _data
-    ) external override onlyBooster returns (bool, bytes memory) {
-        (bool success, bytes memory result) = _to.call{value: _value}(_data);
-
-        return (success, result);
     }
 
     receive() external payable {}

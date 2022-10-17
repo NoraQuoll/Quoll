@@ -34,6 +34,7 @@ contract QuollToken is IQuollToken, ERC20Upgradeable, OwnableUpgradeable {
     }
 
     function setAccess(address _operator, bool _access) external onlyOwner {
+        require(_operator != address(0), "invalid _operator!");
         access[_operator] = _access;
 
         emit AccessUpdated(_operator, _access);
