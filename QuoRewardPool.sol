@@ -200,6 +200,7 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
         override
         updateReward(_for)
     {
+        require(_for != address(0), "invalid _for!");
         require(_amount > 0, "RewardPool : Cannot stake 0");
 
         //add supply

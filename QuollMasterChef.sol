@@ -79,6 +79,10 @@ contract QuollMasterChef is IQuollMasterChef, OwnableUpgradeable {
         require(address(quo) == address(0), "!init");
 
         require(address(_quo) != address(0), "invalid _quo!");
+        require(
+            _bonusEndBlock >= _startBlock,
+            "invalid _startBlock or _bonusEndBlock"
+        );
 
         quo = _quo;
         rewardPerBlock = _rewardPerBlock;
@@ -104,6 +108,7 @@ contract QuollMasterChef is IQuollMasterChef, OwnableUpgradeable {
         bool _withUpdate
     ) external onlyOwner {
         require(address(_lpToken) != address(0), "invalid _lpToken!");
+        _checkDuplicate(_lpToken);
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -120,6 +125,12 @@ contract QuollMasterChef is IQuollMasterChef, OwnableUpgradeable {
                 rewarder: _rewarder
             })
         );
+    }
+
+    function _checkDuplicate(IERC20 _lpToken) internal view {
+        for (uint256 i = 0; i < poolInfo.length; i++) {
+            require(_lpToken != poolInfo[i].lpToken, "existing _lpToken!");
+        }
     }
 
     // Update the given pool's QUO allocation point. Can only be called by the owner.
