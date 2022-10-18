@@ -328,6 +328,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
             //send wom to lp provider reward contract
             address rewardContract = pool.rewardPool;
+            IERC20(wom).safeApprove(rewardContract, 0);
             IERC20(wom).safeApprove(rewardContract, womBal);
             IRewards(rewardContract).queueNewRewards(wom, womBal);
 
@@ -350,6 +351,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
                             value: bonusTokenBalance
                         }(bonusToken, bonusTokenBalance);
                     } else {
+                        IERC20(bonusToken).safeApprove(rewardContract, 0);
                         IERC20(bonusToken).safeApprove(
                             rewardContract,
                             bonusTokenBalance
@@ -370,12 +372,14 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
                     vlQuoIncentiveAmount,
                     false
                 );
+                IERC20(qWom).safeApprove(vlQuo, 0);
                 IERC20(qWom).safeApprove(vlQuo, vlQuoIncentiveAmount);
                 IRewards(vlQuo).queueNewRewards(qWom, vlQuoIncentiveAmount);
             }
 
             //send wom to qWom reward contract
             if (qWomIncentiveAmount > 0) {
+                IERC20(wom).safeApprove(qWomRewardPool, 0);
                 IERC20(wom).safeApprove(qWomRewardPool, qWomIncentiveAmount);
                 IRewards(qWomRewardPool).queueNewRewards(
                     wom,
@@ -388,6 +392,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
                 IERC20(wom).safeApprove(womDepositor, 0);
                 IERC20(wom).safeApprove(womDepositor, quoIncentiveAmount);
                 IWomDepositor(womDepositor).deposit(quoIncentiveAmount, false);
+                IERC20(qWom).safeApprove(quoRewardPool, 0);
                 IERC20(qWom).safeApprove(quoRewardPool, quoIncentiveAmount);
                 IRewards(quoRewardPool).queueNewRewards(
                     qWom,
