@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.0;
+pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
@@ -15,6 +15,9 @@ contract QuollToken is IQuollToken, ERC20Upgradeable, OwnableUpgradeable {
     uint256 public maxSupply;
     uint256 public totalCliffs;
     uint256 public reductionPerCliff;
+
+    uint256 public constant FACTOR_DENOMINATOR = 10000;
+    uint256 public factor;
 
     // --- Events ---
     event AccessUpdated(address _operator, bool _access);
@@ -40,6 +43,10 @@ contract QuollToken is IQuollToken, ERC20Upgradeable, OwnableUpgradeable {
         emit AccessUpdated(_operator, _access);
     }
 
+    function setFactor(uint256 _factor) external onlyOwner {
+        factor = _factor;
+    }
+
     function mint(address _to, uint256 _amount) external override {
         require(access[msg.sender], "!auth");
 
@@ -61,6 +68,9 @@ contract QuollToken is IQuollToken, ERC20Upgradeable, OwnableUpgradeable {
             uint256 reduction = totalCliffs.sub(cliff);
             //reduce
             _amount = _amount.mul(reduction).div(totalCliffs);
+            _amount = factor == 0
+                ? _amount
+                : _amount.mul(factor).div(FACTOR_DENOMINATOR);
 
             //supply cap check
             uint256 amtTillMax = maxSupply.sub(supply);

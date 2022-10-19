@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.0;
+pragma solidity 0.6.12;
 
 interface IWombatVoterProxy {
     function getLpToken(uint256) external view returns (address);

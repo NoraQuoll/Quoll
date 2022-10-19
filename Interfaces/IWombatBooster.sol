@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.0;
+pragma solidity 0.6.12;
 
 interface IWombatBooster {
     function poolInfo(uint256)
