@@ -5,7 +5,6 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "@shared/lib-contracts/contracts/Dependencies/ManagerUpgradeable.sol";
 import "./Interfaces/IBribeManager.sol";
