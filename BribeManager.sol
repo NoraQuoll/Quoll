@@ -5,8 +5,9 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "@shared/lib-contracts/contracts/Dependencies/ManagerUpgradeable.sol";
+import "./Interfaces/IBribeManager.sol";
 import "./Interfaces/IDelegateVotePool.sol";
 import "./Interfaces/INativeZapper.sol";
 import "./Interfaces/IVirtualBalanceRewardPool.sol";
@@ -15,7 +16,7 @@ import "./Interfaces/IWombatVoterProxy.sol";
 import "./Interfaces/Wombat/IVoter.sol";
 import "./Interfaces/Wombat/IVeWom.sol";
 
-contract BribeManager is OwnableUpgradeable {
+contract BribeManager is IBribeManager, OwnableUpgradeable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -26,7 +27,7 @@ contract BribeManager is OwnableUpgradeable {
     IVlQuoV2 public vlQuoV2;
     INativeZapper public nativeZapper;
 
-    address public delegatedPool;
+    address public delegatePool;
 
     struct Pool {
         address lpToken;
@@ -66,7 +67,8 @@ contract BribeManager is OwnableUpgradeable {
         address _veWom,
         address _voterProxy,
         address _vlQuoV2,
-        address _nativeZapper
+        address _nativeZapper,
+        address _delegatePool
     ) external onlyOwner {
         require(address(voter) == address(0), "params have already been set");
 
@@ -77,18 +79,30 @@ contract BribeManager is OwnableUpgradeable {
         vlQuoV2 = IVlQuoV2(_vlQuoV2);
         nativeZapper = INativeZapper(_nativeZapper);
 
+        delegatePool = _delegatePool;
+
         castVotesCooldown = 60;
+    }
+
+    function getUserVoteForPool(address _lp, address _user)
+        public
+        view
+        override
+        returns (uint256)
+    {
+        return userVoteForPools[_user][_lp];
     }
 
     function getUserVoteForPools(address[] calldata _lps, address _user)
         external
         view
+        override
         returns (uint256[] memory votes)
     {
         uint256 length = _lps.length;
         votes = new uint256[](length);
         for (uint256 i; i < length; i++) {
-            votes[i] = userVoteForPools[_user][_lps[i]];
+            votes[i] = getUserVoteForPool(_lps[i], _user);
         }
     }
 
@@ -138,16 +152,18 @@ contract BribeManager is OwnableUpgradeable {
 
     function addPool(address _lp, address _rewarder) external onlyOwner {
         require(_lp != address(0), "_lp ZERO ADDRESS");
-        (, , , , , address gaugeManager, ) = voter.infos(_lp);
-        require(gaugeManager != address(0), "gaugeManager ZERO ADDRESS");
+        if (_lp != delegatePool) {
+            (, , , , , address gaugeManager, ) = voter.infos(_lp);
+            require(gaugeManager != address(0), "gaugeManager ZERO ADDRESS");
+        }
 
         Pool memory pool = Pool({
             lpToken: _lp,
             rewarder: _rewarder,
             isActive: true
         });
-        if (_lp != delegatedPool) {
-            pools.push(_lp); // we don't want the delegatedPool in this array
+        if (_lp != delegatePool) {
+            pools.push(_lp); // we don't want the delegatePool in this array
         }
         poolInfos[_lp] = pool;
         emit PoolAdded(_lp, _rewarder);
@@ -169,7 +185,7 @@ contract BribeManager is OwnableUpgradeable {
         emit AllVoteReset();
     }
 
-    function isPoolActive(address pool) external view returns (bool) {
+    function isPoolActive(address pool) external view override returns (bool) {
         return poolInfos[pool].isActive;
     }
 
@@ -196,13 +212,16 @@ contract BribeManager is OwnableUpgradeable {
 
     function getUserLocked(address _user) public view returns (uint256) {
         return
-            _user == delegatedPool
-                ? poolTotalVote[delegatedPool]
+            _user == delegatePool
+                ? poolTotalVote[delegatePool]
                 : vlQuoV2.balanceOf(_user);
     }
 
     /// @notice Vote on pools. Need to compute the delta prior to casting this.
-    function vote(address[] calldata _lps, int256[] calldata _deltas) external {
+    function vote(address[] calldata _lps, int256[] calldata _deltas)
+        external
+        override
+    {
         uint256 length = _lps.length;
         int256 totalUserVote;
         for (uint256 i; i < length; i++) {
@@ -240,8 +259,8 @@ contract BribeManager is OwnableUpgradeable {
                 );
             }
         }
-        if (msg.sender != delegatedPool) {
-            // this already gets updated when a user vote for the delegated pool
+        if (msg.sender != delegatePool) {
+            // this already gets updated when a user vote for the delegate pool
             if (totalUserVote > 0) {
                 totalVlQuoInVote += uint256(totalUserVote);
             } else {
@@ -255,7 +274,7 @@ contract BribeManager is OwnableUpgradeable {
     }
 
     /// @notice Unvote from an inactive pool. This makes it so that deleting a pool, or changing a rewarder doesn't block users from withdrawing
-    function unvote(address _lp) external {
+    function unvote(address _lp) external override {
         Pool memory pool = poolInfos[_lp];
         uint256 currentVote = userVoteForPools[msg.sender][pool.lpToken];
         if (currentVote == 0) {
@@ -269,7 +288,7 @@ contract BribeManager is OwnableUpgradeable {
             msg.sender,
             currentVote
         );
-        if (msg.sender != delegatedPool) {
+        if (msg.sender != delegatePool) {
             totalVlQuoInVote -= currentVote;
         }
 
@@ -360,8 +379,8 @@ contract BribeManager is OwnableUpgradeable {
     function getRewardForPools(address[] calldata _lps) external {
         uint256 length = _lps.length;
         for (uint256 i; i < length; i++) {
-            if (_lps[i] == delegatedPool) {
-                IDelegateVotePool(delegatedPool).getReward(msg.sender);
+            if (_lps[i] == delegatePool) {
+                IDelegateVotePool(delegatePool).getReward(msg.sender);
             } else {
                 IVirtualBalanceRewardPool(poolInfos[_lps[i]].rewarder)
                     .getReward(msg.sender);
@@ -373,6 +392,7 @@ contract BribeManager is OwnableUpgradeable {
     /// @notice If bribes weren't harvested, this might be lower than actual current value
     function getRewardAll()
         external
+        override
         returns (
             address[][] memory rewardTokens,
             uint256[][] memory earnedRewards
@@ -380,11 +400,11 @@ contract BribeManager is OwnableUpgradeable {
     {
         address[] memory delegatePoolRewardTokens;
         uint256[] memory delegatePoolRewardAmounts;
-        if (userVoteForPools[msg.sender][delegatedPool] > 0) {
+        if (userVoteForPools[msg.sender][delegatePool] > 0) {
             (
                 delegatePoolRewardTokens,
                 delegatePoolRewardAmounts
-            ) = IDelegateVotePool(delegatedPool).getReward(msg.sender);
+            ) = IDelegateVotePool(delegatePool).getReward(msg.sender);
         }
         uint256 length = pools.length;
         rewardTokens = new address[][](length + 1);

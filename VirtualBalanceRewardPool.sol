@@ -50,6 +50,9 @@ contract VirtualBalanceRewardPool is
         __Ownable_init();
 
         operator = _operator;
+
+        access[operator] = true;
+
         emit OperatorUpdated(_operator);
     }
 
