@@ -80,6 +80,10 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
 
     mapping(address => bool) public access;
 
+    mapping(address => uint256) public userLastTime;
+
+    mapping(address => uint256) public userAmountTime;
+
     function initialize() public initializer {
         __Ownable_init();
     }
@@ -142,6 +146,9 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
                 .rewardPerTokenStored;
         }
 
+        userAmountTime[_account] = getUserAmountTime(_account);
+        userLastTime[_account] = now;
+
         _;
     }
 
@@ -175,6 +182,23 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
                 )
                 .div(1e18)
                 .add(userReward.rewards);
+    }
+
+    function getUserAmountTime(address _account)
+        public
+        view
+        override
+        returns (uint256)
+    {
+        uint256 lastTime = userLastTime[_account];
+        if (lastTime == 0) {
+            return 0;
+        }
+        uint256 userBalance = _balances[_account];
+        if (userBalance == 0) {
+            return userAmountTime[_account];
+        }
+        return userAmountTime[_account].add(now.sub(lastTime).mul(userBalance));
     }
 
     function stake(uint256 _amount) public override updateReward(msg.sender) {

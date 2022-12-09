@@ -6,9 +6,12 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+import "./Interfaces/IVirtualBalanceRewardPool.sol";
 import "./Interfaces/IWombatVoterProxy.sol";
+import "./Interfaces/Wombat/IBribe.sol";
 import "./Interfaces/Wombat/IMasterWombatV2.sol";
 import "./Interfaces/Wombat/IVeWom.sol";
+import "./Interfaces/Wombat/IVoter.sol";
 import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
 
 contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
@@ -22,6 +25,13 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
 
     address public booster;
     address public depositor;
+
+    IVoter public voter;
+    address public bribeManager;
+    uint256 constant FEE_DENOMINATOR = 10000;
+    uint256 public bribeCallerFee;
+    uint256 public bribeProtocolFee;
+    address public bribeFeeCollector;
 
     modifier onlyBooster() {
         require(msg.sender == booster, "!auth");
@@ -57,6 +67,42 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
 
         emit BoosterUpdated(_booster);
         emit DepositorUpdated(_depositor);
+    }
+
+    function setVoter(address _voter) external onlyOwner {
+        require(_voter != address(0), "invalid _voter!");
+
+        voter = IVoter(_voter);
+    }
+
+    function setBribeManager(address _bribeManager) external onlyOwner {
+        require(_bribeManager != address(0), "invald _bribeManager!");
+
+        bribeManager = _bribeManager;
+    }
+
+    function setBribeCallerFee(uint256 _bribeCallerFee) external onlyOwner {
+        require(_bribeCallerFee < FEE_DENOMINATOR, "invalid _bribeCallerFee!");
+        bribeCallerFee = _bribeCallerFee;
+    }
+
+    function setBribeProtocolFee(uint256 _bribeProtocolFee) external onlyOwner {
+        require(
+            _bribeProtocolFee < FEE_DENOMINATOR,
+            "invalid _bribeProtocolFee!"
+        );
+        bribeProtocolFee = _bribeProtocolFee;
+    }
+
+    function setBribeFeeCollector(address _bribeFeeCollector)
+        external
+        onlyOwner
+    {
+        require(
+            _bribeFeeCollector != address(0),
+            "invalid _bribeFeeCollector!"
+        );
+        bribeFeeCollector = _bribeFeeCollector;
     }
 
     function getLpToken(uint256 _pid) external view override returns (address) {
@@ -185,6 +231,111 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         IVeWom(veWom).burn(_slot);
 
         emit WomUnlocked(_slot);
+    }
+
+    function vote(
+        address[] calldata _lpVote,
+        int256[] calldata _deltas,
+        address[] calldata _rewarders,
+        address _caller
+    )
+        external
+        override
+        returns (address[][] memory rewardTokens, uint256[][] memory feeAmounts)
+    {
+        require(msg.sender == bribeManager, "!auth");
+        uint256 length = _lpVote.length;
+        require(length == _rewarders.length, "Not good rewarder length");
+        uint256[][] memory bribeRewards = voter.vote(_lpVote, _deltas);
+
+        rewardTokens = new address[][](length);
+        feeAmounts = new uint256[][](length);
+
+        for (uint256 i = 0; i < length; i++) {
+            uint256[] memory rewardAmounts = bribeRewards[i];
+            (, , , , , , address bribesContract) = voter.infos(_lpVote[i]);
+            feeAmounts[i] = new uint256[](rewardAmounts.length);
+            if (bribesContract != address(0)) {
+                rewardTokens[i] = IBribe(bribesContract).rewardTokens();
+                for (uint256 j = 0; j < rewardAmounts.length; j++) {
+                    uint256 rewardAmount = rewardAmounts[j];
+                    if (rewardAmount > 0) {
+                        uint256 protocolFee = rewardAmount
+                            .mul(bribeProtocolFee)
+                            .div(FEE_DENOMINATOR);
+                        if (protocolFee > 0) {
+                            IERC20(rewardTokens[i][j]).safeTransfer(
+                                bribeFeeCollector,
+                                protocolFee
+                            );
+                        }
+                        if (_caller != address(0) && bribeCallerFee != 0) {
+                            uint256 feeAmount = rewardAmount
+                                .mul(bribeCallerFee)
+                                .div(FEE_DENOMINATOR);
+                            IERC20(rewardTokens[i][j]).safeTransfer(
+                                bribeManager,
+                                feeAmount
+                            );
+                            rewardAmount -= feeAmount;
+                            feeAmounts[i][j] = feeAmount;
+                        }
+                        rewardAmount -= protocolFee;
+                        _approveTokenIfNeeded(
+                            rewardTokens[i][j],
+                            _rewarders[i],
+                            rewardAmount
+                        );
+                        IVirtualBalanceRewardPool(_rewarders[i])
+                            .queueNewRewards(rewardTokens[i][j], rewardAmount);
+                    }
+                }
+            }
+        }
+
+        emit Voted(_lpVote, _deltas, _rewarders, _caller);
+    }
+
+    function pendingBribeCallerFee(address[] calldata _pendingPools)
+        external
+        view
+        override
+        returns (
+            address[][] memory rewardTokens,
+            uint256[][] memory callerFeeAmount
+        )
+    {
+        // Warning: Arguments do not take into account repeated elements in the pendingPools list
+        uint256[][] memory pending = voter.pendingBribes(
+            _pendingPools,
+            address(this)
+        );
+        uint256 length = pending.length;
+        rewardTokens = new address[][](length);
+        callerFeeAmount = new uint256[][](length);
+        for (uint256 i; i < length; i++) {
+            (, , , , , , address bribesContract) = voter.infos(
+                _pendingPools[i]
+            );
+            rewardTokens[i] = IBribe(bribesContract).rewardTokens();
+            callerFeeAmount[i] = new uint256[](rewardTokens[i].length);
+            for (uint256 j; j < pending[i].length; j++) {
+                callerFeeAmount[i][j] = pending[i][j].mul(bribeCallerFee).div(
+                    FEE_DENOMINATOR
+                );
+            }
+        }
+    }
+
+    function _approveTokenIfNeeded(
+        address _token,
+        address _to,
+        uint256 _amount
+    ) internal {
+        if (IERC20(_token).allowance(address(this), _to) < _amount) {
+            IERC20(_token).safeApprove(_to, 0);
+            IERC20(_token).safeApprove(_to, type(uint256).max);
+        }
     }
 
     receive() external payable {}

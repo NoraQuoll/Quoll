@@ -3,6 +3,11 @@
 pragma solidity 0.6.12;
 
 interface IPool {
+    function addressOfAsset(address token)
+        external
+        view
+        returns (address);
+
     function deposit(
         address token,
         uint256 amount,

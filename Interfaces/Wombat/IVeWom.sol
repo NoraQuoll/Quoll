@@ -29,4 +29,6 @@ interface IVeWom {
         returns (uint256 veWomAmount);
 
     function burn(uint256 slot) external;
+
+    function usedVote(address) external view returns (uint256);
 }

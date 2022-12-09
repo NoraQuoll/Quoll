@@ -2,24 +2,18 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./IRewards.sol";
 
-interface IRewards {
-    function stakingToken() external view returns (IERC20);
-
+interface IVirtualBalanceRewardPool {
     function totalSupply() external view returns (uint256);
 
     function balanceOf(address account) external view returns (uint256);
 
-    function stake(uint256) external;
+    function stakeFor(address _for, uint256 _amount) external;
 
-    function stakeAll() external;
+    function withdrawFor(address _account, uint256 _amount) external;
 
-    function stakeFor(address, uint256) external;
-
-    function withdraw(uint256) external;
-
-    function withdrawAll() external;
+    function getReward(address _account) external;
 
     function donate(address, uint256) external payable;
 
@@ -34,6 +28,8 @@ interface IRewards {
     function getRewardTokensLength() external view returns (uint256);
 
     function setAccess(address _address, bool _status) external;
+
+    event OperatorUpdated(address _operator);
 
     event RewardTokenAdded(address indexed _rewardToken);
     event RewardAdded(address indexed _rewardToken, uint256 _reward);

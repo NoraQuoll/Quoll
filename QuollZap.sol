@@ -104,6 +104,19 @@ contract QuollZap is OwnableUpgradeable {
         }
     }
 
+    function withdraw(uint256 _pid, uint256 _amount) external {
+        (address lptoken, address token, , address rewardPool, ) = booster
+            .poolInfo(_pid);
+        IBaseRewardPool(rewardPool).withdrawFor(msg.sender, _amount);
+        IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
+        uint256 lptokenBal = IERC20(lptoken).balanceOf(address(this));
+        booster.withdraw(_pid, _amount);
+        uint256 lptokenAmount = IERC20(lptoken).balanceOf(address(this)).sub(
+            lptokenBal
+        );
+        IERC20(lptoken).safeTransfer(msg.sender, lptokenAmount);
+    }
+
     function zapOut(
         uint256 _pid,
         uint256 _amount,

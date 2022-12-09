@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.6.12;
+pragma experimental ABIEncoderV2;
 
 interface IWombatVoterProxy {
     function getLpToken(uint256) external view returns (address);
@@ -18,6 +19,26 @@ interface IWombatVoterProxy {
     function balanceOfPool(uint256) external view returns (uint256);
 
     function lockWom(uint256) external;
+
+    function vote(
+        address[] calldata _lpVote,
+        int256[] calldata _deltas,
+        address[] calldata _rewarders,
+        address _caller
+    )
+        external
+        returns (
+            address[][] memory rewardTokens,
+            uint256[][] memory feeAmounts
+        );
+
+    function pendingBribeCallerFee(address[] calldata _pendingPools)
+        external
+        view
+        returns (
+            address[][] memory rewardTokens,
+            uint256[][] memory callerFeeAmount
+        );
 
     // --- Events ---
     event BoosterUpdated(address _booster);
@@ -37,4 +58,11 @@ interface IWombatVoterProxy {
 
     event WomLocked(uint256 _amount, uint256 _lockDays);
     event WomUnlocked(uint256 _slot);
+
+    event Voted(
+        address[] _lpVote,
+        int256[] _deltas,
+        address[] _rewarders,
+        address _caller
+    );
 }
