@@ -6,12 +6,13 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+import "./Interfaces/ISmartConvertor.sol";
 import "./Interfaces/IWomDepositor.sol";
 import "./Interfaces/Wombat/IWombatRouter.sol";
 import "./Interfaces/Wombat/IAsset.sol";
 import "./Interfaces/Wombat/IPool.sol";
 
-contract SmartConvertor is OwnableUpgradeable {
+contract SmartConvertor is ISmartConvertor, OwnableUpgradeable {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
@@ -211,6 +212,7 @@ contract SmartConvertor is OwnableUpgradeable {
 
     function deposit(uint256 _amount)
         external
+        override
         returns (uint256 obtainedAmount)
     {
         obtainedAmount = _depositFor(_amount, msg.sender);
@@ -218,6 +220,7 @@ contract SmartConvertor is OwnableUpgradeable {
 
     function depositFor(uint256 _amount, address _for)
         external
+        override
         returns (uint256 obtainedAmount)
     {
         obtainedAmount = _depositFor(_amount, _for);

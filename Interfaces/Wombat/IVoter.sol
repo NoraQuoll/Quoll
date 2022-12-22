@@ -4,6 +4,8 @@ pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
 interface IVoter {
+    function veWom() external view returns (address);
+
     function infos(address)
         external
         view

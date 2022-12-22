@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "./Interfaces/IBaseRewardPool.sol";
+import "./Interfaces/IVlQuoV2.sol";
 
 contract VlQuo is OwnableUpgradeable {
     using SafeERC20 for IERC20;
@@ -51,6 +52,8 @@ contract VlQuo is OwnableUpgradeable {
 
     mapping(address => bool) public access;
 
+    IVlQuoV2 public vlQuoV2;
+
     event LockCreated(address indexed _user, uint256 _amount, uint256 _weeks);
 
     event LockExtended(
@@ -77,6 +80,8 @@ contract VlQuo is OwnableUpgradeable {
     );
 
     event AccessSet(address indexed _address, bool _status);
+
+    event Migrated(address indexed _user, uint256 _amount, uint256 _weeks);
 
     function initialize() public initializer {
         __Ownable_init();
@@ -108,6 +113,15 @@ contract VlQuo is OwnableUpgradeable {
 
         booster = _booster;
         setAccess(_booster, true);
+    }
+
+    function setVlQuoV2(address _vlQuoV2) external onlyOwner {
+        require(_vlQuoV2 != address(0), "invalid _vlQuoV2!");
+
+        vlQuoV2 = IVlQuoV2(_vlQuoV2);
+
+        quo.safeApprove(_vlQuoV2, 0);
+        quo.safeApprove(_vlQuoV2, type(uint256).max);
     }
 
     function userWeight(address _user) external view returns (uint256) {
@@ -274,6 +288,31 @@ contract VlQuo is OwnableUpgradeable {
         userLockData[msg.sender].lastUnlockedWeek = lastUnlockedWeek;
 
         emit Unlocked(msg.sender, amount, lastUnlockedWeek);
+    }
+
+    function migrate() external {
+        uint256 nextWeek = _getNextWeek();
+
+        LockData storage data = userLockData[msg.sender];
+
+        for (uint256 i = 0; i <= MAX_LOCK_WEEKS; i++) {
+            uint256 cur = nextWeek.add(i.mul(WEEK));
+            if (data.weeklyWeight[cur] > 0) {
+                weeklyTotalWeight[cur] = weeklyTotalWeight[cur].sub(
+                    data.weeklyWeight[cur]
+                );
+                data.weeklyWeight[cur] = 0;
+            }
+            uint256 unlockAmount = data.weeklyUnlock[cur];
+            if (i == 0 || unlockAmount == 0) {
+                continue;
+            }
+
+            vlQuoV2.lock(msg.sender, unlockAmount, i);
+            data.weeklyUnlock[cur] = 0;
+
+            emit Migrated(msg.sender, unlockAmount, i);
+        }
     }
 
     function _getCurWeek() internal view returns (uint256) {

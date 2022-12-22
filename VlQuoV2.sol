@@ -3,6 +3,7 @@
 pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
+import "@openzeppelin/contracts/math/Math.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -10,6 +11,7 @@ import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol
 import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 
 import "./Interfaces/IVlQuoV2.sol";
+import "./Interfaces/IBribeManager.sol";
 
 contract VlQuoV2 is
     IVlQuoV2,
@@ -22,7 +24,15 @@ contract VlQuoV2 is
 
     IERC20 public quo;
 
+    IBribeManager public bribeManager;
+
+    address public treasury;
+
     uint256 public maxLockLength;
+
+    uint256 public constant FEE_DENOMINATOR = 10000;
+    uint256 public unlockGracePeriod;
+    uint256 public unlockPunishment;
 
     uint256 public constant WEEK = 86400 * 7;
     uint256 public constant MAX_LOCK_WEEKS = 52;
@@ -80,14 +90,31 @@ contract VlQuoV2 is
 
     event AccessSet(address indexed _address, bool _status);
 
-    function initialize(address _quo) external initializer {
+    function initialize() external initializer {
         __Ownable_init();
         __ReentrancyGuard_init_unchained();
         __Pausable_init_unchained();
+    }
+
+    function setParams(
+        address _quo,
+        address _bribeManager,
+        address _treasury
+    ) external onlyOwner {
+        require(address(quo) == address(0), "params have already been set");
+
+        require(_quo != address(0), "invalid _quo!");
+        require(_bribeManager != address(0), "invalid _bribeManager!");
+        require(_treasury != address(0), "invalid _treasury!");
 
         quo = IERC20(_quo);
+        bribeManager = IBribeManager(_bribeManager);
+        treasury = _treasury;
 
         maxLockLength = 10000;
+
+        unlockGracePeriod = 14 days;
+        unlockPunishment = 300;
     }
 
     function pause() external onlyOwner {
@@ -102,6 +129,17 @@ contract VlQuoV2 is
         maxLockLength = _maxLockLength;
     }
 
+    function setUnlockGracePeriod(uint256 _unlockGracePeriod)
+        external
+        onlyOwner
+    {
+        unlockGracePeriod = _unlockGracePeriod;
+    }
+
+    function setUnlockPunishment(uint256 _unlockPunishment) external onlyOwner {
+        unlockPunishment = _unlockPunishment;
+    }
+
     // Allow or block third-party calls on behalf of the caller
     function setBlockThirdPartyActions(bool _block) external {
         blockThirdPartyActions[msg.sender] = _block;
@@ -111,7 +149,7 @@ contract VlQuoV2 is
         return _totalSupply;
     }
 
-    function balanceOf(address _user) external view override returns (uint256) {
+    function balanceOf(address _user) public view override returns (uint256) {
         return _balances[_user];
     }
 
@@ -127,7 +165,7 @@ contract VlQuoV2 is
         address _user,
         uint256 _amount,
         uint256 _weeks
-    ) external nonReentrant whenNotPaused {
+    ) external override nonReentrant whenNotPaused {
         require(_user != address(0), "invalid _user!");
         require(
             msg.sender == _user || !blockThirdPartyActions[_user],
@@ -170,16 +208,37 @@ contract VlQuoV2 is
         LockInfo memory lockInfo = userLocks[msg.sender][_slot];
         require(lockInfo.unlockTime <= block.timestamp, "not yet meh");
 
+        uint256 punishment;
+        if (block.timestamp > lockInfo.unlockTime.add(unlockGracePeriod)) {
+            punishment = block
+                .timestamp
+                .sub(lockInfo.unlockTime.add(unlockGracePeriod))
+                .div(WEEK)
+                .add(1)
+                .mul(unlockPunishment)
+                .mul(lockInfo.quoAmount)
+                .div(FEE_DENOMINATOR);
+            punishment = Math.min(punishment, lockInfo.quoAmount);
+        }
+
         // remove slot
         if (_slot != length - 1) {
             userLocks[msg.sender][_slot] = userLocks[msg.sender][length - 1];
         }
         userLocks[msg.sender].pop();
 
-        quo.transfer(msg.sender, lockInfo.quoAmount);
+        if (punishment > 0) {
+            quo.transfer(treasury, punishment);
+        }
+        quo.transfer(msg.sender, lockInfo.quoAmount.sub(punishment));
 
         _totalSupply -= lockInfo.vlQuoAmount;
         _balances[msg.sender] -= lockInfo.vlQuoAmount;
+
+        require(
+            bribeManager.getUserTotalVote(msg.sender) <= balanceOf(msg.sender),
+            "Too much vote cast"
+        );
 
         emit Unlocked(
             msg.sender,
@@ -189,7 +248,7 @@ contract VlQuoV2 is
         );
     }
 
-    function getReward() external {
+    function getReward() external nonReentrant {
         uint256 userLastClaimedWeek = lastClaimedWeek[msg.sender];
         if (
             userLastClaimedWeek == 0 ||

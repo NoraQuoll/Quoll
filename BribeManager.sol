@@ -64,7 +64,6 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
 
     function setParams(
         address _voter,
-        address _veWom,
         address _voterProxy,
         address _vlQuoV2,
         address _nativeZapper,
@@ -72,8 +71,14 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
     ) external onlyOwner {
         require(address(voter) == address(0), "params have already been set");
 
+        require(_voter != address(0), "invalid _voter!");
+        require(_voterProxy != address(0), "invalid _voterProxy!");
+        require(_vlQuoV2 != address(0), "invalid _vlQuoV2!");
+        require(_nativeZapper != address(0), "invalid _nativeZapper!");
+        require(_delegatePool != address(0), "invalid _delegatePool!");
+
         voter = IVoter(_voter);
-        veWom = IVeWom(_veWom);
+        veWom = IVeWom(voter.veWom());
 
         voterProxy = IWombatVoterProxy(_voterProxy);
         vlQuoV2 = IVlQuoV2(_vlQuoV2);
@@ -82,6 +87,15 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
         delegatePool = _delegatePool;
 
         castVotesCooldown = 60;
+    }
+
+    function getUserTotalVote(address _user)
+        external
+        view
+        override
+        returns (uint256)
+    {
+        return userTotalVote[_user];
     }
 
     function getUserVoteForPool(address _lp, address _user)

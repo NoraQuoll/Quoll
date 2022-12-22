@@ -6,6 +6,8 @@ pragma experimental ABIEncoderV2;
 interface IBribeManager {
     function isPoolActive(address pool) external view returns (bool);
 
+    function getUserTotalVote(address _user) external view returns (uint256);
+
     function getUserVoteForPool(address _lp, address _user)
         external
         view

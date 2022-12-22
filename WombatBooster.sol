@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+import "./Interfaces/ISmartConvertor.sol";
 import "./Interfaces/IWombatBooster.sol";
 import "./Interfaces/IWombatVoterProxy.sol";
 import "./Interfaces/IDepositToken.sol";
@@ -49,6 +50,8 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
     address public womDepositor;
     address public qWom;
+
+    address public smartConvertor;
 
     function initialize() public initializer {
         __Ownable_init();
@@ -138,6 +141,10 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
     function setTreasury(address _treasury) external onlyOwner {
         treasury = _treasury;
+    }
+
+    function setSmartConvertor(address _smartConvertor) external onlyOwner {
+        smartConvertor = _smartConvertor;
     }
 
     /// END SETTER SECTION ///
@@ -366,15 +373,10 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
             //send qWom to vlQuo
             if (vlQuoIncentiveAmount > 0) {
-                IERC20(wom).safeApprove(womDepositor, 0);
-                IERC20(wom).safeApprove(womDepositor, vlQuoIncentiveAmount);
-                IWomDepositor(womDepositor).deposit(
-                    vlQuoIncentiveAmount,
-                    false
-                );
-                IERC20(qWom).safeApprove(vlQuo, 0);
-                IERC20(qWom).safeApprove(vlQuo, vlQuoIncentiveAmount);
-                IRewards(vlQuo).queueNewRewards(qWom, vlQuoIncentiveAmount);
+                uint256 qWomAmount = _convertWomToQWom(vlQuoIncentiveAmount);
+
+                _approveTokenIfNeeded(qWom, vlQuo, qWomAmount);
+                IRewards(vlQuo).queueNewRewards(qWom, qWomAmount);
             }
 
             //send wom to qWom reward contract
@@ -389,15 +391,10 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
             //send qWom to quo reward contract
             if (quoIncentiveAmount > 0) {
-                IERC20(wom).safeApprove(womDepositor, 0);
-                IERC20(wom).safeApprove(womDepositor, quoIncentiveAmount);
-                IWomDepositor(womDepositor).deposit(quoIncentiveAmount, false);
-                IERC20(qWom).safeApprove(quoRewardPool, 0);
-                IERC20(qWom).safeApprove(quoRewardPool, quoIncentiveAmount);
-                IRewards(quoRewardPool).queueNewRewards(
-                    qWom,
-                    quoIncentiveAmount
-                );
+                uint256 qWomAmount = _convertWomToQWom(quoIncentiveAmount);
+
+                _approveTokenIfNeeded(qWom, quoRewardPool, qWomAmount);
+                IRewards(quoRewardPool).queueNewRewards(qWom, qWomAmount);
             }
         }
     }
@@ -433,6 +430,28 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
         //mint reward tokens
         IQuollToken(quo).mint(_account, _amount);
+    }
+
+    function _convertWomToQWom(uint256 _amount) internal returns (uint256) {
+        if (smartConvertor != address(0)) {
+            _approveTokenIfNeeded(wom, smartConvertor, _amount);
+            return ISmartConvertor(smartConvertor).deposit(_amount);
+        } else {
+            _approveTokenIfNeeded(wom, womDepositor, _amount);
+            IWomDepositor(womDepositor).deposit(_amount, false);
+            return _amount;
+        }
+    }
+
+    function _approveTokenIfNeeded(
+        address _token,
+        address _to,
+        uint256 _amount
+    ) internal {
+        if (IERC20(_token).allowance(address(this), _to) < _amount) {
+            IERC20(_token).safeApprove(_to, 0);
+            IERC20(_token).safeApprove(_to, type(uint256).max);
+        }
     }
 
     receive() external payable {}
