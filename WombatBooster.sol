@@ -405,7 +405,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         require(pool.shutdown == false, "pool is closed");
 
         //claim wom and bonus token rewards
-        IWombatVoterProxy(voterProxy).claimRewards(_pid);
+        IWombatVoterProxy(voterProxy).claimRewards(pool.masterWombatPid);
 
         _earmarkRewards(_pid);
         return true;
