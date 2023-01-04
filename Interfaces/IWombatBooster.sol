@@ -2,6 +2,8 @@
 pragma solidity 0.6.12;
 
 interface IWombatBooster {
+    function poolLength() external view returns (uint256);
+
     function poolInfo(uint256)
         external
         view
@@ -39,4 +41,9 @@ interface IWombatBooster {
         uint256 _amount
     );
     event WomClaimed(uint256 _pid, uint256 _amount);
+    event EarmarkIncentiveSent(
+        uint256 _pid,
+        address indexed _caller,
+        uint256 _amount
+    );
 }

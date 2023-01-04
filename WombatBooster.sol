@@ -53,6 +53,8 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
     address public smartConvertor;
 
+    uint256 public earmarkIncentive;
+
     function initialize() public initializer {
         __Ownable_init();
     }
@@ -147,9 +149,17 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         smartConvertor = _smartConvertor;
     }
 
+    function setEarmarkIncentive(uint256 _earmarkIncentive) external onlyOwner {
+        require(
+            _earmarkIncentive >= 10 && _earmarkIncentive <= 100,
+            "invalid _earmarkIncentive"
+        );
+        earmarkIncentive = _earmarkIncentive;
+    }
+
     /// END SETTER SECTION ///
 
-    function poolLength() external view returns (uint256) {
+    function poolLength() external view override returns (uint256) {
         return poolInfo.length;
     }
 
@@ -190,7 +200,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         //withdraw from gauge
         IWombatVoterProxy(voterProxy).withdrawAll(pool.masterWombatPid);
         // rewards are claimed when withdrawing
-        _earmarkRewards(_pid);
+        _earmarkRewards(_pid, address(0));
 
         pool.shutdown = true;
         return true;
@@ -230,7 +240,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         IWombatVoterProxy(voterProxy).deposit(pool.masterWombatPid, _amount);
 
         // rewards are claimed when depositing
-        _earmarkRewards(_pid);
+        _earmarkRewards(_pid, address(0));
 
         address token = pool.token;
         if (_stake) {
@@ -278,7 +288,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
                 _amount
             );
             // rewards are claimed when withdrawing
-            _earmarkRewards(_pid);
+            _earmarkRewards(_pid, address(0));
         }
 
         //return lp tokens
@@ -300,7 +310,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     }
 
     // disperse wom and extra rewards to reward contracts
-    function _earmarkRewards(uint256 _pid) internal {
+    function _earmarkRewards(uint256 _pid, address _caller) internal {
         PoolInfo memory pool = poolInfo[_pid];
         //wom balance
         uint256 womBal = IERC20(wom).balanceOf(address(this));
@@ -317,6 +327,22 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
                 FEE_DENOMINATOR
             );
 
+            uint256 earmarkIncentiveAmount = 0;
+            if (_caller != address(0) && earmarkIncentive > 0) {
+                earmarkIncentiveAmount = womBal.mul(earmarkIncentive).div(
+                    FEE_DENOMINATOR
+                );
+
+                //send incentives for calling
+                IERC20(wom).safeTransfer(msg.sender, earmarkIncentiveAmount);
+
+                emit EarmarkIncentiveSent(
+                    _pid,
+                    msg.sender,
+                    earmarkIncentiveAmount
+                );
+            }
+
             //send treasury
             if (platformFee > 0) {
                 //only subtract after address condition check
@@ -331,7 +357,8 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
             womBal = womBal
                 .sub(vlQuoIncentiveAmount)
                 .sub(qWomIncentiveAmount)
-                .sub(quoIncentiveAmount);
+                .sub(quoIncentiveAmount)
+                .sub(earmarkIncentiveAmount);
 
             //send wom to lp provider reward contract
             address rewardContract = pool.rewardPool;
@@ -407,7 +434,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         //claim wom and bonus token rewards
         IWombatVoterProxy(voterProxy).claimRewards(pool.masterWombatPid);
 
-        _earmarkRewards(_pid);
+        _earmarkRewards(_pid, msg.sender);
         return true;
     }
 

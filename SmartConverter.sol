@@ -153,12 +153,15 @@ contract SmartConvertor is ISmartConvertor, OwnableUpgradeable {
             if (amountToBuy > maxAmountToRespectPriceImpact) {
                 amountToBuy = maxAmountToRespectPriceImpact;
             }
+            if (amountToBuy == 0) {
+                return minimumEstimatedTotal;
+            }
             uint256 estimatedOutAmount = estimateOutAmount(amountToBuy);
             if (amountToBuy < estimatedOutAmount) {
-                minimumEstimatedTotal -= amountToBuy;
-                minimumEstimatedTotal +=
-                    (estimatedOutAmount * (DENOMINATOR - slippagePct)) /
-                    DENOMINATOR;
+                minimumEstimatedTotal = minimumEstimatedTotal.sub(amountToBuy);
+                minimumEstimatedTotal = minimumEstimatedTotal.add(
+                    estimatedOutAmount
+                );
             }
         }
     }
@@ -198,12 +201,12 @@ contract SmartConvertor is ISmartConvertor, OwnableUpgradeable {
                         obtainedAmount > amountToBuy,
                         "Transaction is disadvantageous"
                     );
-                    amountToConvert -= amountToBuy;
+                    amountToConvert = amountToConvert.sub(amountToBuy);
                 }
             }
         }
         if (amountToConvert > 0) {
-            obtainedAmount += amountToConvert;
+            obtainedAmount = obtainedAmount.add(amountToConvert);
             IWomDepositor(womDepositor).deposit(amountToConvert, false);
             IERC20(qWom).safeTransfer(_for, amountToConvert);
         }

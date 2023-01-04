@@ -18,12 +18,7 @@ contract NativeZapper is INativeZapper, OwnableUpgradeable {
     IPancakeRouter02 public pancakeRouter;
     IPancakePath public pancakePath;
 
-    event ZapIn(
-        address indexed _from,
-        uint256 _amount,
-        address indexed _receiver,
-        uint256 _amountOut
-    );
+    mapping(address => bool) public access;
 
     function initialize() public initializer {
         __Ownable_init();
@@ -59,13 +54,22 @@ contract NativeZapper is INativeZapper, OwnableUpgradeable {
         uint256 _amount,
         address _receiver
     ) external override returns (uint256 nativeAmount) {
+        require(access[msg.sender], "!auth");
+
         if (_amount > 0) {
             _approveTokenIfNeeded(_from, _amount);
-            IERC20(_from).transferFrom(msg.sender, address(this), _amount);
+            IERC20(_from).safeTransferFrom(msg.sender, address(this), _amount);
             nativeAmount = _swapTokenForNative(_from, _amount, _receiver);
 
             emit ZapIn(_from, _amount, _receiver, nativeAmount);
         }
+    }
+
+    function setAccess(address _address, bool _status) external onlyOwner {
+        require(_address != address(0), "invalid _address!");
+
+        access[_address] = _status;
+        emit AccessSet(_address, _status);
     }
 
     function _approveTokenIfNeeded(address _token, uint256 _amount) internal {

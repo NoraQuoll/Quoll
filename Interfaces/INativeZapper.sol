@@ -13,4 +13,12 @@ interface INativeZapper {
         uint256 _amount,
         address _receiver
     ) external returns (uint256 nativeAmount);
+
+    event ZapIn(
+        address indexed _from,
+        uint256 _amount,
+        address indexed _receiver,
+        uint256 _amountOut
+    );
+    event AccessSet(address indexed _address, bool _status);
 }

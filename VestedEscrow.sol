@@ -40,6 +40,7 @@ contract VestedEscrow is ManagerUpgradeable {
 
         require(_token != address(0), "invalid _token!");
         require(_lockPercent <= PRECISION, "invalid _lockPercent!");
+        require(_releaseDuration > 0, "invalid _releaseDuration!");
 
         token = IERC20(_token);
         startTime = _startTime;

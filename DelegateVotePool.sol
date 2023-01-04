@@ -7,12 +7,14 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 import "@shared/lib-contracts/contracts/Dependencies/ManagerUpgradeable.sol";
+import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
 import "./Interfaces/IBribeManager.sol";
 import "./Interfaces/IVirtualBalanceRewardPool.sol";
 
 contract DelegateVotePool is ManagerUpgradeable {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
+    using TransferHelper for address;
 
     address public bribeManager;
     IVirtualBalanceRewardPool public rewardPool;
@@ -67,15 +69,22 @@ contract DelegateVotePool is ManagerUpgradeable {
                     uint256 fee = protocolFee.mul(earnedReward).div(
                         DENOMINATOR
                     );
-                    IERC20(rewardToken).safeTransfer(feeCollector, fee);
+                    rewardToken.safeTransferToken(feeCollector, fee);
                     earnedReward = earnedReward.sub(fee);
                 }
-                _approveTokenIfNeeded(
-                    rewardToken,
-                    address(rewardPool),
-                    earnedReward
-                );
-                rewardPool.queueNewRewards(rewardToken, earnedReward);
+                if (AddressLib.isPlatformToken(rewardToken)) {
+                    rewardPool.queueNewRewards{value: earnedReward}(
+                        rewardToken,
+                        earnedReward
+                    );
+                } else {
+                    _approveTokenIfNeeded(
+                        rewardToken,
+                        address(rewardPool),
+                        earnedReward
+                    );
+                    rewardPool.queueNewRewards(rewardToken, earnedReward);
+                }
             }
         }
         _;
@@ -226,4 +235,6 @@ contract DelegateVotePool is ManagerUpgradeable {
             IERC20(_token).safeApprove(_to, type(uint256).max);
         }
     }
+
+    receive() external payable {}
 }

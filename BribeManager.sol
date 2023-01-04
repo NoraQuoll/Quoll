@@ -4,9 +4,11 @@ pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/math/SignedSafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
 import "./Interfaces/IBribeManager.sol";
 import "./Interfaces/IDelegateVotePool.sol";
 import "./Interfaces/INativeZapper.sol";
@@ -18,6 +20,7 @@ import "./Interfaces/Wombat/IVeWom.sol";
 
 contract BribeManager is IBribeManager, OwnableUpgradeable {
     using SafeMath for uint256;
+    using SignedSafeMath for int256;
     using SafeERC20 for IERC20;
 
     IVoter public voter;
@@ -45,18 +48,6 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
     uint256 public totalVlQuoInVote;
     uint256 public lastCastTimer;
     uint256 public castVotesCooldown;
-
-    event PoolAdded(address indexed _lp, address indexed _rewarder);
-
-    event VoteReset(address indexed _lp);
-
-    event AllVoteReset();
-
-    event VoteUpdated(
-        address indexed _user,
-        address indexed _lp,
-        uint256 _amount
-    );
 
     function initialize() public initializer {
         __Ownable_init();
@@ -195,7 +186,7 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
             votes[i] = -int256(getVeWomVoteForLp(pool.lpToken));
             rewarders[i] = pool.rewarder;
         }
-        voterProxy.vote(lpVote, votes, rewarders, owner());
+        voterProxy.vote(lpVote, votes, rewarders, address(0));
         emit AllVoteReset();
     }
 
@@ -242,23 +233,33 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
             Pool memory pool = poolInfos[_lps[i]];
             require(pool.isActive, "Not active");
             int256 delta = _deltas[i];
-            totalUserVote += delta;
+            totalUserVote = totalUserVote.add(delta);
             if (delta != 0) {
                 if (delta > 0) {
-                    poolTotalVote[pool.lpToken] += uint256(delta);
-                    userTotalVote[msg.sender] += uint256(delta);
-                    userVoteForPools[msg.sender][pool.lpToken] += uint256(
-                        delta
+                    poolTotalVote[pool.lpToken] = poolTotalVote[pool.lpToken]
+                        .add(uint256(delta));
+                    userTotalVote[msg.sender] = userTotalVote[msg.sender].add(
+                        uint256(delta)
+                    );
+                    userVoteForPools[msg.sender][
+                        pool.lpToken
+                    ] = userVoteForPools[msg.sender][pool.lpToken].add(
+                        uint256(delta)
                     );
                     IVirtualBalanceRewardPool(pool.rewarder).stakeFor(
                         msg.sender,
                         uint256(delta)
                     );
                 } else {
-                    poolTotalVote[pool.lpToken] -= uint256(-delta);
-                    userTotalVote[msg.sender] -= uint256(-delta);
-                    userVoteForPools[msg.sender][pool.lpToken] -= uint256(
-                        -delta
+                    poolTotalVote[pool.lpToken] = poolTotalVote[pool.lpToken]
+                        .sub(uint256(-delta));
+                    userTotalVote[msg.sender] = userTotalVote[msg.sender].sub(
+                        uint256(-delta)
+                    );
+                    userVoteForPools[msg.sender][
+                        pool.lpToken
+                    ] = userVoteForPools[msg.sender][pool.lpToken].sub(
+                        uint256(-delta)
                     );
                     IVirtualBalanceRewardPool(pool.rewarder).withdrawFor(
                         msg.sender,
@@ -276,9 +277,11 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
         if (msg.sender != delegatePool) {
             // this already gets updated when a user vote for the delegate pool
             if (totalUserVote > 0) {
-                totalVlQuoInVote += uint256(totalUserVote);
+                totalVlQuoInVote = totalVlQuoInVote.add(uint256(totalUserVote));
             } else {
-                totalVlQuoInVote -= uint256(-totalUserVote);
+                totalVlQuoInVote = totalVlQuoInVote.sub(
+                    uint256(-totalUserVote)
+                );
             }
         }
         require(
@@ -295,15 +298,17 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
             return;
         }
         require(!pool.isActive, "Active");
-        poolTotalVote[pool.lpToken] -= currentVote;
-        userTotalVote[msg.sender] -= currentVote;
+        poolTotalVote[pool.lpToken] = poolTotalVote[pool.lpToken].sub(
+            currentVote
+        );
+        userTotalVote[msg.sender] = userTotalVote[msg.sender].sub(currentVote);
         userVoteForPools[msg.sender][pool.lpToken] = 0;
         IVirtualBalanceRewardPool(pool.rewarder).withdrawFor(
             msg.sender,
             currentVote
         );
         if (msg.sender != delegatePool) {
-            totalVlQuoInVote -= currentVote;
+            totalVlQuoInVote = totalVlQuoInVote.sub(currentVote);
         }
 
         emit VoteUpdated(
@@ -341,9 +346,9 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
                 .mul(totalVotes())
                 .div(totalVlQuoInVote);
             if (targetVote >= currentVote) {
-                votes[i] = int256(targetVote - currentVote);
+                votes[i] = int256(targetVote.sub(currentVote));
             } else {
-                votes[i] = int256(targetVote) - int256(currentVote);
+                votes[i] = int256(targetVote).sub(int256(currentVote));
             }
         }
         (
@@ -356,12 +361,14 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
         if (_swapForNative) {
             for (uint256 i = 0; i < length; i++) {
                 finalRewardTokens[i] = new address[](1);
-                finalRewardTokens[i][0] = address(0);
+                finalRewardTokens[i][0] = AddressLib.PLATFORM_TOKEN_ADDRESS;
                 finalFeeAmounts[i] = new uint256[](1);
-                finalFeeAmounts[i][0] += _swapFeesForNative(
-                    rewardTokens[i],
-                    feeAmounts[i],
-                    msg.sender
+                finalFeeAmounts[i][0] = finalFeeAmounts[i][0].add(
+                    _swapFeesForNative(
+                        rewardTokens[i],
+                        feeAmounts[i],
+                        msg.sender
+                    )
                 );
             }
         } else {
@@ -455,10 +462,16 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
         uint256 feeAmount = 0;
         for (uint256 i = 0; i < rewardTokens.length; i++) {
             for (uint256 j = 0; j < rewardTokens[i].length; j++) {
-                feeAmount += nativeZapper.getAmountOut(
-                    rewardTokens[i][j],
-                    amounts[i][j]
-                );
+                if (rewardTokens[i][j] == AddressLib.PLATFORM_TOKEN_ADDRESS) {
+                    feeAmount = feeAmount.add(amounts[i][j]);
+                } else {
+                    feeAmount = feeAmount.add(
+                        nativeZapper.getAmountOut(
+                            rewardTokens[i][j],
+                            amounts[i][j]
+                        )
+                    );
+                }
             }
         }
         return feeAmount;
@@ -489,7 +502,8 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
         uint256 length = _rewardTokens.length;
         for (uint256 i; i < length; i++) {
             if (_rewardTokens[i] != address(0) && _feeAmounts[i] > 0) {
-                IERC20(_rewardTokens[i]).safeTransfer(
+                TransferHelper.safeTransferToken(
+                    _rewardTokens[i],
                     msg.sender,
                     _feeAmounts[i]
                 );
@@ -504,16 +518,24 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
     ) internal returns (uint256 nativeAmount) {
         uint256 length = rewardTokens.length;
         for (uint256 i; i < length; i++) {
-            if (rewardTokens[i] != address(0) && feeAmounts[i] > 0) {
+            if (feeAmounts[i] == 0) {
+                continue;
+            }
+            if (AddressLib.isPlatformToken(rewardTokens[i])) {
+                nativeAmount = nativeAmount.add(feeAmounts[i]);
+                TransferHelper.safeTransferETH(_receiver, feeAmounts[i]);
+            } else {
                 _approveTokenIfNeeded(
                     rewardTokens[i],
                     address(nativeZapper),
                     feeAmounts[i]
                 );
-                nativeAmount += nativeZapper.zapInToken(
-                    rewardTokens[i],
-                    feeAmounts[i],
-                    _receiver
+                nativeAmount = nativeAmount.add(
+                    nativeZapper.zapInToken(
+                        rewardTokens[i],
+                        feeAmounts[i],
+                        _receiver
+                    )
                 );
             }
         }
@@ -529,4 +551,6 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
             IERC20(_token).safeApprove(_to, type(uint256).max);
         }
     }
+
+    receive() external payable {}
 }

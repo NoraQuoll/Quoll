@@ -167,6 +167,14 @@ contract QuollZap is OwnableUpgradeable {
         }
     }
 
+    function claimRewards(uint256[] calldata _pids) external {
+        for (uint256 i = 0; i < _pids.length; i++) {
+            (, , , address rewardPool, ) = booster.poolInfo(_pids[i]);
+            require(rewardPool != address(0), "invalid _pids");
+            IBaseRewardPool(rewardPool).getReward(msg.sender);
+        }
+    }
+
     function inCaseTokensGetStuck(address _token) external onlyOwner {
         uint256 amount = IERC20(_token).balanceOf(address(this));
         IERC20(_token).safeTransfer(msg.sender, amount);

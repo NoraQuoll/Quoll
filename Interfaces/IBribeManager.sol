@@ -28,4 +28,14 @@ interface IBribeManager {
             address[][] memory rewardTokens,
             uint256[][] memory earnedRewards
         );
+
+    event PoolAdded(address indexed _lp, address indexed _rewarder);
+
+    event AllVoteReset();
+
+    event VoteUpdated(
+        address indexed _user,
+        address indexed _lp,
+        uint256 _amount
+    );
 }

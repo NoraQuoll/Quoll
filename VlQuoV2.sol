@@ -228,9 +228,9 @@ contract VlQuoV2 is
         userLocks[msg.sender].pop();
 
         if (punishment > 0) {
-            quo.transfer(treasury, punishment);
+            quo.safeTransfer(treasury, punishment);
         }
-        quo.transfer(msg.sender, lockInfo.quoAmount.sub(punishment));
+        quo.safeTransfer(msg.sender, lockInfo.quoAmount.sub(punishment));
 
         _totalSupply -= lockInfo.vlQuoAmount;
         _balances[msg.sender] -= lockInfo.vlQuoAmount;
