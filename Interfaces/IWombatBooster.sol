@@ -46,4 +46,6 @@ interface IWombatBooster {
         address indexed _caller,
         uint256 _amount
     );
+
+    event Migrated(uint256 _pid, address indexed _newMasterWombat);
 }

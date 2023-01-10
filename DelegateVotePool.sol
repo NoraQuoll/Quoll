@@ -110,7 +110,7 @@ contract DelegateVotePool is ManagerUpgradeable {
             isVotePool[_lp] = true;
             votePools.push(_lp);
         }
-        totalWeight = totalWeight - votingWeights[_lp] + _weight;
+        totalWeight = totalWeight.sub(votingWeights[_lp]).add(_weight);
         votingWeights[_lp] = _weight;
     }
 

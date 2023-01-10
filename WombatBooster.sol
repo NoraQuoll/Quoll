@@ -55,6 +55,8 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
     uint256 public earmarkIncentive;
 
+    mapping(uint256 => address) public pidToMasterWombat;
+
     function initialize() public initializer {
         __Ownable_init();
     }
@@ -165,6 +167,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
     //create a new pool
     function addPool(
+        address _masterWombat,
         uint256 _masterWombatPid,
         address _token,
         address _rewardPool
@@ -180,15 +183,23 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         //add the new pool
         poolInfo.push(
             PoolInfo({
-                lptoken: IWombatVoterProxy(voterProxy).getLpToken(
-                    _masterWombatPid
-                ),
+                lptoken: _masterWombat == address(0)
+                    ? IWombatVoterProxy(voterProxy).getLpToken(_masterWombatPid)
+                    : IWombatVoterProxy(voterProxy).getLpTokenV2(
+                        _masterWombat,
+                        _masterWombatPid
+                    ),
                 token: _token,
                 masterWombatPid: _masterWombatPid,
                 rewardPool: _rewardPool,
                 shutdown: false
             })
         );
+
+        if (_masterWombat != address(0)) {
+            pidToMasterWombat[pid] = _masterWombat;
+        }
+
         return true;
     }
 
@@ -198,7 +209,15 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         require(!pool.shutdown, "already shutdown!");
 
         //withdraw from gauge
-        IWombatVoterProxy(voterProxy).withdrawAll(pool.masterWombatPid);
+        if (pidToMasterWombat[_pid] == address(0)) {
+            IWombatVoterProxy(voterProxy).withdrawAll(pool.masterWombatPid);
+        } else {
+            IWombatVoterProxy(voterProxy).withdrawAllV2(
+                pidToMasterWombat[_pid],
+                pool.masterWombatPid
+            );
+        }
+
         // rewards are claimed when withdrawing
         _earmarkRewards(_pid, address(0));
 
@@ -222,6 +241,31 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         }
     }
 
+    function migrate(uint256[] calldata _pids, address _newMasterWombat)
+        external
+        onlyOwner
+    {
+        for (uint256 i = 0; i < _pids.length; i++) {
+            uint256 pid = _pids[i];
+            require(
+                pidToMasterWombat[pid] != _newMasterWombat,
+                "invalid _newMasterWombat"
+            );
+            uint256 newPid = IWombatVoterProxy(voterProxy).migrate(
+                pid,
+                pidToMasterWombat[pid],
+                _newMasterWombat
+            );
+
+            _earmarkRewards(pid, address(0));
+
+            pidToMasterWombat[pid] = _newMasterWombat;
+            poolInfo[pid].masterWombatPid = newPid;
+
+            emit Migrated(pid, _newMasterWombat);
+        }
+    }
+
     //deposit lp tokens and stake
     function deposit(
         uint256 _pid,
@@ -237,7 +281,18 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         IERC20(lptoken).safeTransferFrom(msg.sender, voterProxy, _amount);
 
         //stake
-        IWombatVoterProxy(voterProxy).deposit(pool.masterWombatPid, _amount);
+        if (pidToMasterWombat[_pid] == address(0)) {
+            IWombatVoterProxy(voterProxy).deposit(
+                pool.masterWombatPid,
+                _amount
+            );
+        } else {
+            IWombatVoterProxy(voterProxy).depositV2(
+                pidToMasterWombat[_pid],
+                pool.masterWombatPid,
+                _amount
+            );
+        }
 
         // rewards are claimed when depositing
         _earmarkRewards(_pid, address(0));
@@ -283,10 +338,18 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         //pull from gauge if not shutdown
         // if shutdown tokens will be in this contract
         if (!pool.shutdown) {
-            IWombatVoterProxy(voterProxy).withdraw(
-                pool.masterWombatPid,
-                _amount
-            );
+            if (pidToMasterWombat[_pid] == address(0)) {
+                IWombatVoterProxy(voterProxy).withdraw(
+                    pool.masterWombatPid,
+                    _amount
+                );
+            } else {
+                IWombatVoterProxy(voterProxy).withdrawV2(
+                    pidToMasterWombat[_pid],
+                    pool.masterWombatPid,
+                    _amount
+                );
+            }
             // rewards are claimed when withdrawing
             _earmarkRewards(_pid, address(0));
         }
@@ -367,8 +430,15 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
             IRewards(rewardContract).queueNewRewards(wom, womBal);
 
             //check if there are extra rewards
-            address[] memory bonusTokenAddresses = IWombatVoterProxy(voterProxy)
-                .getBonusTokens(pool.masterWombatPid);
+            address[] memory bonusTokenAddresses = pidToMasterWombat[_pid] ==
+                address(0)
+                ? IWombatVoterProxy(voterProxy).getBonusTokens(
+                    pool.masterWombatPid
+                )
+                : IWombatVoterProxy(voterProxy).getBonusTokensV2(
+                    pidToMasterWombat[_pid],
+                    pool.masterWombatPid
+                );
             for (uint256 i = 0; i < bonusTokenAddresses.length; i++) {
                 address bonusToken = bonusTokenAddresses[i];
                 if (bonusToken == wom) {
@@ -432,7 +502,14 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         require(pool.shutdown == false, "pool is closed");
 
         //claim wom and bonus token rewards
-        IWombatVoterProxy(voterProxy).claimRewards(pool.masterWombatPid);
+        if (pidToMasterWombat[_pid] == address(0)) {
+            IWombatVoterProxy(voterProxy).claimRewards(pool.masterWombatPid);
+        } else {
+            IWombatVoterProxy(voterProxy).claimRewardsV2(
+                pidToMasterWombat[_pid],
+                pool.masterWombatPid
+            );
+        }
 
         _earmarkRewards(_pid, msg.sender);
         return true;

@@ -186,12 +186,14 @@ contract VlQuoV2 is
             LockInfo(_amount, vlQuoAmount, block.timestamp, unlockTime)
         );
 
-        _totalSupply += vlQuoAmount;
-        _balances[_user] += vlQuoAmount;
+        _totalSupply = _totalSupply.add(vlQuoAmount);
+        _balances[_user] = _balances[_user].add(vlQuoAmount);
 
         for (uint256 week = _getNextWeek(); week < unlockTime; week += WEEK) {
-            weeklyTotalWeight[week] += vlQuoAmount;
-            weeklyUserWeight[_user][week] += vlQuoAmount;
+            weeklyTotalWeight[week] = weeklyTotalWeight[week].add(vlQuoAmount);
+            weeklyUserWeight[_user][week] = weeklyUserWeight[_user][week].add(
+                vlQuoAmount
+            );
         }
 
         if (lastClaimedWeek[_user] == 0) {
@@ -232,8 +234,8 @@ contract VlQuoV2 is
         }
         quo.safeTransfer(msg.sender, lockInfo.quoAmount.sub(punishment));
 
-        _totalSupply -= lockInfo.vlQuoAmount;
-        _balances[msg.sender] -= lockInfo.vlQuoAmount;
+        _totalSupply = _totalSupply.sub(lockInfo.vlQuoAmount);
+        _balances[msg.sender] = _balances[msg.sender].sub(lockInfo.vlQuoAmount);
 
         require(
             bribeManager.getUserTotalVote(msg.sender) <= balanceOf(msg.sender),
