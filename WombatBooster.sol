@@ -247,12 +247,13 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     {
         for (uint256 i = 0; i < _pids.length; i++) {
             uint256 pid = _pids[i];
+            PoolInfo storage pool = poolInfo[pid];
             require(
                 pidToMasterWombat[pid] != _newMasterWombat,
                 "invalid _newMasterWombat"
             );
             uint256 newPid = IWombatVoterProxy(voterProxy).migrate(
-                pid,
+                pool.masterWombatPid,
                 pidToMasterWombat[pid],
                 _newMasterWombat
             );
@@ -260,7 +261,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
             _earmarkRewards(pid, address(0));
 
             pidToMasterWombat[pid] = _newMasterWombat;
-            poolInfo[pid].masterWombatPid = newPid;
+            pool.masterWombatPid = newPid;
 
             emit Migrated(pid, _newMasterWombat);
         }
