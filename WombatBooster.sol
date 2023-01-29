@@ -107,6 +107,14 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         platformFee = 100;
     }
 
+    function setVlQuo(address _vlQuo) external onlyOwner {
+        require(_vlQuo != address(0), "invalid _vlQuo!");
+
+        vlQuo = _vlQuo;
+
+        emit VlQuoAddressChanged(_vlQuo);
+    }
+
     function setFees(
         uint256 _vlQuoIncentive,
         uint256 _qWomIncentive,

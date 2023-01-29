@@ -48,4 +48,6 @@ interface IWombatBooster {
     );
 
     event Migrated(uint256 _pid, address indexed _newMasterWombat);
+
+    event VlQuoAddressChanged(address _vlQuo);
 }
