@@ -4,7 +4,7 @@ pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
 interface IMasterWombatV3 {
-    function poolInfo(uint256)
+    function poolInfoV3(uint256)
         external
         view
         returns (

@@ -118,7 +118,7 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         if (_masterWombat == address(masterWombat)) {
             (token, , , , , , ) = masterWombat.poolInfo(_pid);
         } else {
-            (token, , , , , , , ) = IMasterWombatV3(_masterWombat).poolInfo(
+            (token, , , , , , , ) = IMasterWombatV3(_masterWombat).poolInfoV3(
                 _pid
             );
         }
