@@ -6,6 +6,8 @@ pragma experimental ABIEncoderV2;
 interface IVoter {
     function veWom() external view returns (address);
 
+    function lpTokens(uint256) external view returns (address);
+
     function infos(address)
         external
         view
@@ -34,4 +36,6 @@ interface IVoter {
         external
         view
         returns (uint256[][] memory bribeRewards);
+
+    function distribute(address _lpToken) external;
 }

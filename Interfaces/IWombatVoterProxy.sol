@@ -15,29 +15,41 @@ interface IWombatVoterProxy {
         view
         returns (address[] memory);
 
-    function deposit(uint256, uint256) external;
+    function deposit(uint256, uint256)
+        external
+        returns (address[] memory, uint256[] memory);
 
     function depositV2(
         address,
         uint256,
         uint256
-    ) external;
+    ) external returns (address[] memory, uint256[] memory);
 
-    function withdraw(uint256, uint256) external;
+    function withdraw(uint256, uint256)
+        external
+        returns (address[] memory, uint256[] memory);
 
     function withdrawV2(
         address,
         uint256,
         uint256
-    ) external;
+    ) external returns (address[] memory, uint256[] memory);
 
-    function withdrawAll(uint256) external;
+    function withdrawAll(uint256)
+        external
+        returns (address[] memory, uint256[] memory);
 
-    function withdrawAllV2(address, uint256) external;
+    function withdrawAllV2(address, uint256)
+        external
+        returns (address[] memory, uint256[] memory);
 
-    function claimRewards(uint256) external;
+    function claimRewards(uint256)
+        external
+        returns (address[] memory, uint256[] memory);
 
-    function claimRewardsV2(address, uint256) external;
+    function claimRewardsV2(address, uint256)
+        external
+        returns (address[] memory, uint256[] memory);
 
     function balanceOfPool(uint256) external view returns (uint256);
 
@@ -47,7 +59,13 @@ interface IWombatVoterProxy {
         uint256,
         address,
         address
-    ) external returns (uint256);
+    )
+        external
+        returns (
+            uint256,
+            address[] memory,
+            uint256[] memory
+        );
 
     function lockWom(uint256) external;
 

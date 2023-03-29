@@ -3,6 +3,7 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "./Interfaces/ISmartConvertor.sol";
@@ -18,6 +19,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
     using TransferHelper for address;
+    using EnumerableSet for EnumerableSet.AddressSet;
 
     address public wom;
 
@@ -56,6 +58,12 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     uint256 public earmarkIncentive;
 
     mapping(uint256 => address) public pidToMasterWombat;
+
+    mapping(uint256 => EnumerableSet.AddressSet) pidToRewardTokens;
+
+    mapping(uint256 => mapping(address => uint256)) public pidToPendingRewards;
+
+    bool public earmarkOnOperation;
 
     function initialize() public initializer {
         __Ownable_init();
@@ -167,6 +175,13 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         earmarkIncentive = _earmarkIncentive;
     }
 
+    function setEarmarkOnOperation(bool _earmarkOnOperation)
+        external
+        onlyOwner
+    {
+        earmarkOnOperation = _earmarkOnOperation;
+    }
+
     /// END SETTER SECTION ///
 
     function poolLength() external view override returns (uint256) {
@@ -217,14 +232,16 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         require(!pool.shutdown, "already shutdown!");
 
         //withdraw from gauge
+        address[] memory rewardTokens;
+        uint256[] memory rewardAmounts;
         if (pidToMasterWombat[_pid] == address(0)) {
-            IWombatVoterProxy(voterProxy).withdrawAll(pool.masterWombatPid);
+            (rewardTokens, rewardAmounts) = IWombatVoterProxy(voterProxy)
+                .withdrawAll(pool.masterWombatPid);
         } else {
-            IWombatVoterProxy(voterProxy).withdrawAllV2(
-                pidToMasterWombat[_pid],
-                pool.masterWombatPid
-            );
+            (rewardTokens, rewardAmounts) = IWombatVoterProxy(voterProxy)
+                .withdrawAllV2(pidToMasterWombat[_pid], pool.masterWombatPid);
         }
+        _updatePendingRewards(_pid, rewardTokens, rewardAmounts);
 
         // rewards are claimed when withdrawing
         _earmarkRewards(_pid, address(0));
@@ -260,11 +277,17 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
                 pidToMasterWombat[pid] != _newMasterWombat,
                 "invalid _newMasterWombat"
             );
-            uint256 newPid = IWombatVoterProxy(voterProxy).migrate(
-                pool.masterWombatPid,
-                pidToMasterWombat[pid],
-                _newMasterWombat
-            );
+
+            (
+                uint256 newPid,
+                address[] memory rewardTokens,
+                uint256[] memory rewardAmounts
+            ) = IWombatVoterProxy(voterProxy).migrate(
+                    pool.masterWombatPid,
+                    pidToMasterWombat[pid],
+                    _newMasterWombat
+                );
+            _updatePendingRewards(pid, rewardTokens, rewardAmounts);
 
             _earmarkRewards(pid, address(0));
 
@@ -290,29 +313,32 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         IERC20(lptoken).safeTransferFrom(msg.sender, voterProxy, _amount);
 
         //stake
+        address[] memory rewardTokens;
+        uint256[] memory rewardAmounts;
         if (pidToMasterWombat[_pid] == address(0)) {
-            IWombatVoterProxy(voterProxy).deposit(
-                pool.masterWombatPid,
-                _amount
-            );
+            (rewardTokens, rewardAmounts) = IWombatVoterProxy(voterProxy)
+                .deposit(pool.masterWombatPid, _amount);
         } else {
-            IWombatVoterProxy(voterProxy).depositV2(
-                pidToMasterWombat[_pid],
-                pool.masterWombatPid,
-                _amount
-            );
+            (rewardTokens, rewardAmounts) = IWombatVoterProxy(voterProxy)
+                .depositV2(
+                    pidToMasterWombat[_pid],
+                    pool.masterWombatPid,
+                    _amount
+                );
         }
-
         // rewards are claimed when depositing
-        _earmarkRewards(_pid, address(0));
+        _updatePendingRewards(_pid, rewardTokens, rewardAmounts);
+
+        if (earmarkOnOperation) {
+            _earmarkRewards(_pid, address(0));
+        }
 
         address token = pool.token;
         if (_stake) {
             //mint here and send to rewards on user behalf
             IDepositToken(token).mint(address(this), _amount);
             address rewardContract = pool.rewardPool;
-            IERC20(token).safeApprove(rewardContract, 0);
-            IERC20(token).safeApprove(rewardContract, _amount);
+            _approveTokenIfNeeded(token, rewardContract, _amount);
             IBaseRewardPool(rewardContract).stakeFor(msg.sender, _amount);
         } else {
             //add user balance directly
@@ -347,20 +373,25 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         //pull from gauge if not shutdown
         // if shutdown tokens will be in this contract
         if (!pool.shutdown) {
+            address[] memory rewardTokens;
+            uint256[] memory rewardAmounts;
             if (pidToMasterWombat[_pid] == address(0)) {
-                IWombatVoterProxy(voterProxy).withdraw(
-                    pool.masterWombatPid,
-                    _amount
-                );
+                (rewardTokens, rewardAmounts) = IWombatVoterProxy(voterProxy)
+                    .withdraw(pool.masterWombatPid, _amount);
             } else {
-                IWombatVoterProxy(voterProxy).withdrawV2(
-                    pidToMasterWombat[_pid],
-                    pool.masterWombatPid,
-                    _amount
-                );
+                (rewardTokens, rewardAmounts) = IWombatVoterProxy(voterProxy)
+                    .withdrawV2(
+                        pidToMasterWombat[_pid],
+                        pool.masterWombatPid,
+                        _amount
+                    );
             }
             // rewards are claimed when withdrawing
-            _earmarkRewards(_pid, address(0));
+            _updatePendingRewards(_pid, rewardTokens, rewardAmounts);
+
+            if (earmarkOnOperation) {
+                _earmarkRewards(_pid, address(0));
+            }
         }
 
         //return lp tokens
@@ -385,10 +416,12 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     function _earmarkRewards(uint256 _pid, address _caller) internal {
         PoolInfo memory pool = poolInfo[_pid];
         //wom balance
-        uint256 womBal = IERC20(wom).balanceOf(address(this));
+        uint256 womBal = pidToPendingRewards[_pid][wom];
         emit WomClaimed(_pid, womBal);
 
         if (womBal > 0) {
+            pidToPendingRewards[_pid][wom] = 0;
+
             uint256 vlQuoIncentiveAmount = womBal.mul(vlQuoIncentive).div(
                 FEE_DENOMINATOR
             );
@@ -406,11 +439,11 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
                 );
 
                 //send incentives for calling
-                IERC20(wom).safeTransfer(msg.sender, earmarkIncentiveAmount);
+                IERC20(wom).safeTransfer(_caller, earmarkIncentiveAmount);
 
                 emit EarmarkIncentiveSent(
                     _pid,
-                    msg.sender,
+                    _caller,
                     earmarkIncentiveAmount
                 );
             }
@@ -434,38 +467,27 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
             //send wom to lp provider reward contract
             address rewardContract = pool.rewardPool;
-            IERC20(wom).safeApprove(rewardContract, 0);
-            IERC20(wom).safeApprove(rewardContract, womBal);
+            _approveTokenIfNeeded(wom, rewardContract, womBal);
             IRewards(rewardContract).queueNewRewards(wom, womBal);
 
             //check if there are extra rewards
-            address[] memory bonusTokenAddresses = pidToMasterWombat[_pid] ==
-                address(0)
-                ? IWombatVoterProxy(voterProxy).getBonusTokens(
-                    pool.masterWombatPid
-                )
-                : IWombatVoterProxy(voterProxy).getBonusTokensV2(
-                    pidToMasterWombat[_pid],
-                    pool.masterWombatPid
-                );
-            for (uint256 i = 0; i < bonusTokenAddresses.length; i++) {
-                address bonusToken = bonusTokenAddresses[i];
+            for (uint256 i = 0; i < pidToRewardTokens[_pid].length(); i++) {
+                address bonusToken = pidToRewardTokens[_pid].at(i);
                 if (bonusToken == wom) {
                     // wom was dispersed above
                     continue;
                 }
-                uint256 bonusTokenBalance = TransferHelper.balanceOf(
-                    bonusToken,
-                    address(this)
-                );
+                uint256 bonusTokenBalance = pidToPendingRewards[_pid][
+                    bonusToken
+                ];
                 if (bonusTokenBalance > 0) {
                     if (AddressLib.isPlatformToken(bonusToken)) {
                         IRewards(rewardContract).queueNewRewards{
                             value: bonusTokenBalance
                         }(bonusToken, bonusTokenBalance);
                     } else {
-                        IERC20(bonusToken).safeApprove(rewardContract, 0);
-                        IERC20(bonusToken).safeApprove(
+                        _approveTokenIfNeeded(
+                            bonusToken,
                             rewardContract,
                             bonusTokenBalance
                         );
@@ -474,6 +496,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
                             bonusTokenBalance
                         );
                     }
+                    pidToPendingRewards[_pid][bonusToken] = 0;
                 }
             }
 
@@ -487,8 +510,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
             //send wom to qWom reward contract
             if (qWomIncentiveAmount > 0) {
-                IERC20(wom).safeApprove(qWomRewardPool, 0);
-                IERC20(wom).safeApprove(qWomRewardPool, qWomIncentiveAmount);
+                _approveTokenIfNeeded(wom, qWomRewardPool, qWomIncentiveAmount);
                 IRewards(qWomRewardPool).queueNewRewards(
                     wom,
                     qWomIncentiveAmount
@@ -511,17 +533,33 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         require(pool.shutdown == false, "pool is closed");
 
         //claim wom and bonus token rewards
+        address[] memory rewardTokens;
+        uint256[] memory rewardAmounts;
         if (pidToMasterWombat[_pid] == address(0)) {
-            IWombatVoterProxy(voterProxy).claimRewards(pool.masterWombatPid);
+            (rewardTokens, rewardAmounts) = IWombatVoterProxy(voterProxy)
+                .claimRewards(pool.masterWombatPid);
         } else {
-            IWombatVoterProxy(voterProxy).claimRewardsV2(
-                pidToMasterWombat[_pid],
-                pool.masterWombatPid
-            );
+            (rewardTokens, rewardAmounts) = IWombatVoterProxy(voterProxy)
+                .claimRewardsV2(pidToMasterWombat[_pid], pool.masterWombatPid);
         }
+        _updatePendingRewards(_pid, rewardTokens, rewardAmounts);
 
         _earmarkRewards(_pid, msg.sender);
         return true;
+    }
+
+    function getRewardTokensForPid(uint256 _pid)
+        external
+        view
+        returns (address[] memory)
+    {
+        address[] memory rewardTokens = new address[](
+            pidToRewardTokens[_pid].length()
+        );
+        for (uint256 i = 0; i < rewardTokens.length; i++) {
+            rewardTokens[i] = pidToRewardTokens[_pid].at(i);
+        }
+        return rewardTokens;
     }
 
     //callback from reward contract when wom is received.
@@ -543,6 +581,24 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
         //mint reward tokens
         IQuollToken(quo).mint(_account, _amount);
+    }
+
+    function _updatePendingRewards(
+        uint256 _pid,
+        address[] memory _rewardTokens,
+        uint256[] memory _rewardAmounts
+    ) internal {
+        for (uint256 i = 0; i < _rewardTokens.length; i++) {
+            address rewardToken = _rewardTokens[i];
+            uint256 rewardAmount = _rewardAmounts[i];
+            if (rewardToken == address(0) || rewardAmount == 0) {
+                continue;
+            }
+            pidToRewardTokens[_pid].add(rewardToken);
+            pidToPendingRewards[_pid][rewardToken] = pidToPendingRewards[_pid][
+                rewardToken
+            ].add(rewardAmount);
+        }
     }
 
     function _convertWomToQWom(uint256 _amount) internal returns (uint256) {

@@ -166,6 +166,7 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         external
         override
         onlyBooster
+        returns (address[] memory rewardTokens, uint256[] memory rewardAmounts)
     {
         (address token, , , , , , ) = masterWombat.poolInfo(_pid);
         uint256 balance = IERC20(token).balanceOf(address(this));
@@ -174,7 +175,7 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         IERC20(token).safeApprove(address(masterWombat), 0);
         IERC20(token).safeApprove(address(masterWombat), balance);
         masterWombat.deposit(_pid, balance);
-        _claimRewards(_pid);
+        (rewardTokens, rewardAmounts) = _claimRewards(_pid);
 
         emit Deposited(_pid, balance);
     }
@@ -183,7 +184,12 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         address _masterWombat,
         uint256 _pid,
         uint256 _amount
-    ) external override onlyBooster {
+    )
+        external
+        override
+        onlyBooster
+        returns (address[] memory rewardTokens, uint256[] memory rewardAmounts)
+    {
         address token = getLpTokenV2(_masterWombat, _pid);
         uint256 balance = IERC20(token).balanceOf(address(this));
         require(balance >= _amount, "insufficient balance");
@@ -192,7 +198,7 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         IERC20(token).safeApprove(_masterWombat, balance);
         // V2 & V3 have the same interface
         IMasterWombatV3(_masterWombat).deposit(_pid, balance);
-        _claimRewardsV2(_masterWombat, _pid);
+        (rewardTokens, rewardAmounts) = _claimRewardsV2(_masterWombat, _pid);
 
         emit DepositedV2(_masterWombat, _pid, balance);
     }
@@ -202,12 +208,13 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         public
         override
         onlyBooster
+        returns (address[] memory rewardTokens, uint256[] memory rewardAmounts)
     {
         (address token, , , , , , ) = masterWombat.poolInfo(_pid);
         uint256 _balance = IERC20(token).balanceOf(address(this));
         if (_balance < _amount) {
             masterWombat.withdraw(_pid, _amount.sub(_balance));
-            _claimRewards(_pid);
+            (rewardTokens, rewardAmounts) = _claimRewards(_pid);
         }
         IERC20(token).safeTransfer(booster, _amount);
 
@@ -219,7 +226,12 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         address _masterWombat,
         uint256 _pid,
         uint256 _amount
-    ) public override onlyBooster {
+    )
+        public
+        override
+        onlyBooster
+        returns (address[] memory rewardTokens, uint256[] memory rewardAmounts)
+    {
         address token = getLpTokenV2(_masterWombat, _pid);
         uint256 _balance = IERC20(token).balanceOf(address(this));
         if (_balance < _amount) {
@@ -228,55 +240,78 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
                 _pid,
                 _amount.sub(_balance)
             );
-            _claimRewardsV2(_masterWombat, _pid);
+            (rewardTokens, rewardAmounts) = _claimRewardsV2(
+                _masterWombat,
+                _pid
+            );
         }
         IERC20(token).safeTransfer(booster, _amount);
 
         emit WithdrawnV2(_masterWombat, _pid, _amount);
     }
 
-    function withdrawAll(uint256 _pid) external override onlyBooster {
+    function withdrawAll(uint256 _pid)
+        external
+        override
+        onlyBooster
+        returns (address[] memory, uint256[] memory)
+    {
         (address token, , , , , , ) = masterWombat.poolInfo(_pid);
         uint256 amount = balanceOfPool(_pid).add(
             IERC20(token).balanceOf(address(this))
         );
-        withdraw(_pid, amount);
+        return withdraw(_pid, amount);
     }
 
     function withdrawAllV2(address _masterWombat, uint256 _pid)
         external
         override
         onlyBooster
+        returns (address[] memory, uint256[] memory)
     {
         address token = getLpTokenV2(_masterWombat, _pid);
         uint256 amount = balanceOfPoolV2(_masterWombat, _pid).add(
             IERC20(token).balanceOf(address(this))
         );
-        withdrawV2(_masterWombat, _pid, amount);
+        return withdrawV2(_masterWombat, _pid, amount);
     }
 
-    function claimRewards(uint256 _pid) external override onlyBooster {
+    function claimRewards(uint256 _pid)
+        external
+        override
+        onlyBooster
+        returns (address[] memory, uint256[] memory)
+    {
         // call deposit with _amount == 0 to claim current rewards
         masterWombat.deposit(_pid, 0);
 
-        _claimRewards(_pid);
+        return _claimRewards(_pid);
     }
 
     function claimRewardsV2(address _masterWombat, uint256 _pid)
         external
         override
         onlyBooster
+        returns (address[] memory, uint256[] memory)
     {
         // call deposit with _amount == 0 to claim current rewards
         IMasterWombatV3(_masterWombat).deposit(_pid, 0);
 
-        _claimRewardsV2(_masterWombat, _pid);
+        return _claimRewardsV2(_masterWombat, _pid);
     }
 
     // send claimed rewards to booster
-    function _claimRewards(uint256 _pid) internal {
+    function _claimRewards(uint256 _pid)
+        internal
+        returns (address[] memory rewardTokens, uint256[] memory rewardAmounts)
+    {
         address[] memory bonusTokenAddresses = getBonusTokens(_pid);
+        rewardTokens = new address[](1 + bonusTokenAddresses.length);
+        rewardAmounts = new uint256[](1 + bonusTokenAddresses.length);
+
         uint256 _balance = IERC20(wom).balanceOf(address(this));
+        rewardTokens[0] = wom;
+        rewardAmounts[0] = _balance;
         IERC20(wom).safeTransfer(booster, _balance);
         emit RewardsClaimed(_pid, _balance);
 
@@ -286,6 +321,8 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
                 bonusTokenAddress,
                 address(this)
             );
+            rewardTokens[1 + i] = bonusTokenAddress;
+            rewardAmounts[1 + i] = bonusTokenBalance;
             if (bonusTokenBalance == 0) {
                 continue;
             }
@@ -300,12 +337,20 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
     }
 
     // send claimed rewards to booster
-    function _claimRewardsV2(address _masterWombat, uint256 _pid) internal {
+    function _claimRewardsV2(address _masterWombat, uint256 _pid)
+        internal
+        returns (address[] memory rewardTokens, uint256[] memory rewardAmounts)
+    {
         address[] memory bonusTokenAddresses = getBonusTokensV2(
             _masterWombat,
             _pid
         );
+        rewardTokens = new address[](1 + bonusTokenAddresses.length);
+        rewardAmounts = new uint256[](1 + bonusTokenAddresses.length);
+
         uint256 _balance = IERC20(wom).balanceOf(address(this));
+        rewardTokens[0] = wom;
+        rewardAmounts[0] = _balance;
         IERC20(wom).safeTransfer(booster, _balance);
         emit RewardsClaimedV2(_masterWombat, _pid, _balance);
 
@@ -315,6 +360,8 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
                 bonusTokenAddress,
                 address(this)
             );
+            rewardTokens[1 + i] = bonusTokenAddress;
+            rewardAmounts[1 + i] = bonusTokenBalance;
             if (bonusTokenBalance == 0) {
                 continue;
             }
@@ -356,14 +403,23 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         uint256 _pid,
         address _masterWombat,
         address _newMasterWombat
-    ) external override onlyBooster returns (uint256) {
+    )
+        external
+        override
+        onlyBooster
+        returns (
+            uint256 newPid,
+            address[] memory rewardTokens,
+            uint256[] memory rewardAmounts
+        )
+    {
         if (_masterWombat == address(0)) {
             _masterWombat = address(masterWombat);
         }
 
         address token = getLpTokenV2(_masterWombat, _pid);
         // will revert if not exist
-        uint256 newPid = IMasterWombatV3(_newMasterWombat).getAssetPid(token);
+        newPid = IMasterWombatV3(_newMasterWombat).getAssetPid(token);
         uint256 balanceOfOld = balanceOfPoolV2(_masterWombat, _pid);
         uint256 balanceofNewBefore = balanceOfPoolV2(_newMasterWombat, newPid);
 
@@ -377,9 +433,7 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
             "migration failed"
         );
 
-        _claimRewardsV2(_masterWombat, _pid);
-
-        return newPid;
+        (rewardTokens, rewardAmounts) = _claimRewardsV2(_masterWombat, _pid);
     }
 
     function lockWom(uint256 _lockDays) external override onlyDepositor {
