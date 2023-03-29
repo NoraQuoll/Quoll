@@ -22,7 +22,7 @@ contract VlQuoV2 is
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
-    IERC20 public quo;
+    IERC20 public override quo;
 
     IBribeManager public bribeManager;
 
@@ -31,8 +31,8 @@ contract VlQuoV2 is
     uint256 public maxLockLength;
 
     uint256 public constant FEE_DENOMINATOR = 10000;
-    uint256 public unlockGracePeriod;
-    uint256 public unlockPunishment;
+    uint256 public override unlockGracePeriod;
+    uint256 public override unlockPunishment;
 
     uint256 public constant WEEK = 86400 * 7;
     uint256 public constant MAX_LOCK_WEEKS = 52;
@@ -53,7 +53,7 @@ contract VlQuoV2 is
     mapping(address => mapping(uint256 => uint256)) public weeklyUserWeight;
 
     // when set to true, other accounts cannot call `lock` on behalf of an account
-    mapping(address => bool) public blockThirdPartyActions;
+    mapping(address => bool) public override blockThirdPartyActions;
 
     address[] public rewardTokens;
     mapping(address => bool) public isRewardToken;
@@ -69,26 +69,15 @@ contract VlQuoV2 is
 
     mapping(address => bool) public access;
 
-    event Locked(address indexed _user, uint256 _amount, uint256 _weeks);
+    mapping(address => bool) public allowedLocker;
 
-    event Unlocked(
-        address indexed _user,
-        uint256 _unlockTime,
-        uint256 _quoAmount,
-        uint256 _vlQuoAmount
-    );
+    mapping(address => uint256) private _lockerTotalSupply;
+    mapping(address => mapping(address => uint256)) private _lockerBalances;
 
-    event RewardTokenAdded(address indexed _rewardToken);
-
-    event RewardAdded(address indexed _rewardToken, uint256 _reward);
-
-    event RewardPaid(
-        address indexed _user,
-        address indexed _rewardToken,
-        uint256 _reward
-    );
-
-    event AccessSet(address indexed _address, bool _status);
+    modifier onlyAllowedLocker() {
+        require(allowedLocker[msg.sender], "!auth");
+        _;
+    }
 
     function initialize() external initializer {
         __Ownable_init();
@@ -186,8 +175,7 @@ contract VlQuoV2 is
             LockInfo(_amount, vlQuoAmount, block.timestamp, unlockTime)
         );
 
-        _totalSupply = _totalSupply.add(vlQuoAmount);
-        _balances[_user] = _balances[_user].add(vlQuoAmount);
+        _increaseBalance(address(0), _user, vlQuoAmount);
 
         for (uint256 week = _getNextWeek(); week < unlockTime; week += WEEK) {
             weeklyTotalWeight[week] = weeklyTotalWeight[week].add(vlQuoAmount);
@@ -234,13 +222,7 @@ contract VlQuoV2 is
         }
         quo.safeTransfer(msg.sender, lockInfo.quoAmount.sub(punishment));
 
-        _totalSupply = _totalSupply.sub(lockInfo.vlQuoAmount);
-        _balances[msg.sender] = _balances[msg.sender].sub(lockInfo.vlQuoAmount);
-
-        require(
-            bribeManager.getUserTotalVote(msg.sender) <= balanceOf(msg.sender),
-            "Too much vote cast"
-        );
+        _decreaseBalance(address(0), msg.sender, lockInfo.vlQuoAmount);
 
         emit Unlocked(
             msg.sender,
@@ -361,6 +343,72 @@ contract VlQuoV2 is
 
         access[_address] = _status;
         emit AccessSet(_address, _status);
+    }
+
+    function setAllowedLocker(address _locker, bool _allowed)
+        external
+        onlyOwner
+    {
+        require(_locker != address(0), "invalid _address!");
+
+        allowedLocker[_locker] = _allowed;
+        emit AllowedLockerSet(_locker, _allowed);
+    }
+
+    function increaseBalance(address _user, uint256 _amount)
+        external
+        override
+        onlyAllowedLocker
+    {
+        _increaseBalance(msg.sender, _user, _amount);
+    }
+
+    function decreaseBalance(address _user, uint256 _amount)
+        external
+        override
+        onlyAllowedLocker
+    {
+        _decreaseBalance(msg.sender, _user, _amount);
+    }
+
+    function _increaseBalance(
+        address _locker,
+        address _user,
+        uint256 _amount
+    ) internal {
+        if (_locker != address(0)) {
+            _lockerTotalSupply[_locker] = _lockerTotalSupply[_locker].add(
+                _amount
+            );
+            _lockerBalances[_locker][_user] = _lockerBalances[_locker][_user]
+                .add(_amount);
+        }
+        _totalSupply = _totalSupply.add(_amount);
+        uint256 newBal = _balances[_user].add(_amount);
+        _balances[_user] = newBal;
+        emit BalanceUpdated(_user, newBal);
+    }
+
+    function _decreaseBalance(
+        address _locker,
+        address _user,
+        uint256 _amount
+    ) internal {
+        if (_locker != address(0)) {
+            _lockerTotalSupply[_locker] = _lockerTotalSupply[_locker].sub(
+                _amount
+            );
+            _lockerBalances[_locker][_user] = _lockerBalances[_locker][_user]
+                .sub(_amount);
+        }
+        _totalSupply = _totalSupply.sub(_amount);
+        uint256 newBal = _balances[_user].sub(_amount);
+        _balances[_user] = newBal;
+        require(
+            bribeManager.getUserTotalVote(_user) <= newBal,
+            "Too much vote cast"
+        );
+        emit BalanceUpdated(_user, newBal);
     }
 
     function _getCurWeek() internal view returns (uint256) {
