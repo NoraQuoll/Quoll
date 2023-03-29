@@ -14,8 +14,22 @@ interface INativeZapper {
         address _receiver
     ) external returns (uint256 nativeAmount);
 
+    function swapToken(
+        address _from,
+        address _to,
+        uint256 _amount,
+        address _receiver
+    ) external payable returns (uint256);
+
     event ZapIn(
         address indexed _from,
+        uint256 _amount,
+        address indexed _receiver,
+        uint256 _amountOut
+    );
+    event Swapped(
+        address indexed _from,
+        address indexed _to,
         uint256 _amount,
         address indexed _receiver,
         uint256 _amountOut

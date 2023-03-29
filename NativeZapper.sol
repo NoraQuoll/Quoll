@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
 import "./Interfaces/INativeZapper.sol";
 import "./Interfaces/IPancakePath.sol";
 import "./Interfaces/Pancake/IPancakeRouter.sol";
@@ -44,7 +45,7 @@ contract NativeZapper is INativeZapper, OwnableUpgradeable {
     {
         uint256[] memory amounts = pancakeRouter.getAmountsOut(
             _amount,
-            _getSwapPath(_from)
+            _getSwapPath(_from, wNative)
         );
         return amounts[amounts.length - 1];
     }
@@ -63,6 +64,43 @@ contract NativeZapper is INativeZapper, OwnableUpgradeable {
 
             emit ZapIn(_from, _amount, _receiver, nativeAmount);
         }
+    }
+
+    function swapToken(
+        address _from,
+        address _to,
+        uint256 _amount,
+        address _receiver
+    ) external payable override returns (uint256) {
+        require(access[msg.sender], "!auth");
+
+        if (_amount == 0) {
+            return 0;
+        }
+
+        uint256 amountOut;
+        if (AddressLib.isPlatformToken(_from)) {
+            require(_amount == msg.value, "invalid amount");
+            uint256[] memory amounts = pancakeRouter.swapExactETHForTokens{
+                value: _amount
+            }(0, _getSwapPath(wNative, _to), _receiver, block.timestamp);
+            amountOut = amounts[amounts.length - 1];
+        } else {
+            require(msg.value == 0, "invalid msg.value");
+            IERC20(_from).safeTransferFrom(msg.sender, address(this), _amount);
+            _approveTokenIfNeeded(_from, _amount);
+            uint256[] memory amounts = pancakeRouter.swapExactTokensForTokens(
+                _amount,
+                0,
+                _getSwapPath(_from, _to),
+                _receiver,
+                block.timestamp
+            );
+            amountOut = amounts[amounts.length - 1];
+        }
+        emit Swapped(_from, _to, _amount, _receiver, amountOut);
+
+        return amountOut;
     }
 
     function setAccess(address _address, bool _status) external onlyOwner {
@@ -93,23 +131,23 @@ contract NativeZapper is INativeZapper, OwnableUpgradeable {
         uint256[] memory amounts = pancakeRouter.swapExactTokensForETH(
             _amount,
             0,
-            _getSwapPath(_token),
+            _getSwapPath(_token, wNative),
             _receiver,
             block.timestamp
         );
         return amounts[amounts.length - 1];
     }
 
-    function _getSwapPath(address _from)
+    function _getSwapPath(address _from, address _to)
         internal
         view
         returns (address[] memory)
     {
-        address[] memory path = pancakePath.getPath(_from, wNative);
+        address[] memory path = pancakePath.getPath(_from, _to);
         if (path.length == 0) {
             path = new address[](2);
             path[0] = _from;
-            path[1] = wNative;
+            path[1] = _to;
         }
         return path;
     }

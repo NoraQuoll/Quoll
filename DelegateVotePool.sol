@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@shared/lib-contracts/contracts/Dependencies/ManagerUpgradeable.sol";
 import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
 import "./Interfaces/IBribeManager.sol";
+import "./Interfaces/INativeZapper.sol";
 import "./Interfaces/IVirtualBalanceRewardPool.sol";
 
 contract DelegateVotePool is ManagerUpgradeable {
@@ -16,8 +17,11 @@ contract DelegateVotePool is ManagerUpgradeable {
     using SafeMath for uint256;
     using TransferHelper for address;
 
+    address public quo;
     address public bribeManager;
     IVirtualBalanceRewardPool public rewardPool;
+    INativeZapper public nativeZapper;
+
     address public feeCollector;
 
     uint256 public constant DENOMINATOR = 10000;
@@ -28,23 +32,31 @@ contract DelegateVotePool is ManagerUpgradeable {
     mapping(address => uint256) public votingWeights;
     uint256 public totalWeight;
 
+    event QuoHarvested(uint256 _amount, uint256 _fee);
+
     function initialize() public initializer {
         __ManagerUpgradeable_init();
     }
 
     function setParams(
+        address _quo,
         address _bribeManager,
         address _rewardPool,
+        address _nativeZapper,
         address _feeCollector
     ) external onlyOwner {
         require(bribeManager == address(0), "params have already been set");
 
+        require(_quo != address(0), "invalid _quo!");
         require(_bribeManager != address(0), "invalid _bribeManager!");
         require(_rewardPool != address(0), "invalid _rewardPool!");
+        require(_nativeZapper != address(0), "invalid _nativeZapper!");
         require(_feeCollector != address(0), "invalid _feeCollector!");
 
+        quo = _quo;
         bribeManager = _bribeManager;
         rewardPool = IVirtualBalanceRewardPool(_rewardPool);
+        nativeZapper = INativeZapper(_nativeZapper);
         feeCollector = _feeCollector;
 
         protocolFee = 500;
@@ -61,31 +73,54 @@ contract DelegateVotePool is ManagerUpgradeable {
             address[][] memory rewardTokensList,
             uint256[][] memory earnedRewards
         ) = IBribeManager(bribeManager).getRewardAll();
+        uint256 quoAmount = 0;
         for (uint256 i = 0; i < rewardTokensList.length; i++) {
             for (uint256 j = 0; j < rewardTokensList[i].length; j++) {
                 address rewardToken = rewardTokensList[i][j];
                 uint256 earnedReward = earnedRewards[i][j];
-                if (protocolFee > 0 && feeCollector != address(0)) {
-                    uint256 fee = protocolFee.mul(earnedReward).div(
-                        DENOMINATOR
-                    );
-                    rewardToken.safeTransferToken(feeCollector, fee);
-                    earnedReward = earnedReward.sub(fee);
+                if (rewardToken == address(0) || earnedReward == 0) {
+                    continue;
+                }
+                if (rewardToken == quo) {
+                    quoAmount = quoAmount.add(earnedReward);
+                    continue;
                 }
                 if (AddressLib.isPlatformToken(rewardToken)) {
-                    rewardPool.queueNewRewards{value: earnedReward}(
-                        rewardToken,
-                        earnedReward
+                    quoAmount = quoAmount.add(
+                        nativeZapper.swapToken{value: earnedReward}(
+                            rewardToken,
+                            quo,
+                            earnedReward,
+                            address(this)
+                        )
                     );
                 } else {
                     _approveTokenIfNeeded(
                         rewardToken,
-                        address(rewardPool),
+                        address(nativeZapper),
                         earnedReward
                     );
-                    rewardPool.queueNewRewards(rewardToken, earnedReward);
+                    quoAmount = quoAmount.add(
+                        nativeZapper.swapToken(
+                            rewardToken,
+                            quo,
+                            earnedReward,
+                            address(this)
+                        )
+                    );
                 }
             }
+        }
+        if (quoAmount > 0) {
+            uint256 fee;
+            if (protocolFee > 0 && feeCollector != address(0)) {
+                fee = protocolFee.mul(quoAmount).div(DENOMINATOR);
+                quo.safeTransferToken(feeCollector, fee);
+            }
+            emit QuoHarvested(quoAmount, fee);
+            quoAmount = quoAmount.sub(fee);
+            _approveTokenIfNeeded(quo, address(rewardPool), quoAmount);
+            rewardPool.queueNewRewards(quo, quoAmount);
         }
         _;
     }
@@ -173,7 +208,6 @@ contract DelegateVotePool is ManagerUpgradeable {
         external
         onlyBribeManager
         harvest
-        returns (bool)
     {
         rewardPool.stakeFor(_for, _amount);
         _updateVote();
