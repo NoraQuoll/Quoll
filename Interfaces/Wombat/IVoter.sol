@@ -35,7 +35,11 @@ interface IVoter {
     function pendingBribes(address[] calldata _lpTokens, address _user)
         external
         view
-        returns (uint256[][] memory bribeRewards);
+        returns (
+            address[][] memory bribeTokenAddresses,
+            string[][] memory bribeTokenSymbols,
+            uint256[][] memory bribeRewards
+        );
 
     function distribute(address _lpToken) external;
 }

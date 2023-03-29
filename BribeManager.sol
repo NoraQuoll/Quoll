@@ -80,6 +80,12 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
         castVotesCooldown = 60;
     }
 
+    function setDelegatePool(address _delegatePool) external onlyOwner {
+        require(_delegatePool != address(0), "invalid _delegatePool!");
+
+        delegatePool = _delegatePool;
+    }
+
     function getUserTotalVote(address _user)
         external
         view

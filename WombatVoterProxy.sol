@@ -547,23 +547,27 @@ contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
         )
     {
         // Warning: Arguments do not take into account repeated elements in the pendingPools list
-        uint256[][] memory pending = voter.pendingBribes(
-            _pendingPools,
-            address(this)
-        );
-        uint256 length = pending.length;
+        (
+            address[][] memory bribeTokenAddresses,
+            ,
+            uint256[][] memory bribeRewards
+        ) = voter.pendingBribes(_pendingPools, address(this));
+        uint256 length = bribeTokenAddresses.length;
         rewardTokens = new address[][](length);
         callerFeeAmount = new uint256[][](length);
         for (uint256 i; i < length; i++) {
-            (, , , , , , address bribesContract) = voter.infos(
-                _pendingPools[i]
-            );
-            rewardTokens[i] = _getBribeRewardTokens(bribesContract);
-            callerFeeAmount[i] = new uint256[](rewardTokens[i].length);
-            for (uint256 j; j < pending[i].length; j++) {
-                callerFeeAmount[i][j] = pending[i][j].mul(bribeCallerFee).div(
-                    FEE_DENOMINATOR
-                );
+            rewardTokens[i] = new address[](bribeTokenAddresses[i].length);
+            callerFeeAmount[i] = new uint256[](bribeTokenAddresses[i].length);
+            for (uint256 j; j < bribeTokenAddresses[i].length; j++) {
+                // if rewardToken is 0, native token is used as reward token
+                if (bribeTokenAddresses[i][j] == address(0)) {
+                    rewardTokens[i][j] = AddressLib.PLATFORM_TOKEN_ADDRESS;
+                } else {
+                    rewardTokens[i][j] = bribeTokenAddresses[i][j];
+                }
+                callerFeeAmount[i][j] = bribeRewards[i][j]
+                    .mul(bribeCallerFee)
+                    .div(FEE_DENOMINATOR);
             }
         }
     }
