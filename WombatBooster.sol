@@ -65,6 +65,8 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
     bool public earmarkOnOperation;
 
+    address public quoMinter;
+
     function initialize() public initializer {
         __Ownable_init();
     }
@@ -175,11 +177,14 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         earmarkIncentive = _earmarkIncentive;
     }
 
-    function setEarmarkOnOperation(bool _earmarkOnOperation)
-        external
-        onlyOwner
-    {
+    function setEarmarkOnOperation(
+        bool _earmarkOnOperation
+    ) external onlyOwner {
         earmarkOnOperation = _earmarkOnOperation;
+    }
+
+    function setQuoMinter(address _quoMinter) external onlyOwner {
+        quoMinter = _quoMinter;
     }
 
     /// END SETTER SECTION ///
@@ -266,10 +271,10 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         }
     }
 
-    function migrate(uint256[] calldata _pids, address _newMasterWombat)
-        external
-        onlyOwner
-    {
+    function migrate(
+        uint256[] calldata _pids,
+        address _newMasterWombat
+    ) external onlyOwner {
         for (uint256 i = 0; i < _pids.length; i++) {
             uint256 pid = _pids[i];
             PoolInfo storage pool = poolInfo[pid];
@@ -548,11 +553,9 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         return true;
     }
 
-    function getRewardTokensForPid(uint256 _pid)
-        external
-        view
-        returns (address[] memory)
-    {
+    function getRewardTokensForPid(
+        uint256 _pid
+    ) external view returns (address[] memory) {
         address[] memory rewardTokens = new address[](
             pidToRewardTokens[_pid].length()
         );
@@ -580,7 +583,11 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         }
 
         //mint reward tokens
-        IQuollToken(quo).mint(_account, _amount);
+        if (quoMinter != address(0)) {
+            IQuollToken(quoMinter).mint(_account, _amount);
+        } else {
+            IQuollToken(quo).mint(_account, _amount);
+        }
     }
 
     function _updatePendingRewards(
