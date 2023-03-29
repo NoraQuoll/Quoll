@@ -3,6 +3,11 @@
 pragma solidity 0.6.12;
 
 interface INativeZapper {
+    enum Dex {
+        PCS,
+        Thena
+    }
+
     function getAmountOut(address _from, uint256 _amount)
         external
         view
@@ -22,6 +27,7 @@ interface INativeZapper {
     ) external payable returns (uint256);
 
     event ZapIn(
+        Dex _dex,
         address indexed _from,
         uint256 _amount,
         address indexed _receiver,
@@ -35,4 +41,5 @@ interface INativeZapper {
         uint256 _amountOut
     );
     event AccessSet(address indexed _address, bool _status);
+    event PairToDexSet(address indexed _from, address indexed _to, Dex _dex);
 }

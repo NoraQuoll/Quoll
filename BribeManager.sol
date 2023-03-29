@@ -468,6 +468,9 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
         uint256 feeAmount = 0;
         for (uint256 i = 0; i < rewardTokens.length; i++) {
             for (uint256 j = 0; j < rewardTokens[i].length; j++) {
+                if (amounts[i][j] == 0) {
+                    continue;
+                }
                 if (rewardTokens[i][j] == AddressLib.PLATFORM_TOKEN_ADDRESS) {
                     feeAmount = feeAmount.add(amounts[i][j]);
                 } else {
