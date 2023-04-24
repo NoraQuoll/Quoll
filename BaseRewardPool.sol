@@ -247,10 +247,10 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         _withdraw(_account, _amount);
     }
 
-    function _withdraw(address _account, uint256 _amount)
-        internal
-        updateReward(_account)
-    {
+    function _withdraw(
+        address _account,
+        uint256 _amount
+    ) internal virtual updateReward(_account) {
         require(_amount > 0, "RewardPool : Cannot withdraw 0");
 
         _totalSupply = _totalSupply.sub(_amount);
@@ -361,4 +361,6 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
     }
 
     receive() external payable {}
+
+    uint256[100] private __gap;
 }
