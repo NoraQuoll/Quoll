@@ -212,9 +212,9 @@ contract LpLocker is
         userLocks[msg.sender].pop();
 
         if (punishment > 0) {
-            IERC20(token).safeTransfer(treasury, punishment);
+            _safeTransferToken(token, treasury, punishment);
         }
-        IERC20(token).safeTransfer(msg.sender, lockInfo.amount.sub(punishment));
+        _safeTransferToken(token, msg.sender, lockInfo.amount.sub(punishment));
 
         vlQuoV2.decreaseBalance(msg.sender, lockInfo.vlQuoAmount);
 
@@ -243,6 +243,13 @@ contract LpLocker is
                 .mul(rewardPerTokenStored.sub(userRewardPerTokenPaid[_user]))
                 .div(1e18)
                 .add(rewards[_user]);
+    }
+
+    function getVlQuoAmount(
+        uint256 _amount,
+        uint256 _weeks
+    ) external view returns (uint256) {
+        return _getVlQuoAmount(_amount, _weeks);
     }
 
     function emergencyWithdraw() external onlyOwner {
@@ -281,6 +288,18 @@ contract LpLocker is
         if (tokenBal < _amount) {
             kalmyLpWar.withdraw(pid, _amount.sub(tokenBal));
         }
+    }
+
+    function _safeTransferToken(
+        address _token,
+        address _to,
+        uint256 _amount
+    ) internal {
+        uint256 tokenBal = IERC20(_token).balanceOf(address(this));
+        if (_amount > tokenBal) {
+            _amount = tokenBal;
+        }
+        IERC20(_token).safeTransfer(_to, _amount);
     }
 
     function _getVlQuoAmount(uint256 _amount, uint256 _weeks)
