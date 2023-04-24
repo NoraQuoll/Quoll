@@ -8,14 +8,17 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
 import "@shared/lib-contracts/contracts/Dependencies/ManagerUpgradeable.sol";
 import "../Interfaces/IVlQuoV2.sol";
+import "../Interfaces/IWomDepositor.sol";
 
-contract CampaignRewardPool is ManagerUpgradeable {
+contract CampaignRewardPoolV2 is ManagerUpgradeable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     using TransferHelper for address;
 
     IERC20 public stakingToken;
+    address public wom;
     address public quo;
+    address public womDepositor;
     address public vlQuoV2;
     address public treasury;
 
@@ -46,19 +49,25 @@ contract CampaignRewardPool is ManagerUpgradeable {
 
     function setParams(
         address _stakingToken,
+        address _wom,
         address _quo,
+        address _womDepositor,
         address _vlquoV2,
         address _treasury
     ) external onlyOwner {
         require(quo == address(0), "params have already been set");
 
         require(_stakingToken != address(0), "invalid _stakingToken!");
+        require(_wom != address(0), "invalid _wom!");
         require(_quo != address(0), "invalid _quo!");
+        require(_womDepositor != address(0), "invalid _womDepositor!");
         require(_vlquoV2 != address(0), "invalid _vlquoV2!");
         require(_treasury != address(0), "invalid _treasury!");
 
         stakingToken = IERC20(_stakingToken);
+        wom = _wom;
         quo = _quo;
+        womDepositor = _womDepositor;
         vlQuoV2 = _vlquoV2;
         treasury = _treasury;
     }
@@ -144,7 +153,10 @@ contract CampaignRewardPool is ManagerUpgradeable {
         _totalSupply = _totalSupply.add(_amount);
         _balances[msg.sender] = _balances[msg.sender].add(_amount);
 
-        stakingToken.safeTransferFrom(msg.sender, address(this), _amount);
+        IERC20(wom).safeTransferFrom(msg.sender, address(this), _amount);
+        _approveTokenIfNeeded(wom, womDepositor, _amount);
+        IWomDepositor(womDepositor).deposit(_amount, false);
+
         emit Staked(msg.sender, _amount);
     }
 
@@ -176,6 +188,17 @@ contract CampaignRewardPool is ManagerUpgradeable {
                 IERC20(quo).safeTransfer(msg.sender, reward.sub(penaltyAmount));
             }
             emit RewardPaid(msg.sender, reward);
+        }
+    }
+
+    function _approveTokenIfNeeded(
+        address _token,
+        address _to,
+        uint256 _amount
+    ) internal {
+        if (IERC20(_token).allowance(address(this), _to) < _amount) {
+            IERC20(_token).safeApprove(_to, 0);
+            IERC20(_token).safeApprove(_to, type(uint256).max);
         }
     }
 }
