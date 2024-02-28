@@ -1,25 +1,62 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity 0.6.12;
+/**
+ *Submitted for verification at Etherscan.io on 2020-07-17
+ */
+
+/*
+   ____            __   __        __   _
+  / __/__ __ ___  / /_ / /  ___  / /_ (_)__ __
+ _\ \ / // // _ \/ __// _ \/ -_)/ __// / \ \ /
+/___/ \_, //_//_/\__//_//_/\__/ \__//_/ /_\_\
+     /___/
+
+* Synthetix: BaseRewardPool.sol
+*
+* Docs: https://docs.synthetix.io/
+*
+*
+* MIT License
+* ===========
+*
+* Copyright (c) 2020 Synthetix
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+*/
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "./Interfaces/IVirtualBalanceRewardPool.sol";
+import "./Interfaces/IBaseRewardPool.sol";
 import "./Interfaces/IWombatBooster.sol";
-import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
+import "./lib/TransferHelper.sol";
 
-contract VirtualBalanceRewardPool is
-    IVirtualBalanceRewardPool,
-    OwnableUpgradeable
-{
+contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     using TransferHelper for address;
 
     address public operator;
+    address public booster;
+    uint256 public pid;
 
+    IERC20 public override stakingToken;
     address[] public rewardTokens;
 
     uint256 private _totalSupply;
@@ -42,6 +79,8 @@ contract VirtualBalanceRewardPool is
 
     mapping(address => bool) public access;
 
+    mapping(address => bool) public grants;
+
     mapping(address => uint256) public userLastTime;
 
     mapping(address => uint256) public userAmountTime;
@@ -51,14 +90,32 @@ contract VirtualBalanceRewardPool is
 
         operator = _operator;
 
-        access[operator] = true;
-
         emit OperatorUpdated(_operator);
     }
 
-    modifier onlyOperator() {
-        require(msg.sender == operator, "Only Operator");
-        _;
+    function setParams(
+        address _booster,
+        uint256 _pid,
+        address _stakingToken,
+        address _rewardToken
+    ) external override {
+        require(msg.sender == owner() || msg.sender == operator, "!auth");
+
+        require(booster == address(0), "params has already been set");
+        require(_booster != address(0), "invalid _booster!");
+        require(_stakingToken != address(0), "invalid _stakingToken!");
+        require(_rewardToken != address(0), "invalid _rewardToken!");
+
+        booster = _booster;
+
+        pid = _pid;
+        stakingToken = IERC20(_stakingToken);
+
+        addRewardToken(_rewardToken);
+
+        access[_booster] = true;
+
+        emit BoosterUpdated(_booster);
     }
 
     function addRewardToken(address _rewardToken) internal {
@@ -144,10 +201,24 @@ contract VirtualBalanceRewardPool is
         return userAmountTime[_account].add(now.sub(lastTime).mul(userBalance));
     }
 
+    function stake(uint256 _amount) public override updateReward(msg.sender) {
+        require(_amount > 0, "RewardPool : Cannot stake 0");
+
+        _totalSupply = _totalSupply.add(_amount);
+        _balances[msg.sender] = _balances[msg.sender].add(_amount);
+
+        stakingToken.safeTransferFrom(msg.sender, address(this), _amount);
+        emit Staked(msg.sender, _amount);
+    }
+
+    function stakeAll() external override {
+        uint256 balance = stakingToken.balanceOf(msg.sender);
+        stake(balance);
+    }
+
     function stakeFor(address _for, uint256 _amount)
         external
         override
-        onlyOperator
         updateReward(_for)
     {
         require(_for != address(0), "invalid _for!");
@@ -157,20 +228,35 @@ contract VirtualBalanceRewardPool is
         _totalSupply = _totalSupply.add(_amount);
         _balances[_for] = _balances[_for].add(_amount);
 
+        //take away from sender
+        stakingToken.safeTransferFrom(msg.sender, address(this), _amount);
         emit Staked(_for, _amount);
     }
 
-    function withdrawFor(address _account, uint256 _amount)
-        external
-        override
-        onlyOperator
-        updateReward(_account)
-    {
+    function withdraw(uint256 amount) external override {
+        _withdraw(msg.sender, amount);
+    }
+
+    function withdrawAll() external override {
+        _withdraw(msg.sender, _balances[msg.sender]);
+    }
+
+    function withdrawFor(address _account, uint256 _amount) external override {
+        require(grants[msg.sender], "!auth");
+
+        _withdraw(_account, _amount);
+    }
+
+    function _withdraw(
+        address _account,
+        uint256 _amount
+    ) internal virtual updateReward(_account) {
         require(_amount > 0, "RewardPool : Cannot withdraw 0");
 
         _totalSupply = _totalSupply.sub(_amount);
         _balances[_account] = _balances[_account].sub(_amount);
 
+        stakingToken.safeTransfer(_account, _amount);
         emit Withdrawn(_account, _amount);
 
         getReward(_account);
@@ -179,7 +265,6 @@ contract VirtualBalanceRewardPool is
     function getReward(address _account)
         public
         override
-        onlyOperator
         updateReward(_account)
     {
         for (uint256 i = 0; i < rewardTokens.length; i++) {
@@ -188,6 +273,12 @@ contract VirtualBalanceRewardPool is
             if (reward > 0) {
                 userRewards[_account][rewardToken].rewards = 0;
                 rewardToken.safeTransferToken(_account, reward);
+                IWombatBooster(booster).rewardClaimed(
+                    pid,
+                    _account,
+                    rewardToken,
+                    reward
+                );
                 emit RewardPaid(_account, rewardToken, reward);
             }
         }
@@ -251,6 +342,13 @@ contract VirtualBalanceRewardPool is
         emit RewardAdded(_rewardToken, _rewards);
     }
 
+    function grant(address _address, bool _grant) external onlyOwner {
+        require(_address != address(0), "invalid _address!");
+
+        grants[_address] = _grant;
+        emit Granted(_address, _grant);
+    }
+
     function setAccess(address _address, bool _status)
         external
         override
@@ -263,4 +361,6 @@ contract VirtualBalanceRewardPool is
     }
 
     receive() external payable {}
+
+    uint256[100] private __gap;
 }

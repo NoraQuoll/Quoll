@@ -6,9 +6,9 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
-import "@shared/lib-contracts/contracts/Interfaces/IWNative.sol";
-import "@shared/lib-contracts/contracts/Interfaces/IWNativeRelayer.sol";
+import "./lib/TransferHelper.sol";
+import "./lib/Interfaces/IWNative.sol";
+import "./lib/Interfaces/IWNativeRelayer.sol";
 import "./Interfaces/IBaseRewardPool.sol";
 import "./Interfaces/IWombatBooster.sol";
 import "./Interfaces/Wombat/IAsset.sol";

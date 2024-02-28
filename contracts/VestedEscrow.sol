@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/math/Math.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-import "@shared/lib-contracts/contracts/Dependencies/ManagerUpgradeable.sol";
+import "./lib/ManagerUpgradeable.sol";
 
 contract VestedEscrow is ManagerUpgradeable {
     using SafeERC20 for IERC20;

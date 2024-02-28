@@ -13,7 +13,7 @@ import "./Interfaces/Wombat/IMasterWombatV2.sol";
 import "./Interfaces/Wombat/IMasterWombatV3.sol";
 import "./Interfaces/Wombat/IVeWom.sol";
 import "./Interfaces/Wombat/IVoter.sol";
-import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
+import "./lib/TransferHelper.sol";
 
 contract WombatVoterProxy is IWombatVoterProxy, OwnableUpgradeable {
     using SafeERC20 for IERC20;

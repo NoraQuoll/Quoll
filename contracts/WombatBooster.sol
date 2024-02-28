@@ -13,7 +13,7 @@ import "./Interfaces/IDepositToken.sol";
 import "./Interfaces/IWomDepositor.sol";
 import "./Interfaces/IQuollToken.sol";
 import "./Interfaces/IBaseRewardPool.sol";
-import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
+import "./lib/TransferHelper.sol";
 
 contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     using SafeERC20 for IERC20;

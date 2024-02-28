@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
+import "./lib/TransferHelper.sol";
 import "./Interfaces/INativeZapper.sol";
 import "./Interfaces/IPancakePath.sol";
 import "./Interfaces/Pancake/IPancakeRouter.sol";

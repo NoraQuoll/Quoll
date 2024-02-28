@@ -10,7 +10,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 
-import "@shared/lib-contracts/contracts/Dependencies/ManagerUpgradeable.sol";
+import "./lib/ManagerUpgradeable.sol";
 import "./Interfaces/Pancake/IPancakePair.sol";
 import "./Interfaces/IVlQuoV2.sol";
 import "./Interfaces/ILpLocker.sol";

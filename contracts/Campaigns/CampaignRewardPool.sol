@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/math/Math.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-import "@shared/lib-contracts/contracts/Dependencies/TransferHelper.sol";
-import "@shared/lib-contracts/contracts/Dependencies/ManagerUpgradeable.sol";
+import "../lib/TransferHelper.sol";
+import "../lib/ManagerUpgradeable.sol";
 import "../Interfaces/IVlQuoV2.sol";
 
 contract CampaignRewardPool is ManagerUpgradeable {
