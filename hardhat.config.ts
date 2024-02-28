@@ -1,28 +1,64 @@
-import * as dotenv from "dotenv";
-
-import { HardhatUserConfig, task } from "hardhat/config";
+import { HardhatUserConfig } from "hardhat/config";
+import { HttpNetworkConfig } from "hardhat/src/types";
+import "hardhat-contract-sizer";
+import "hardhat-deploy";
+import "hardhat-deploy-ethers";
+import "@nomicfoundation/hardhat-chai-matchers";
 import "@nomiclabs/hardhat-etherscan";
-import "@nomiclabs/hardhat-waffle";
-import "@typechain/hardhat";
-import "hardhat-gas-reporter";
-import "solidity-coverage";
+import "@nomiclabs/hardhat-ethers";
 
+import * as dotenv from "dotenv";
 dotenv.config();
 
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
-
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
-
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
+const private_key = process.env.PK !== undefined ? [process.env.PK] : [];
 
 const config: HardhatUserConfig = {
+  defaultNetwork: "hardhat",
+  namedAccounts: {
+    deployer: {
+      default: 0,
+    },
+    dev: {
+      // Default to 1
+      default: 1,
+      // dev address mainnet
+      // 1: "",
+    },
+  },
+  networks: {
+    hardhat: {
+      chainId: 1337,
+    },
+    goerli_arbi: {
+      url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
+      accounts: private_key,
+    },
+    sepolia: {
+      url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
+      accounts: private_key,
+    },
+    localhost: {
+      url: "http://127.0.0.1:8545",
+      accounts: private_key,
+    },
+    goerli: {
+      url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
+      accounts: private_key,
+    },
+    testnet: {
+      url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
+      accounts: private_key,
+    },
+  },
+  etherscan: {
+    apiKey: process.env.ETH_API_KEY,
+  },
+  contractSizer: {
+    alphaSort: true,
+    disambiguatePaths: false,
+    runOnCompile: false,
+    strict: true,
+  },
   solidity: {
     compilers: [
       {
@@ -35,20 +71,6 @@ const config: HardhatUserConfig = {
         },
       },
     ],
-  },
-  networks: {
-    ropsten: {
-      url: process.env.ROPSTEN_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-    },
-  },
-  gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
-    currency: "USD",
-  },
-  etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
   },
 };
 
