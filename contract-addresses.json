@@ -1,0 +1,23 @@
+{
+    "testnet": {
+        "DefaultProxyAdmin": {
+            "address": "0x384a4FbF7D527e44a9dB6aa694233c35eA930b09"
+        },
+        "QUO": {
+            "address": "0x0D10dF5c951ABFd925FE91632a89e81d8aFAbB06",
+            "impl": "0xDDaa043AB1427cEBDb12095D55FEC5C42269EE5E"
+        },
+        "QuoRewardPool": {
+            "address": "0x24C771529C5e0671299cFB1225B99B064E626bD7",
+            "impl": "0xCDd944cc07FB2a14a0DB554cD5E539a020A9f81e"
+        },
+        "QuollMasterChef": {
+            "address": "0x30fd8c91A48918478aeE8AdaF22f5E2AE8aBE781",
+            "impl": "0x6778528B14469d92a03E618B6a7D3b6Be657719d"
+        },
+        "qWOM": {
+            "address": "0xE45db54158b649db21AAB6489F2327cde16Ed99a",
+            "impl": "0x680a7E0eE0Ace68c51333af0239126d3d20f0B37"
+        }
+    }
+}

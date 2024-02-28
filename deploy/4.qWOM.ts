@@ -14,7 +14,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const data = await deploy("QuollToken", {
+  const data = await deploy("QuollExternalToken", {
     from: deployer,
     args: [],
     log: true,
@@ -25,13 +25,13 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       owner: deployer,
       execute: {
         methodName: "initialize",
-        args: [],
+        args: ["Quoll WOM", "qWOM"],
       },
     },
   });
 
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
-  await saveContract(network.name, "QUO", data.address, data.implementation!);
+  await saveContract(network.name, "qWOM", data.address, data.implementation!);
 
   try {
     // verify
@@ -44,6 +44,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-deploy.tags = ["QUO"];
+deploy.tags = ["qWOM"];
 
 export default deploy;
