@@ -14,7 +14,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const data = await deploy("WombatVoterProxy", {
+  const data = await deploy("BaseRewardPool", {
     from: deployer,
     args: [],
     log: true,
@@ -33,7 +33,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
   await saveContract(
     network.name,
-    "WombatVoterProxy",
+    "qWOMReward",
     data.address,
     data.implementation!
   );
@@ -49,6 +49,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-deploy.tags = ["WombatVoterProxy"];
+deploy.tags = ["qWOMReward"];
 
 export default deploy;
