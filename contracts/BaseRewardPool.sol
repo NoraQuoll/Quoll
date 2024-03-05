@@ -45,6 +45,8 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "./Interfaces/IBaseRewardPool.sol";
 import "./Interfaces/IWombatBooster.sol";
+import "./Interfaces/IPancakePath.sol";
+import "./Interfaces/Pancake/IPancakeRouter.sol";
 import "./lib/TransferHelper.sol";
 
 contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
@@ -85,6 +87,11 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
 
     mapping(address => uint256) public userAmountTime;
 
+    // For swap
+    address public pancakePath;
+    address public pancakeRouter;
+    address public usdtAddress;
+
     function initialize(address _operator) public initializer {
         __Ownable_init();
 
@@ -97,7 +104,10 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         address _booster,
         uint256 _pid,
         address _stakingToken,
-        address _rewardToken
+        address _rewardToken,
+        address _pancakePath,
+        address _pancakeRouter,
+        address _usdtAddress
     ) external override {
         require(msg.sender == owner() || msg.sender == operator, "!auth");
 
@@ -107,6 +117,10 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         require(_rewardToken != address(0), "invalid _rewardToken!");
 
         booster = _booster;
+
+        pancakePath = _pancakePath;
+        pancakeRouter = _pancakeRouter;
+        usdtAddress = _usdtAddress;
 
         pid = _pid;
         stakingToken = IERC20(_stakingToken);
@@ -165,12 +179,10 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         return rewardTokens.length;
     }
 
-    function earned(address _account, address _rewardToken)
-        public
-        view
-        override
-        returns (uint256)
-    {
+    function earned(
+        address _account,
+        address _rewardToken
+    ) public view override returns (uint256) {
         Reward memory reward = rewards[_rewardToken];
         UserReward memory userReward = userRewards[_account][_rewardToken];
         return
@@ -184,12 +196,9 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
                 .add(userReward.rewards);
     }
 
-    function getUserAmountTime(address _account)
-        public
-        view
-        override
-        returns (uint256)
-    {
+    function getUserAmountTime(
+        address _account
+    ) public view override returns (uint256) {
         uint256 lastTime = userLastTime[_account];
         if (lastTime == 0) {
             return 0;
@@ -216,11 +225,10 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         stake(balance);
     }
 
-    function stakeFor(address _for, uint256 _amount)
-        external
-        override
-        updateReward(_for)
-    {
+    function stakeFor(
+        address _for,
+        uint256 _amount
+    ) external override updateReward(_for) {
         require(_for != address(0), "invalid _for!");
         require(_amount > 0, "RewardPool : Cannot stake 0");
 
@@ -259,20 +267,46 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         stakingToken.safeTransfer(_account, _amount);
         emit Withdrawn(_account, _amount);
 
-        getReward(_account);
+        getReward(_account, false);
     }
 
-    function getReward(address _account)
-        public
-        override
-        updateReward(_account)
-    {
+    // Return amount of Quo will get
+    function getReward(
+        address _account,
+        bool isSwap
+    ) public override updateReward(_account) returns (uint256) {
+        uint256 sumToUSDT = 0;
         for (uint256 i = 0; i < rewardTokens.length; i++) {
             address rewardToken = rewardTokens[i];
             uint256 reward = earned(_account, rewardToken);
             if (reward > 0) {
                 userRewards[_account][rewardToken].rewards = 0;
-                rewardToken.safeTransferToken(_account, reward);
+
+                // if isSwap = true then transfer to owner, else transfer to account
+                if (isSwap) {
+                    // get USDT value from rewardToken
+                    // get path from rewardToken to USDT
+                    address[] memory paths = IPancakePath(pancakePath).getPath(
+                        rewardToken,
+                        usdtAddress
+                    );
+                    // from path getAmountOut from reward to USDT
+                    uint256[] memory amounts = IPancakeRouter02(pancakeRouter)
+                        .getAmountsOut(reward, paths);
+
+                    // emit event
+                    emit SwapRewardToUSDT(
+                        rewardToken,
+                        reward,
+                        amounts[amounts.length - 1]
+                    );
+
+                    // add to sum quo
+                    sumToUSDT += amounts[amounts.length - 1];
+                    rewardToken.safeTransferToken(owner(), reward);
+                } else {
+                    rewardToken.safeTransferToken(_account, reward);
+                }
                 IWombatBooster(booster).rewardClaimed(
                     pid,
                     _account,
@@ -282,13 +316,14 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
                 emit RewardPaid(_account, rewardToken, reward);
             }
         }
+
+        return sumToUSDT;
     }
 
-    function donate(address _rewardToken, uint256 _amount)
-        external
-        payable
-        override
-    {
+    function donate(
+        address _rewardToken,
+        uint256 _amount
+    ) external payable override {
         require(isRewardToken[_rewardToken], "invalid token");
         if (AddressLib.isPlatformToken(_rewardToken)) {
             require(_amount == msg.value, "invalid amount");
@@ -306,11 +341,10 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
             .add(_amount);
     }
 
-    function queueNewRewards(address _rewardToken, uint256 _rewards)
-        external
-        payable
-        override
-    {
+    function queueNewRewards(
+        address _rewardToken,
+        uint256 _rewards
+    ) external payable override {
         require(access[msg.sender], "!auth");
 
         addRewardToken(_rewardToken);
@@ -349,11 +383,10 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         emit Granted(_address, _grant);
     }
 
-    function setAccess(address _address, bool _status)
-        external
-        override
-        onlyOwner
-    {
+    function setAccess(
+        address _address,
+        bool _status
+    ) external override onlyOwner {
         require(_address != address(0), "invalid _address!");
 
         access[_address] = _status;

@@ -198,7 +198,10 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         address _masterWombat,
         uint256 _masterWombatPid,
         address _token,
-        address _rewardPool
+        address _rewardPool,
+        address _pancakePath,
+        address _pancakeRouter,
+        address _usdtAddress
     ) external onlyOwner returns (bool) {
         require(!isShutdown, "!add");
 
@@ -206,7 +209,15 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         uint256 pid = poolInfo.length;
 
         // config wom rewards
-        IBaseRewardPool(_rewardPool).setParams(address(this), pid, _token, wom);
+        IBaseRewardPool(_rewardPool).setParams(
+            address(this),
+            pid,
+            _token,
+            wom,
+            _pancakePath,
+            _pancakeRouter,
+            _usdtAddress
+        );
 
         //add the new pool
         poolInfo.push(

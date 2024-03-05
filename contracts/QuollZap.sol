@@ -13,6 +13,7 @@ import "./Interfaces/IBaseRewardPool.sol";
 import "./Interfaces/IWombatBooster.sol";
 import "./Interfaces/Wombat/IAsset.sol";
 import "./Interfaces/Wombat/IPool.sol";
+import "./Interfaces/INativeZapper.sol";
 
 contract QuollZap is OwnableUpgradeable {
     using SafeMath for uint256;
@@ -20,6 +21,11 @@ contract QuollZap is OwnableUpgradeable {
 
     address public wNative;
     address public wNativeRelayer;
+
+    // for swap
+    address public nativeZapper;
+    address public usdtAddress;
+    address public quoAddress;
 
     IWombatBooster public booster;
 
@@ -30,7 +36,10 @@ contract QuollZap is OwnableUpgradeable {
     function setParams(
         address _wNative,
         address _wNativeRelayer,
-        address _booster
+        address _booster,
+        address _nativeZapper,
+        address _usdtAddress,
+        address _quoAddress
     ) external onlyOwner {
         require(_wNative != address(0), "invalid _wNative!");
         require(_wNativeRelayer != address(0), "invalid _wNativeRelayer!");
@@ -38,6 +47,10 @@ contract QuollZap is OwnableUpgradeable {
 
         wNative = _wNative;
         wNativeRelayer = _wNativeRelayer;
+        nativeZapper = _nativeZapper;
+
+        usdtAddress = _usdtAddress;
+        quoAddress = _quoAddress;
         IERC20(wNative).safeApprove(wNativeRelayer, uint256(-1));
 
         booster = IWombatBooster(_booster);
@@ -167,17 +180,44 @@ contract QuollZap is OwnableUpgradeable {
         }
     }
 
-    function claimRewards(uint256[] calldata _pids) external {
+    function claimRewards(uint256[] calldata _pids, bool isSwap) external {
+        uint256 sumRewardInUSDT = 0;
         for (uint256 i = 0; i < _pids.length; i++) {
             (, , , address rewardPool, ) = booster.poolInfo(_pids[i]);
             require(rewardPool != address(0), "invalid _pids");
-            IBaseRewardPool(rewardPool).getReward(msg.sender);
+            uint256 rewardInUSDT = IBaseRewardPool(rewardPool).getReward(
+                msg.sender,
+                isSwap
+            );
+            sumRewardInUSDT += rewardInUSDT;
+        }
+
+        if (sumRewardInUSDT > 0) {
+            // from USDT swap to QUO and send to user
+            _approveTokenIfNeeded(usdtAddress, nativeZapper, sumRewardInUSDT);
+            INativeZapper(nativeZapper).swapToken(
+                usdtAddress,
+                quoAddress,
+                sumRewardInUSDT,
+                msg.sender
+            );
         }
     }
 
     function inCaseTokensGetStuck(address _token) external onlyOwner {
         uint256 amount = IERC20(_token).balanceOf(address(this));
         IERC20(_token).safeTransfer(msg.sender, amount);
+    }
+
+    function _approveTokenIfNeeded(
+        address _token,
+        address _to,
+        uint256 _amount
+    ) internal {
+        if (IERC20(_token).allowance(address(this), _to) < _amount) {
+            IERC20(_token).safeApprove(_to, 0);
+            IERC20(_token).safeApprove(_to, type(uint256).max);
+        }
     }
 
     receive() external payable {}
