@@ -564,6 +564,39 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         return true;
     }
 
+    function earmarkRewardsForAllPool() external returns (bool) {
+        require(!isShutdown, "shutdown");
+
+        // loop all pool
+        for (uint256 i = 0; i < poolInfo.length; i++) {
+            PoolInfo memory pool = poolInfo[i];
+
+            // Only claim for not yet shutdown pool
+            if (!pool.shutdown) {
+                //claim wom and bonus token rewards
+                address[] memory rewardTokens;
+                uint256[] memory rewardAmounts;
+
+                if (pidToMasterWombat[i] == address(0)) {
+                    (rewardTokens, rewardAmounts) = IWombatVoterProxy(
+                        voterProxy
+                    ).claimRewards(pool.masterWombatPid);
+                } else {
+                    (rewardTokens, rewardAmounts) = IWombatVoterProxy(
+                        voterProxy
+                    ).claimRewardsV2(
+                            pidToMasterWombat[i],
+                            pool.masterWombatPid
+                        );
+                }
+                _updatePendingRewards(i, rewardTokens, rewardAmounts);
+
+                _earmarkRewards(i, msg.sender);
+            }
+        }
+        return true;
+    }
+
     function getRewardTokensForPid(
         uint256 _pid
     ) external view returns (address[] memory) {
