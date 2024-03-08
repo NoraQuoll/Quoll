@@ -1,13 +1,3 @@
-// Set Param
-
-// contract quoRewardPool
-// _stakingToken: ..
-// WOM
-// _womDepositor: womDepositor contract
-// _qWomRewards: qWOMReward Contract
-// _qWomToken
-// _booster: wombatBooster contract
-
 // Set Access wombatBooster to contract QUO
 // Contract QUO
 // Accessable to wombatBooster
@@ -28,50 +18,21 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const quoll_reward_pool = await getContracts()[process.env.NETWORK_NAME!][
-    "QuoRewardPool"
-  ]["address"];
+  const quoll_token = "0x0fdaa1bFF1Fe573C420eb401E2132d9FfCE80Bb7";
 
-  const quoll = await getContracts()[process.env.NETWORK_NAME!]["QUO"][
-    "address"
-  ];
-
-  const wom_depositor = await getContracts()[process.env.NETWORK_NAME!][
-    "WomDeposit"
-  ]["address"];
-
-  const q_wom_reward = await getContracts()[process.env.NETWORK_NAME!][
-    "qWOMReward"
-  ]["address"];
-
-  const q_wom = await getContracts()[process.env.NETWORK_NAME!]["qWOM"][
-    "address"
-  ];
-
-  const booster = await getContracts()[process.env.NETWORK_NAME!][
-    "WombatBooster"
-  ]["address"];
-
-  const QuoRewardPool = JSON.parse(
+  const QuollToken = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/QuoRewardPool.sol/QuoRewardPool.json",
+      "./artifacts/contracts/QuollToken.sol/QuollToken.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(QuoRewardPool);
+  const contract = new web3.eth.Contract(QuollToken);
 
   const txData = contract.methods
-    .setParams(
-      quoll,
-      process.env.WOM,
-      wom_depositor,
-      q_wom_reward,
-      q_wom,
-      booster
-    )
+    .setAccess("0xDbE717a72fa40dFd67A5c9FAF61b0a7d9595a826", true)
     .encodeABI();
   console.log(txData);
 
@@ -80,7 +41,7 @@ async function main() {
     nonce: txCount,
     gasLimit: web3.utils.toHex("30000000"),
     data: txData,
-    to: quoll_reward_pool,
+    to: quoll_token,
     from: user,
   };
 

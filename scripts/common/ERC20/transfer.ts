@@ -1,16 +1,10 @@
-// set operator
-
-// contract qWOM
-// _operator: womDepositor contract
-
 import Web3 from "web3";
-import { ethers } from "ethers";
-import * as dotenv from "dotenv";
 
+import * as dotenv from "dotenv";
 dotenv.config();
 
 import * as fs from "fs";
-import { saveContract, getContracts, sleep } from "../utils";
+import { getContracts } from "../../utils";
 
 const web3 = new Web3(process.env.RPC!);
 
@@ -18,35 +12,31 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
+const to = "0xDbE717a72fa40dFd67A5c9FAF61b0a7d9595a826";
+
 async function main() {
-  const qWom = await getContracts()[process.env.NETWORK_NAME!]["qWOM"][
-    "address"
-  ];
+  const quoll_token = "0x6E847Cc3383525Ad33bEDd260139c1e097546B60";
 
-  const operator = await getContracts()[process.env.NETWORK_NAME!][
-    "WomDeposit"
-  ]["address"];
-
-  const QuollExternalToken = JSON.parse(
+  const Token = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/QuollExternalToken.sol/QuollExternalToken.json",
+      "./artifacts/contracts/QuollToken.sol/QuollToken.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(QuollExternalToken);
+  const contract = new web3.eth.Contract(Token);
 
-  const txData = contract.methods.setOperator(operator).encodeABI();
-  console.log(txData);
+  const txData = contract.methods
+    .transfer(to, "10000000000000000000")
+    .encodeABI();
 
-  //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
+    gasLimit: web3.utils.toHex("300000"),
     data: txData,
-    to: qWom,
+    to: quoll_token,
     from: user,
   };
 

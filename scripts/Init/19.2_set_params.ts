@@ -1,3 +1,16 @@
+// setParams
+
+// contract WombatBooster
+// _wom
+// _voterProxy
+// _womDepositor
+// _qWom
+// _quo
+// _vlQuo
+// _quoRewardPool
+// _qWomRewardPool
+// _treasury: Address
+
 import Web3 from "web3";
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
@@ -14,44 +27,35 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const bribeManager = await getContracts()[process.env.NETWORK_NAME!][
-    "BribeManager"
-  ]["address"];
-
-  const voterProxy = await getContracts()[process.env.NETWORK_NAME!][
-    "WombatVoterProxy"
-  ]["address"];
-
-  const vlQuoV2 = await getContracts()[process.env.NETWORK_NAME!]["VlQuoV2"][
-    "address"
-  ];
-
-  const nativeZap = await getContracts()[process.env.NETWORK_NAME!][
-    "NativeZapper"
-  ]["address"];
-
-  const delegatePool = await getContracts()[process.env.NETWORK_NAME!][
-    "DelegateVotePool"
-  ]["address"];
-
-  const BribeManager = JSON.parse(
+  const contract_address = "0x18c7ED62ADB937e51928ECc9E4234103C0Fb1Fa8";
+  const WombatBooster = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/BribeManager.sol/BribeManager.json",
+      "./artifacts/contracts/WombatBooster.sol/WombatBooster.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(BribeManager);
+  const booster = await getContracts()[process.env.NETWORK_NAME!][
+    "WombatBooster"
+  ]["address"];
+
+  const pancakePath = await getContracts()[process.env.NETWORK_NAME!][
+    "PancakePath"
+  ]["address"];
+
+  const contract = new web3.eth.Contract(WombatBooster);
 
   const txData = contract.methods
     .setParams(
-      process.env.WOMBAT_VOTER,
-      voterProxy,
-      vlQuoV2,
-      nativeZap,
-      delegatePool
+      booster,
+      2,
+      "0x5f451d5143511FF27c4C252E974Fd2e69c4EfBEB",
+      process.env.USDT,
+      pancakePath,
+      process.env.PANCAKE_ROUTER,
+      process.env.USDT
     )
     .encodeABI();
   console.log(txData);
@@ -61,7 +65,7 @@ async function main() {
     nonce: txCount,
     gasLimit: web3.utils.toHex("30000000"),
     data: txData,
-    to: bribeManager,
+    to: contract_address,
     from: user,
   };
 

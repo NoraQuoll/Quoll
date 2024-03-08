@@ -14,7 +14,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const data = await deploy("BribeManager", {
+  const data = await deploy("DelegateVotePool", {
     from: deployer,
     args: [],
     log: true,
@@ -23,17 +23,17 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     proxy: {
       proxyContract: "OptimizedTransparentProxy",
       owner: deployer,
-      // execute: {
-      //   methodName: "initialize",
-      //   args: [],
-      // },
+      execute: {
+        methodName: "initialize",
+        args: [],
+      },
     },
   });
 
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
   await saveContract(
     network.name,
-    "BribeManager",
+    "DelegateVotePool",
     data.address,
     data.implementation!
   );
@@ -49,6 +49,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-deploy.tags = ["BribeManager"];
+deploy.tags = ["DelegateVotePool"];
 
 export default deploy;

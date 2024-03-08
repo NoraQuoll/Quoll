@@ -1,3 +1,8 @@
+// set operator
+
+// contract qWOM
+// _operator: womDepositor contract
+
 import Web3 from "web3";
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
@@ -14,46 +19,24 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const bribeManager = await getContracts()[process.env.NETWORK_NAME!][
-    "BribeManager"
+  const reward_pool = "0x6aF52FEB5d9d5167123348A4Cb2C92421A41801B";
+
+  const operator = await getContracts()[process.env.NETWORK_NAME!][
+    "WombatBooster"
   ]["address"];
 
-  const voterProxy = await getContracts()[process.env.NETWORK_NAME!][
-    "WombatVoterProxy"
-  ]["address"];
-
-  const vlQuoV2 = await getContracts()[process.env.NETWORK_NAME!]["VlQuoV2"][
-    "address"
-  ];
-
-  const nativeZap = await getContracts()[process.env.NETWORK_NAME!][
-    "NativeZapper"
-  ]["address"];
-
-  const delegatePool = await getContracts()[process.env.NETWORK_NAME!][
-    "DelegateVotePool"
-  ]["address"];
-
-  const BribeManager = JSON.parse(
+  const QuollExternalToken = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/BribeManager.sol/BribeManager.json",
+      "./artifacts/contracts/QuollExternalToken.sol/QuollExternalToken.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(BribeManager);
+  const contract = new web3.eth.Contract(QuollExternalToken);
 
-  const txData = contract.methods
-    .setParams(
-      process.env.WOMBAT_VOTER,
-      voterProxy,
-      vlQuoV2,
-      nativeZap,
-      delegatePool
-    )
-    .encodeABI();
+  const txData = contract.methods.setOperator(operator).encodeABI();
   console.log(txData);
 
   //using ETH
@@ -61,7 +44,7 @@ async function main() {
     nonce: txCount,
     gasLimit: web3.utils.toHex("30000000"),
     data: txData,
-    to: bribeManager,
+    to: reward_pool,
     from: user,
   };
 

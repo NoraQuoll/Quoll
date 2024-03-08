@@ -41,7 +41,7 @@
         },
         "WombatBooster": {
             "address": "0xCDdd78083e7FbAf07F6a1455167b4401D54e4eE2",
-            "impl": "0xF5b2Bff4aa777a087a768B1B85F312bc22e0eb61"
+            "impl": "0x71CE27a06701DECd794B438150AafcDcAdA7b564"
         },
         "SmartConvertor": {
             "address": "0xaFE38B055924c163Ac8D4b8cEcB90895a33D1E10",
@@ -53,7 +53,47 @@
         },
         "BribeManager": {
             "address": "0x34ee34eFD026A626815375178bbDC546E3894bD6",
-            "impl": "0x5A3d9235d0Cc2c8e7bC9b2150Efb0F07583b7fEd"
+            "impl": "0x55791Ae7303d3ddb03205b677c0a5650397CEde8"
+        },
+        "qWOMReward": {
+            "address": "0xb7B169AaC06e8d2b8Df20609B2F5E21Dbf3b1a3d",
+            "impl": "0xCf9e2229393e0fE008A0eC58CC59C56f53FAdA98"
+        },
+        "DelegateVotePool": {
+            "address": "0x2C7f9Ef64c02d66e49a9D4c43e0420014618Fbc3",
+            "impl": "0x354840a3bdf97ae2450536dDa9c17aF624D972c1"
+        },
+        "Reward_Pool-1709799626551": {
+            "address": "0x944B7ee4113A0bd0b916cE752193D7A4A56e402d",
+            "impl": "0x2A0E598BEfA95AcD618d5F82D327A1aAA4282bf2"
+        },
+        "Reward_Pool-1709799667162": {
+            "address": "0x2694888F20C3Ca821FDCB12528B41d49286Bb7cF",
+            "impl": "0x2A0E598BEfA95AcD618d5F82D327A1aAA4282bf2"
+        },
+        "Reward_Pool-1709799707309": {
+            "address": "0x18c7ED62ADB937e51928ECc9E4234103C0Fb1Fa8",
+            "impl": "0x2A0E598BEfA95AcD618d5F82D327A1aAA4282bf2"
+        },
+        "DepositToken0xA1a8d6688A2DEF14d6bD3A76E3AA2bdB5670C567": {
+            "address": "0xFd98274986d4259F84448f0e3b92442E3120B4Eb",
+            "impl": "0x80B74d63E5a292fbc26Ba75f92260304B3D88D5b"
+        },
+        "DepositToken0x254dF1f8A8Fa9B7bFAd9e25bF912ea71484332cE": {
+            "address": "0xEf1DE632aF4C162cB8A34c7b6E236dcD3bB183A5",
+            "impl": "0x80B74d63E5a292fbc26Ba75f92260304B3D88D5b"
+        },
+        "DepositToken0x61ABD791773a7E583aD439F558C6c0F157707e7b": {
+            "address": "0xaF9CDD899FdBFa82B6ff006F55a75ff3aF8EAB1e",
+            "impl": "0x80B74d63E5a292fbc26Ba75f92260304B3D88D5b"
+        },
+        "DepositToken0x2C89105ce90f8C3aE13e01b268eAe57B95e1e5a6": {
+            "address": "0x5f451d5143511FF27c4C252E974Fd2e69c4EfBEB",
+            "impl": "0x80B74d63E5a292fbc26Ba75f92260304B3D88D5b"
+        },
+        "Reward_Pool-1709806041250": {
+            "address": "0x18c7ED62ADB937e51928ECc9E4234103C0Fb1Fa8",
+            "impl": "0x5b4338769dDC38Dad63a3aacE05a465C1e9B9943"
         }
     }
 }

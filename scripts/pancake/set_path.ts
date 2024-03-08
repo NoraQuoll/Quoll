@@ -1,13 +1,3 @@
-// Set Param
-
-// contract quoRewardPool
-// _stakingToken: ..
-// WOM
-// _womDepositor: womDepositor contract
-// _qWomRewards: qWOMReward Contract
-// _qWomToken
-// _booster: wombatBooster contract
-
 // Set Access wombatBooster to contract QUO
 // Contract QUO
 // Accessable to wombatBooster
@@ -28,49 +18,29 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const quoll_reward_pool = await getContracts()[process.env.NETWORK_NAME!][
-    "QuoRewardPool"
+  const pancakePath = await getContracts()[process.env.NETWORK_NAME!][
+    "PancakePath"
   ]["address"];
 
-  const quoll = await getContracts()[process.env.NETWORK_NAME!]["QUO"][
-    "address"
-  ];
-
-  const wom_depositor = await getContracts()[process.env.NETWORK_NAME!][
-    "WomDeposit"
-  ]["address"];
-
-  const q_wom_reward = await getContracts()[process.env.NETWORK_NAME!][
-    "qWOMReward"
-  ]["address"];
-
-  const q_wom = await getContracts()[process.env.NETWORK_NAME!]["qWOM"][
-    "address"
-  ];
-
-  const booster = await getContracts()[process.env.NETWORK_NAME!][
-    "WombatBooster"
-  ]["address"];
-
-  const QuoRewardPool = JSON.parse(
+  const PancakePath = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/QuoRewardPool.sol/QuoRewardPool.json",
+      "./artifacts/contracts/PancakePath.sol/PancakePath.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(QuoRewardPool);
+  const contract = new web3.eth.Contract(PancakePath);
 
   const txData = contract.methods
-    .setParams(
-      quoll,
-      process.env.WOM,
-      wom_depositor,
-      q_wom_reward,
-      q_wom,
-      booster
+    .setPath(
+      "0x6E847Cc3383525Ad33bEDd260139c1e097546B60",
+      "0x0d10df5c951abfd925fe91632a89e81d8afabb06",
+      [
+        "0x6E847Cc3383525Ad33bEDd260139c1e097546B60",
+        "0x0d10df5c951abfd925fe91632a89e81d8afabb06",
+      ]
     )
     .encodeABI();
   console.log(txData);
@@ -80,7 +50,7 @@ async function main() {
     nonce: txCount,
     gasLimit: web3.utils.toHex("30000000"),
     data: txData,
-    to: quoll_reward_pool,
+    to: pancakePath,
     from: user,
   };
 

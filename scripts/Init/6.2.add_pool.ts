@@ -21,12 +21,21 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-const _masterWombatPid = "";
-const _token = "";
-const _rewardPool = "";
+
+const _rewardPool = "0x18c7ED62ADB937e51928ECc9E4234103C0Fb1Fa8";
+
+const data = {
+  _masterWombatPid: "2",
+  _token: "0x6E847Cc3383525Ad33bEDd260139c1e097546B60"
+}
 async function main() {
   const booster = await getContracts()[process.env.NETWORK_NAME!][
     "WombatBooster"
+  ]["address"];
+
+
+  const pancakePath = await getContracts()[process.env.NETWORK_NAME!][
+    "PancakePath"
   ]["address"];
 
   const WombatBooster = JSON.parse(
@@ -43,9 +52,12 @@ async function main() {
   const txData = contract.methods
     .addPool(
       process.env.WOMBAT_MASTERCHEF,
-      _masterWombatPid,
-      _token,
-      _rewardPool
+      data._masterWombatPid,
+      data._token,
+      _rewardPool,
+      pancakePath,
+      process.env.PANCAKE_ROUTER,
+      process.env.USDT
     )
     .encodeABI();
   console.log(txData);

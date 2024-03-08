@@ -9,51 +9,29 @@ import { saveContract, getContracts, sleep } from "../utils";
 
 const web3 = new Web3(process.env.RPC!);
 
-const user_pk = process.env.PK;
+const user_pk =
+  "9c215d4b98cb403170438b835c556540d241b9a64b76016c1ff1184b023f8bfb";
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const bribeManager = await getContracts()[process.env.NETWORK_NAME!][
-    "BribeManager"
+  const contract = "0xDbE717a72fa40dFd67A5c9FAF61b0a7d9595a826";
+
+  const operator = await getContracts()[process.env.NETWORK_NAME!][
+    "WombatBooster"
   ]["address"];
 
-  const voterProxy = await getContracts()[process.env.NETWORK_NAME!][
-    "WombatVoterProxy"
-  ]["address"];
-
-  const vlQuoV2 = await getContracts()[process.env.NETWORK_NAME!]["VlQuoV2"][
-    "address"
-  ];
-
-  const nativeZap = await getContracts()[process.env.NETWORK_NAME!][
-    "NativeZapper"
-  ]["address"];
-
-  const delegatePool = await getContracts()[process.env.NETWORK_NAME!][
-    "DelegateVotePool"
-  ]["address"];
-
-  const BribeManager = JSON.parse(
+  const QuollToken = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/BribeManager.sol/BribeManager.json",
+      "./artifacts/contracts/QuollToken.sol/QuollToken.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(BribeManager);
-
-  const txData = contract.methods
-    .setParams(
-      process.env.WOMBAT_VOTER,
-      voterProxy,
-      vlQuoV2,
-      nativeZap,
-      delegatePool
-    )
-    .encodeABI();
+  const txData =
+    "0xbc908f10000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000038d7ea4c680000000000000000000000000000000000000000000000000000002d79883d200000000000000000000000000000000000000000000000000000000000000000001";
   console.log(txData);
 
   //using ETH
@@ -61,7 +39,7 @@ async function main() {
     nonce: txCount,
     gasLimit: web3.utils.toHex("30000000"),
     data: txData,
-    to: bribeManager,
+    to: contract,
     from: user,
   };
 

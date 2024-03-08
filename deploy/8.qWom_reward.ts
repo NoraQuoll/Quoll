@@ -25,7 +25,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       owner: deployer,
       execute: {
         methodName: "initialize",
-        args: [],
+        args: [process.env.GNOSIS],
       },
     },
   });

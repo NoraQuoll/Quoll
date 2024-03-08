@@ -18,22 +18,6 @@ async function main() {
     "BribeManager"
   ]["address"];
 
-  const voterProxy = await getContracts()[process.env.NETWORK_NAME!][
-    "WombatVoterProxy"
-  ]["address"];
-
-  const vlQuoV2 = await getContracts()[process.env.NETWORK_NAME!]["VlQuoV2"][
-    "address"
-  ];
-
-  const nativeZap = await getContracts()[process.env.NETWORK_NAME!][
-    "NativeZapper"
-  ]["address"];
-
-  const delegatePool = await getContracts()[process.env.NETWORK_NAME!][
-    "DelegateVotePool"
-  ]["address"];
-
   const BribeManager = JSON.parse(
     fs.readFileSync(
       "./artifacts/contracts/BribeManager.sol/BribeManager.json",
@@ -45,15 +29,7 @@ async function main() {
 
   const contract = new web3.eth.Contract(BribeManager);
 
-  const txData = contract.methods
-    .setParams(
-      process.env.WOMBAT_VOTER,
-      voterProxy,
-      vlQuoV2,
-      nativeZap,
-      delegatePool
-    )
-    .encodeABI();
+  const txData = contract.methods.setCastVoteCoolDown(3600).encodeABI();
   console.log(txData);
 
   //using ETH
