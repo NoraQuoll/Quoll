@@ -22,11 +22,11 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 
-const _rewardPool = "0x18c7ED62ADB937e51928ECc9E4234103C0Fb1Fa8";
+const _rewardPool = "0xea922cB41B9Ef9316c2D99faEa447cf237d1A57e";
 
 const data = {
-  _masterWombatPid: "2",
-  _token: "0x6E847Cc3383525Ad33bEDd260139c1e097546B60"
+  _masterWombatPid: "4",
+  _token: "0x83342838cDBD2861E7ae994d0fE3F775dc7AA55A"
 }
 async function main() {
   const booster = await getContracts()[process.env.NETWORK_NAME!][

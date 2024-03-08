@@ -94,6 +94,14 @@
         "Reward_Pool-1709806041250": {
             "address": "0x18c7ED62ADB937e51928ECc9E4234103C0Fb1Fa8",
             "impl": "0x5b4338769dDC38Dad63a3aacE05a465C1e9B9943"
+        },
+        "Reward_Pool-1709887982015": {
+            "address": "0xea922cB41B9Ef9316c2D99faEa447cf237d1A57e",
+            "impl": "0x521482D069Ac99B445d0e6F42f7f30E78818194b"
+        },
+        "DepositToken0x9f6163070fBCa0a61F49F37e0123fCE3d28B8e21": {
+            "address": "0x83342838cDBD2861E7ae994d0fE3F775dc7AA55A",
+            "impl": "0x80B74d63E5a292fbc26Ba75f92260304B3D88D5b"
         }
     }
 }

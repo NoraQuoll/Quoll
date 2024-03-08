@@ -27,10 +27,10 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     proxy: {
       proxyContract: "OptimizedTransparentProxy",
       owner: deployer,
-    //   execute: {
-    //     methodName: "initialize",
-    //     args: [operator],
-    //   },
+      execute: {
+        methodName: "initialize",
+        args: [operator],
+      },
     },
   });
 
