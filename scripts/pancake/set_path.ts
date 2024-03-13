@@ -35,11 +35,11 @@ async function main() {
 
   const txData = contract.methods
     .setPath(
+      "0x7BFC90abeEB4138e583bfC46aBC69De34c9ABb8B",
       "0x6E847Cc3383525Ad33bEDd260139c1e097546B60",
-      "0x0d10df5c951abfd925fe91632a89e81d8afabb06",
       [
+        "0x7BFC90abeEB4138e583bfC46aBC69De34c9ABb8B",
         "0x6E847Cc3383525Ad33bEDd260139c1e097546B60",
-        "0x0d10df5c951abfd925fe91632a89e81d8afabb06",
       ]
     )
     .encodeABI();

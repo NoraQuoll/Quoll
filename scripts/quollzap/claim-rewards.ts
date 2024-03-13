@@ -1,10 +1,6 @@
-// addPool
-
-// contract WombatBooster
-// _masterWombat
-// _masterWombatPid
-// _token
-// _rewardPool
+// Set Access wombatBooster to contract QUO
+// Contract QUO
+// Accessable to wombatBooster
 
 import Web3 from "web3";
 import { ethers } from "ethers";
@@ -21,45 +17,20 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-
-const _rewardPool = "0x13405dd07a4b1DA46d38044Cb36Db2006e230aCA";
-
-const data = {
-  _masterWombatPid: "4",
-  _token: "0x51A6c3D50C6Cff243fED2EFc62c13c7e0472AC18"
-}
 async function main() {
-  const booster = await getContracts()[process.env.NETWORK_NAME!][
-    "WombatBooster"
-  ]["address"];
+  const quoll_zap = await getContracts()[process.env.NETWORK_NAME!]["QuollZap"][
+    "address"
+  ];
 
-
-  const pancakePath = await getContracts()[process.env.NETWORK_NAME!][
-    "PancakePath"
-  ]["address"];
-
-  const WombatBooster = JSON.parse(
-    fs.readFileSync(
-      "./artifacts/contracts/WombatBooster.sol/WombatBooster.json",
-      "utf-8"
-    )
+  const QuollToken = JSON.parse(
+    fs.readFileSync("./artifacts/contracts/QuollZap.sol/QuollZap.json", "utf-8")
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(WombatBooster);
+  const contract = new web3.eth.Contract(QuollToken);
 
-  const txData = contract.methods
-    .addPool(
-      process.env.WOMBAT_MASTERCHEF,
-      data._masterWombatPid,
-      data._token,
-      _rewardPool,
-      pancakePath,
-      process.env.PANCAKE_ROUTER,
-      process.env.USDT
-    )
-    .encodeABI();
+  const txData = contract.methods.claimRewards(["0"], true).encodeABI();
   console.log(txData);
 
   //using ETH
@@ -67,7 +38,7 @@ async function main() {
     nonce: txCount,
     gasLimit: web3.utils.toHex("30000000"),
     data: txData,
-    to: booster,
+    to: quoll_zap,
     from: user,
   };
 

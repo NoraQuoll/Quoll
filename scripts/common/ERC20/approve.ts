@@ -12,7 +12,7 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 const token = "0x7BFC90abeEB4138e583bfC46aBC69De34c9ABb8B";
-const contract_add = "0x944B7ee4113A0bd0b916cE752193D7A4A56e402d";
+const contract_add = "0x13405dd07a4b1DA46d38044Cb36Db2006e230aCA";
 
 async function main() {
   const Token = JSON.parse(

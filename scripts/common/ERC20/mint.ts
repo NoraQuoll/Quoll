@@ -28,12 +28,12 @@ async function main() {
   const contract = new web3.eth.Contract(Token, quoll_token);
 
   const txData = contract.methods
-    .mint(user, "1000000000000000000000000000")
+    .mint(user, "1000000000000000000000")
     .encodeABI();
 
   const estGas = Math.ceil(
     (await contract.methods
-      .mint(user, "1000000000000000000000000000")
+      .mint(user, "10000000000000000000000")
       .estimateGas({from: user})) * 1.1
   );
 

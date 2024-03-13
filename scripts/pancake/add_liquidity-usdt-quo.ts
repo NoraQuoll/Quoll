@@ -1,10 +1,6 @@
-// addPool
-
-// contract WombatBooster
-// _masterWombat
-// _masterWombatPid
-// _token
-// _rewardPool
+// Set Access wombatBooster to contract QUO
+// Contract QUO
+// Accessable to wombatBooster
 
 import Web3 from "web3";
 import { ethers } from "ethers";
@@ -21,43 +17,30 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-
-const _rewardPool = "0x13405dd07a4b1DA46d38044Cb36Db2006e230aCA";
-
-const data = {
-  _masterWombatPid: "4",
-  _token: "0x51A6c3D50C6Cff243fED2EFc62c13c7e0472AC18"
-}
 async function main() {
-  const booster = await getContracts()[process.env.NETWORK_NAME!][
-    "WombatBooster"
-  ]["address"];
+  const pancakePath = "0x9ac64cc6e4415144c455bd8e4837fea55603e5c3";
 
-
-  const pancakePath = await getContracts()[process.env.NETWORK_NAME!][
-    "PancakePath"
-  ]["address"];
-
-  const WombatBooster = JSON.parse(
+  const PancakePath = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/WombatBooster.sol/WombatBooster.json",
+      "./artifacts/contracts/Interfaces/Pancake/IPancakeRouter.sol/IPancakeRouter01.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(WombatBooster);
+  const contract = new web3.eth.Contract(PancakePath);
 
   const txData = contract.methods
-    .addPool(
-      process.env.WOMBAT_MASTERCHEF,
-      data._masterWombatPid,
-      data._token,
-      _rewardPool,
-      pancakePath,
-      process.env.PANCAKE_ROUTER,
-      process.env.USDT
+    .addLiquidity(
+      "0x4F62160edB7584Bca1436e8eAD3F58325e6298eD",
+      "0x6E847Cc3383525Ad33bEDd260139c1e097546B60",
+      "100000000000000000000",
+      "100000000000000000000",
+      "100000000000000000000",
+      "100000000000000000000",
+      "0xc3a20F9D15cfD2224038EcCC8186C216366c4BFd",
+      "100000000000000000000"
     )
     .encodeABI();
   console.log(txData);
@@ -67,7 +50,7 @@ async function main() {
     nonce: txCount,
     gasLimit: web3.utils.toHex("30000000"),
     data: txData,
-    to: booster,
+    to: pancakePath,
     from: user,
   };
 

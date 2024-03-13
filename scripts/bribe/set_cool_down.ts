@@ -29,7 +29,7 @@ async function main() {
 
   const contract = new web3.eth.Contract(BribeManager);
 
-  const txData = contract.methods.setCastVoteCoolDown(3600).encodeABI();
+  const txData = contract.methods.setCastVoteCoolDown(60).encodeABI();
   console.log(txData);
 
   //using ETH

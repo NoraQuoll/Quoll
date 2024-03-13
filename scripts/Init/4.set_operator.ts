@@ -24,7 +24,7 @@ async function main() {
   ];
 
   const operator = await getContracts()[process.env.NETWORK_NAME!][
-    "WomDeposit"
+    "WomDepositor"
   ]["address"];
 
   const QuollExternalToken = JSON.parse(

@@ -1,11 +1,10 @@
-import Web3 from "web3";
-import { ethers } from "ethers";
 import * as dotenv from "dotenv";
+import Web3 from "web3";
 
 dotenv.config();
 
 import * as fs from "fs";
-import { saveContract, getContracts, sleep } from "../utils";
+import { getContracts } from "../utils";
 
 const web3 = new Web3(process.env.RPC!);
 

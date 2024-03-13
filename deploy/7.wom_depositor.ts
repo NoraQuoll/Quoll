@@ -33,7 +33,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
   await saveContract(
     network.name,
-    "WomDeposit",
+    "WomDepositor",
     data.address,
     data.implementation!
   );
@@ -49,6 +49,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-deploy.tags = ["WomDeposit"];
+deploy.tags = ["WomDepositor"];
 
 export default deploy;

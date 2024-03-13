@@ -30,7 +30,7 @@ async function main() {
   ]["address"];
 
   const depositor = await getContracts()[process.env.NETWORK_NAME!][
-    "WomDeposit"
+    "WomDepositor"
   ]["address"];
 
   const WombatVoterProxy = JSON.parse(

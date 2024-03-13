@@ -1,107 +1,99 @@
 {
-    "testnet": {
-        "DefaultProxyAdmin": {
-            "address": "0x384a4FbF7D527e44a9dB6aa694233c35eA930b09"
-        },
-        "QUO": {
-            "address": "0x0D10dF5c951ABFd925FE91632a89e81d8aFAbB06",
-            "impl": "0xDDaa043AB1427cEBDb12095D55FEC5C42269EE5E"
-        },
-        "QuoRewardPool": {
-            "address": "0x24C771529C5e0671299cFB1225B99B064E626bD7",
-            "impl": "0xCDd944cc07FB2a14a0DB554cD5E539a020A9f81e"
-        },
-        "QuollMasterChef": {
-            "address": "0x30fd8c91A48918478aeE8AdaF22f5E2AE8aBE781",
-            "impl": "0x6778528B14469d92a03E618B6a7D3b6Be657719d"
-        },
-        "qWOM": {
-            "address": "0xE45db54158b649db21AAB6489F2327cde16Ed99a",
-            "impl": "0x680a7E0eE0Ace68c51333af0239126d3d20f0B37"
-        },
-        "WombatVoterProxy": {
-            "address": "0xC5561D2b096585d4005563441197F5586393d135",
-            "impl": "0xa5C6634D64be8af1980c66803d6Ac7cE93345DcE"
-        },
-        "WomDeposit": {
-            "address": "0x3a5645bfA687a95b17Ff99782333234074aB50Ea",
-            "impl": "0x21B770766CC5Be39C1D43ED15AF209a8c96b26d5"
-        },
-        "VlQuoV2": {
-            "address": "0x381D8E8d2d60e9733019Ccf6C97145232181fB7E",
-            "impl": "0x71d64D0cEb1c1d7a28b042186FB7FceEe06A6Bf7"
-        },
-        "PancakePath": {
-            "address": "0xA9a5A5a4fED733AD73FE679aB69cFFC89376f4Cd",
-            "impl": "0x95dbB49E4EE36A1A84F9083a1c22ec57f7A4c5a8"
-        },
-        "QuollZap": {
-            "address": "0xDbE717a72fa40dFd67A5c9FAF61b0a7d9595a826",
-            "impl": "0x664DD78f51D27236c378D3E52Deed5cdB4686Ac2"
-        },
-        "WombatBooster": {
-            "address": "0xCDdd78083e7FbAf07F6a1455167b4401D54e4eE2",
-            "impl": "0x71CE27a06701DECd794B438150AafcDcAdA7b564"
-        },
-        "SmartConvertor": {
-            "address": "0xaFE38B055924c163Ac8D4b8cEcB90895a33D1E10",
-            "impl": "0xd1E7D5346b2BD67b35e2adB8CB842F1ab7Df2Ff9"
-        },
-        "NativeZapper": {
-            "address": "0x0fdaa1bFF1Fe573C420eb401E2132d9FfCE80Bb7",
-            "impl": "0xceCE8722cC6F86Bc5D3e818907D6e29c5dc61dD0"
-        },
-        "BribeManager": {
-            "address": "0x34ee34eFD026A626815375178bbDC546E3894bD6",
-            "impl": "0x55791Ae7303d3ddb03205b677c0a5650397CEde8"
-        },
-        "qWOMReward": {
-            "address": "0xb7B169AaC06e8d2b8Df20609B2F5E21Dbf3b1a3d",
-            "impl": "0xCf9e2229393e0fE008A0eC58CC59C56f53FAdA98"
-        },
-        "DelegateVotePool": {
-            "address": "0x2C7f9Ef64c02d66e49a9D4c43e0420014618Fbc3",
-            "impl": "0x354840a3bdf97ae2450536dDa9c17aF624D972c1"
-        },
-        "Reward_Pool-1709799626551": {
-            "address": "0x944B7ee4113A0bd0b916cE752193D7A4A56e402d",
-            "impl": "0x2A0E598BEfA95AcD618d5F82D327A1aAA4282bf2"
-        },
-        "Reward_Pool-1709799667162": {
-            "address": "0x2694888F20C3Ca821FDCB12528B41d49286Bb7cF",
-            "impl": "0x2A0E598BEfA95AcD618d5F82D327A1aAA4282bf2"
-        },
-        "Reward_Pool-1709799707309": {
-            "address": "0x18c7ED62ADB937e51928ECc9E4234103C0Fb1Fa8",
-            "impl": "0x2A0E598BEfA95AcD618d5F82D327A1aAA4282bf2"
-        },
-        "DepositToken0xA1a8d6688A2DEF14d6bD3A76E3AA2bdB5670C567": {
-            "address": "0xFd98274986d4259F84448f0e3b92442E3120B4Eb",
-            "impl": "0x80B74d63E5a292fbc26Ba75f92260304B3D88D5b"
-        },
-        "DepositToken0x254dF1f8A8Fa9B7bFAd9e25bF912ea71484332cE": {
-            "address": "0xEf1DE632aF4C162cB8A34c7b6E236dcD3bB183A5",
-            "impl": "0x80B74d63E5a292fbc26Ba75f92260304B3D88D5b"
-        },
-        "DepositToken0x61ABD791773a7E583aD439F558C6c0F157707e7b": {
-            "address": "0xaF9CDD899FdBFa82B6ff006F55a75ff3aF8EAB1e",
-            "impl": "0x80B74d63E5a292fbc26Ba75f92260304B3D88D5b"
-        },
-        "DepositToken0x2C89105ce90f8C3aE13e01b268eAe57B95e1e5a6": {
-            "address": "0x5f451d5143511FF27c4C252E974Fd2e69c4EfBEB",
-            "impl": "0x80B74d63E5a292fbc26Ba75f92260304B3D88D5b"
-        },
-        "Reward_Pool-1709806041250": {
-            "address": "0x18c7ED62ADB937e51928ECc9E4234103C0Fb1Fa8",
-            "impl": "0x5b4338769dDC38Dad63a3aacE05a465C1e9B9943"
-        },
-        "Reward_Pool-1709887982015": {
-            "address": "0xea922cB41B9Ef9316c2D99faEa447cf237d1A57e",
-            "impl": "0x521482D069Ac99B445d0e6F42f7f30E78818194b"
-        },
-        "DepositToken0x9f6163070fBCa0a61F49F37e0123fCE3d28B8e21": {
-            "address": "0x83342838cDBD2861E7ae994d0fE3F775dc7AA55A",
-            "impl": "0x80B74d63E5a292fbc26Ba75f92260304B3D88D5b"
-        }
+  "testnet": {
+    "DefaultProxyAdmin": {
+      "address": "0xd8751F87f90D7459A3500D974C9363302c67E7e8"
+    },
+    "QUO": {
+      "address": "0x4F62160edB7584Bca1436e8eAD3F58325e6298eD",
+      "impl": "0x85c8Aa45647895AD70DBdC4f8d109A91Ff5Ca2C2"
+    },
+    "QuoRewardPool": {
+      "address": "0x5B87ACabB607D4d14D2A795884Dbcb669A3b495A",
+      "impl": "0xe3f8B8aE6150B65bCe7d1b95a18B05fe82a13ea9"
+    },
+    "QuollMasterChef": {
+      "address": "0xAd878EB6545071203c21dc506d98541bE32edfD2",
+      "impl": "0x998af2Aa56f08Db2f23AB56ECB40397c3dC11D87"
+    },
+    "qWOM": {
+      "address": "0xA22e2f3047e7D1F0cD864A4EB9A89D298Ca171C5",
+      "impl": "0xba8230D34E2dB54f18bb3916C0b64CDd4f327794"
+    },
+    "WombatVoterProxy": {
+      "address": "0x81eFaFf9Ea94c424eB48c408303Ff37562e3E537",
+      "impl": "0xbEa726DbAaEA1baB1c5Fe0B10e2dF80e8faC82Bd"
+    },
+    "WombatBooster": {
+      "address": "0x22F416551581aB6C1029F49622Dbf1222D106882",
+      "impl": "0x0a23b743FaD6852091EF84bee0f3ED6f652a20EA"
+    },
+    "WomDepositor": {
+      "address": "0x7a08F6e28D9508A812Ad2CCa1d6207B5eCf063C4",
+      "impl": "0x7b3e81a3E909B36b8A43Cee8e1D03A36f7FadD32"
+    },
+    "qWOMReward": {
+      "address": "0xC549B2917A1e4a5263eD9cF5950A417E3B3e8e87",
+      "impl": "0x8160d53857e5E32E4297554cEdf9FCD46948B8c1"
+    },
+    "VlQuoV2": {
+      "address": "0x494d1dC23e342156c3A3ea9007A70681B81928D7",
+      "impl": "0xA8bD3C4b8b1F32E9A601912273dEd430d1e98901"
+    },
+    "PancakePath": {
+      "address": "0xaEDC9aa60762d72587581F243c01e38629690729",
+      "impl": "0x0072b920b23CBA1Ca35E107A58116c95A7BFC931"
+    },
+    "QuollZap": {
+      "address": "0x9F55400aAA248a6271338e3c78c197ed5Fa4af10",
+      "impl": "0x92A7A8A7864BDcc4B4a89Cf1Bc733F3b5C0c44c0"
+    },
+    "SmartConvertor": {
+      "address": "0x5F65631EaA6C646deA77CBa2758D8E029BD63E4A",
+      "impl": "0xD67c81a4DA6f298f158E9990BE7ba6E25282cdA3"
+    },
+    "NativeZapper": {
+      "address": "0x9FA19fF8D0628FbCFD0a7fCf5048a3BaC951C362",
+      "impl": "0xf554BF1D4889751B0af9700b3918ca9E00835ca3"
+    },
+    "BribeManager": {
+      "address": "0x37F8168Ba41a2265cCB05a6C1FC295b599ae2AC3",
+      "impl": "0x60EdE88537F04D63A21123Ff9c30e4F22ccD3a09"
+    },
+    "DelegateVotePool": {
+      "address": "0xCEae79FfD61ad2fEE5a08EB151Ab361E0e940d5a",
+      "impl": "0xED8B7888DFB1494baBC4d5DeE1c5595e441DcEf6"
+    },
+    "DepositToken0x9f6163070fBCa0a61F49F37e0123fCE3d28B8e21": {
+      "address": "0x51A6c3D50C6Cff243fED2EFc62c13c7e0472AC18",
+      "impl": "0x3A79FC95cED6AF109EE3Cc58b7b4f3a1dA014558"
+    },
+    "Reward_Pool-1710242185844-0x98dA7Af9f1A46EDd7F8a5f2fDb4d9E0c21f1bFdB": {
+      "address": "0x80a8A2e0366b49aC5cA9A29a4D90D4170a3AF73c",
+      "impl": "0x1d1076Ef1461D96321f607dABd9b5019775f55F8"
+    },
+    "Reward_Pool-1710242218063-0xbdb0029b065386557d8dBD2C38946897877ceD2D": {
+      "address": "0xdda1460228EfD9565807dec2B52bE6FB3eF47fb4",
+      "impl": "0x1d1076Ef1461D96321f607dABd9b5019775f55F8"
+    },
+    "DepositToken0xA1a8d6688A2DEF14d6bD3A76E3AA2bdB5670C567": {
+      "address": "0x98dA7Af9f1A46EDd7F8a5f2fDb4d9E0c21f1bFdB",
+      "impl": "0x3A79FC95cED6AF109EE3Cc58b7b4f3a1dA014558"
+    },
+    "DepositToken0x61ABD791773a7E583aD439F558C6c0F157707e7b": {
+      "address": "0xbdb0029b065386557d8dBD2C38946897877ceD2D",
+      "impl": "0x3A79FC95cED6AF109EE3Cc58b7b4f3a1dA014558"
+    },
+    "DepositToken0x2C89105ce90f8C3aE13e01b268eAe57B95e1e5a6": {
+      "address": "0xFFeAb48Cdeab13bbD7f74F9B5cF4e1eaD89da923",
+      "impl": "0x3A79FC95cED6AF109EE3Cc58b7b4f3a1dA014558"
+    },
+    "Reward_Pool-1710242483831-0xFFeAb48Cdeab13bbD7f74F9B5cF4e1eaD89da923": {
+      "address": "0xcf50AD50eFDf9C1AF34F0f260eF82a86b58CEAb6",
+      "impl": "0x1d1076Ef1461D96321f607dABd9b5019775f55F8"
+    },
+    "Reward_Pool-1710242510669-0x51A6c3D50C6Cff243fED2EFc62c13c7e0472AC18": {
+      "address": "0x13405dd07a4b1DA46d38044Cb36Db2006e230aCA",
+      "impl": "0x1d1076Ef1461D96321f607dABd9b5019775f55F8"
     }
+  }
 }

@@ -36,7 +36,7 @@ async function main() {
   ]["address"];
 
   const wom_depositor = await getContracts()[process.env.NETWORK_NAME!][
-    "WomDeposit"
+    "WomDepositor"
   ]["address"];
 
   const qWom = await getContracts()[process.env.NETWORK_NAME!]["qWOM"][
