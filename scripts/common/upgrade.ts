@@ -13,10 +13,9 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
+const upgradesContract = ["0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54"];
 async function main() {
-  const proxyAdmin = await getContracts()[process.env.NETWORK_NAME!][
-    "DefaultProxyAdmin"
-  ]["address"];
+  const proxyAdmin = "0x4F878DCa03d9970Bb2a9B770Df7f7E49226510bC";
 
   const ProxyAdmin: any = [
     {
@@ -137,31 +136,35 @@ async function main() {
     },
   ];
 
-  const txCount = await web3.eth.getTransactionCount(user);
+  for (let i = 0; i < upgradesContract.length; i++) {
+    const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(ProxyAdmin);
+    const contract = new web3.eth.Contract(ProxyAdmin);
 
-  const txData = contract.methods
-    .upgrade(
-      "0x944B7ee4113A0bd0b916cE752193D7A4A56e402d",
-      "0x5b4338769dDC38Dad63a3aacE05a465C1e9B9943"
-    )
-    .encodeABI();
-  console.log(txData);
+    const txData = contract.methods
+      .upgrade(
+        upgradesContract[i],
+        "0xf2D050845E1cfb09a1AD3e5a87F14449FedEde7E"
+      )
+      .encodeABI();
+    console.log(txData);
 
-  //using ETH
-  const txObj = {
-    nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
-    data: txData,
-    to: proxyAdmin,
-    from: user,
-  };
+    //using ETH
+    const txObj = {
+      nonce: txCount,
+      gasLimit: web3.utils.toHex("3000000"),
+      data: txData,
+      to: proxyAdmin,
+      from: user,
+    };
 
-  const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);
+    const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);
 
-  const result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction!);
-  console.log(result);
+    const result = await web3.eth.sendSignedTransaction(
+      signedTx.rawTransaction!
+    );
+    console.log(result);
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -1,7 +1,3 @@
-// Set Access wombatBooster to contract QUO
-// Contract QUO
-// Accessable to wombatBooster
-
 import Web3 from "web3";
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
@@ -18,41 +14,28 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  // const pancakePath = await getContracts()[process.env.NETWORK_NAME!][
-  //   "PancakePath"
-  // ]["address"];
+  const bribeManager = "0x9bB0cE4a4000c1127E3D420713E0c77d7E32086b";
 
-  const pancakePath = "0x3e981541d489B8ac5dE9016a0A67f3c2Eb369E66";
-
-  const PancakePath = JSON.parse(
+  const BribeManager = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/PancakePath.sol/PancakePath.json",
+      "./artifacts/contracts/BribeManager.sol/BribeManager.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(PancakePath);
+  const contract = new web3.eth.Contract(BribeManager);
 
-  const txData = contract.methods
-    .setPath(
-      "0x55d398326f99059fF775485246999027B3197955",
-      "0x08b450e4a48C04CDF6DB2bD4cf24057f7B9563fF",
-      [
-        "0x55d398326f99059fF775485246999027B3197955",
-        "0x08b450e4a48C04CDF6DB2bD4cf24057f7B9563fF",
-      ]
-    )
-    .encodeABI();
+  const txData = contract.methods.castVotes(false).encodeABI();
   console.log(txData);
 
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("300000"),
+    gasLimit: web3.utils.toHex("30000000"),
     data: txData,
-    to: pancakePath,
+    to: bribeManager,
     from: user,
   };
 

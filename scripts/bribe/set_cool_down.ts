@@ -14,9 +14,7 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const bribeManager = await getContracts()[process.env.NETWORK_NAME!][
-    "BribeManager"
-  ]["address"];
+  const bribeManager = "0x9bB0cE4a4000c1127E3D420713E0c77d7E32086b"
 
   const BribeManager = JSON.parse(
     fs.readFileSync(
@@ -29,7 +27,7 @@ async function main() {
 
   const contract = new web3.eth.Contract(BribeManager);
 
-  const txData = contract.methods.setCastVoteCoolDown(60).encodeABI();
+  const txData = contract.methods.setCastVoteCoolDown(172800).encodeABI();
   console.log(txData);
 
   //using ETH

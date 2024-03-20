@@ -20,14 +20,14 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     log: true,
     deterministicDeployment: false,
     gasPrice: await web3.eth.getGasPrice(),
-    proxy: {
-      proxyContract: "OptimizedTransparentProxy",
-      owner: deployer,
-      execute: {
-        methodName: "initialize",
-        args: [],
-      },
-    },
+    // proxy: {
+    //   proxyContract: "OptimizedTransparentProxy",
+    //   owner: deployer,
+    //   // execute: {
+    //   //   methodName: "initialize",
+    //   //   args: [],
+    //   // },
+    // },
   });
 
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
@@ -41,7 +41,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   try {
     // verify
     await hre.run("verify:verify", {
-      address: data.implementation,
+      address: data.address,
       constructorArguments: [],
     });
   } catch (e) {

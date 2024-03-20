@@ -51,7 +51,7 @@ contract QuollZap is OwnableUpgradeable {
 
     usdtAddress = _usdtAddress;
     quoAddress = _quoAddress;
-    IERC20(wNative).safeApprove(wNativeRelayer, uint256(-1));
+    IERC20(wNative).approve(wNativeRelayer, uint256(-1));
 
     booster = IWombatBooster(_booster);
   }

@@ -21,22 +21,17 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-
-const _rewardPool = "0x13405dd07a4b1DA46d38044Cb36Db2006e230aCA";
+const pancakePath = "0x3e981541d489B8ac5dE9016a0A67f3c2Eb369E66";
+const pancakeRouter = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
+const USDT = "0x55d398326f99059fF775485246999027B3197955";
 
 const data = {
-  _masterWombatPid: "4",
-  _token: "0x51A6c3D50C6Cff243fED2EFc62c13c7e0472AC18"
-}
+  _masterWombatPid: "30",
+  _token: "0x1F970663a14F7d779C2d40F4E34ea9f3340F90f4",
+  _rewardPool: "0x6c75F223b24CB892FA9F4B99847F26bFb7674514"
+};
 async function main() {
-  const booster = await getContracts()[process.env.NETWORK_NAME!][
-    "WombatBooster"
-  ]["address"];
-
-
-  const pancakePath = await getContracts()[process.env.NETWORK_NAME!][
-    "PancakePath"
-  ]["address"];
+  const booster = "0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54"
 
   const WombatBooster = JSON.parse(
     fs.readFileSync(
@@ -51,13 +46,13 @@ async function main() {
 
   const txData = contract.methods
     .addPool(
-      process.env.WOMBAT_MASTERCHEF,
+      "0x62A83C6791A3d7950D823BB71a38e47252b6b6F4",
       data._masterWombatPid,
       data._token,
-      _rewardPool,
+      data._rewardPool,
       pancakePath,
-      process.env.PANCAKE_ROUTER,
-      process.env.USDT
+      pancakeRouter,
+      USDT
     )
     .encodeABI();
   console.log(txData);
@@ -65,7 +60,7 @@ async function main() {
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
+    gasLimit: web3.utils.toHex("3000000"),
     data: txData,
     to: booster,
     from: user,

@@ -19,7 +19,7 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const address = "0x80a8A2e0366b49aC5cA9A29a4D90D4170a3AF73c";
+  const address = "0xCA6d1A6F618628c22B4DaBCb40AA4E9746db966F";
 
   const BaseRewardPool = JSON.parse(
     fs.readFileSync(
@@ -33,7 +33,7 @@ async function main() {
   const contract = new web3.eth.Contract(BaseRewardPool);
 
   const txData = contract.methods
-    .queueNewRewards(process.env.WOM, "100000000000000000")
+    .queueNewRewards(process.env.WOM, "10000000000000000")
     .encodeABI();
   console.log(txData);
 

@@ -49,6 +49,14 @@ const config: HardhatUserConfig = {
       url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
       accounts: private_key,
     },
+    bsc: {
+      url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
+      accounts: private_key,
+    },
+    arb: {
+      url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
+      accounts: private_key,
+    },
   },
   etherscan: {
     apiKey: process.env.ETH_API_KEY,

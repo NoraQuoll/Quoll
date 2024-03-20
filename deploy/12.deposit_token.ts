@@ -7,7 +7,7 @@ dotenv.config();
 
 import Web3 from "web3";
 
-const lp_token = "0x2C89105ce90f8C3aE13e01b268eAe57B95e1e5a6";
+const lp_token = "0x5aD0b68c8544D475ee73ffd4c8dfe7E273b01266";
 
 const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deployments, getNamedAccounts, network } = hre;
@@ -16,9 +16,8 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const operator = await getContracts()[network.name]["WombatBooster"][
-    "address"
-  ];
+  //booster
+  const operator = "0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54"
 
   const data = await deploy("DepositToken", {
     from: deployer,

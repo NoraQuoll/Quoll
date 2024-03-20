@@ -14,9 +14,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const operator = await getContracts()[process.env.NETWORK_NAME!][
-    "WombatBooster"
-  ]["address"];
+  const operator = "0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54"
 
   const data = await deploy("BaseRewardPool", {
     from: deployer,

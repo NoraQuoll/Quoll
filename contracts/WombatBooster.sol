@@ -543,12 +543,14 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     return true;
   }
 
-  function earmarkRewardsForAllPool() external returns (bool) {
+  function earmarkRewardsForAllPool(
+    uint256[] memory _pids
+  ) external returns (bool) {
     require(!isShutdown, "shutdown");
 
     // loop all pool
-    for (uint256 i = 0; i < poolInfo.length; i++) {
-      PoolInfo memory pool = poolInfo[i];
+    for (uint256 i = 0; i < _pids.length; i++) {
+      PoolInfo memory pool = poolInfo[_pids[i]];
 
       // Only claim for not yet shutdown pool
       if (!pool.shutdown) {
@@ -556,16 +558,16 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         address[] memory rewardTokens;
         uint256[] memory rewardAmounts;
 
-        if (pidToMasterWombat[i] == address(0)) {
+        if (pidToMasterWombat[_pids[i]] == address(0)) {
           (rewardTokens, rewardAmounts) = IWombatVoterProxy(voterProxy)
             .claimRewards(pool.masterWombatPid);
         } else {
           (rewardTokens, rewardAmounts) = IWombatVoterProxy(voterProxy)
-            .claimRewardsV2(pidToMasterWombat[i], pool.masterWombatPid);
+            .claimRewardsV2(pidToMasterWombat[_pids[i]], pool.masterWombatPid);
         }
-        _updatePendingRewards(i, rewardTokens, rewardAmounts);
+        _updatePendingRewards(_pids[i], rewardTokens, rewardAmounts);
 
-        _earmarkRewards(i, msg.sender);
+        _earmarkRewards(_pids[i], msg.sender);
       }
     }
     return true;
