@@ -14,7 +14,7 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const bribeManager = "0x9bB0cE4a4000c1127E3D420713E0c77d7E32086b"
+  const bribeManager = "0x2906d3392d90563DaB2548C0F353a4491F8E9bCc"
 
   const BribeManager = JSON.parse(
     fs.readFileSync(
@@ -33,7 +33,7 @@ async function main() {
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
+    gasLimit: web3.utils.toHex("300000"),
     data: txData,
     to: bribeManager,
     from: user,

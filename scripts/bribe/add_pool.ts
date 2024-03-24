@@ -14,7 +14,7 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const bribeManager = "0x9bB0cE4a4000c1127E3D420713E0c77d7E32086b";
+  const bribeManager = "0x2906d3392d90563DaB2548C0F353a4491F8E9bCc";
 
   const BribeManager = JSON.parse(
     fs.readFileSync(
@@ -27,10 +27,11 @@ async function main() {
 
   const contract = new web3.eth.Contract(BribeManager);
 
+  // lp + reward
   const txData = contract.methods
     .addPool(
-      "0x5aD0b68c8544D475ee73ffd4c8dfe7E273b01266",
-      "0x1F20519deA03ee6a06ED479d530aCB63c0A9f69A"
+      "0xaA0811AfF60Fbe2d7D7D0A18F26e584b8C148Ee8",
+      "0x68a239Fc3c4c5d192F2df2950d1D9B9a703833eD"
     )
     .encodeABI();
   console.log(txData);
@@ -38,7 +39,7 @@ async function main() {
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
+    gasLimit: web3.utils.toHex("3000000"),
     data: txData,
     to: bribeManager,
     from: user,

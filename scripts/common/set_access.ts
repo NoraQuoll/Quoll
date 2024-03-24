@@ -18,7 +18,7 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const quoll_token = "0x1F20519deA03ee6a06ED479d530aCB63c0A9f69A";
+  const quoll_token = "0x68a239Fc3c4c5d192F2df2950d1D9B9a703833eD";
 
   const QuollToken = JSON.parse(
     fs.readFileSync(
@@ -32,14 +32,14 @@ async function main() {
   const contract = new web3.eth.Contract(QuollToken);
 
   const txData = contract.methods
-    .setAccess("0x277Cd4b508aFbb75d182870409bBf610AFab5c7b", true)
+    .setAccess("0xe96c48C5FddC0DC1Df5Cf21d68A3D8b3aba68046", true)
     .encodeABI();
   console.log(txData);
 
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
+    gasLimit: web3.utils.toHex("3000000"),
     data: txData,
     to: quoll_token,
     from: user,

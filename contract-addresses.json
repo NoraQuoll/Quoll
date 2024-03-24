@@ -1,7 +1,7 @@
 {
     "testnet": {
         "DefaultProxyAdmin": {
-            "address": "0x1C96b4Aaab7203874693a5D4F69C7dFdf570807F"
+            "address": "0x9a89bbd0E48D7979aca0AE723199a80E6855F22a"
         },
         "QUO": {
             "address": "0x4F62160edB7584Bca1436e8eAD3F58325e6298eD",
@@ -20,8 +20,8 @@
             "impl": "0xba8230D34E2dB54f18bb3916C0b64CDd4f327794"
         },
         "WombatVoterProxy": {
-            "address": "0x81eFaFf9Ea94c424eB48c408303Ff37562e3E537",
-            "impl": "0xbEa726DbAaEA1baB1c5Fe0B10e2dF80e8faC82Bd"
+            "address": "0xF93620e056Fdd00fEF0ef52F3D0C6bBEd2f01a8D",
+            "impl": "0x353E47a6af1B2D7EFEb81eC12EB54BC85413179C"
         },
         "WombatBooster": {
             "address": "0xCb773F03281a1361E4b70A0d7f7477D008Fb8988",
@@ -106,6 +106,18 @@
         "Reward_Pool-1710845638567": {
             "address": "0x015A9E12E33cb7aaF0863Ae81Ffc403612c6f985",
             "impl": "0xeaDa611E64a9A66F6424B91A23730FF4787eA43a"
+        },
+        "CampaignRewardPoolV2": {
+            "address": "0xD67520E6076E4DDC1166024050c67c71ACB4BFc2",
+            "impl": "0xb93396c1C765a605A37A68faD5A4f173CA1e44bB"
+        },
+        "MockVewom": {
+            "address": "0xabdA4fc1F6a6D5a67A2cD18a48CA00B25A8cdE19",
+            "impl": "0x66cF196Fd7610d2715106B514d985e266514Aa49"
+        },
+        "MockWhitelist": {
+            "address": "0x6627b414dEFEF421C395037c580694F21228276d",
+            "impl": "0xAe78508c473E84832A64F741133eceF5097F2d87"
         }
     },
     "bsc": {
@@ -142,6 +154,10 @@
         "DepositToken0xceC37c0803f00D4a622F9E2B1f682D627b62279b": {
             "address": "0x125822D77cfb1924cd586e796aE8b67078011d45",
             "impl": "0xC5488951002E255Bef213976b4367bC238B77755"
+        },
+        "VirtualBalanceRewardPool": {
+            "address": "0x68a239Fc3c4c5d192F2df2950d1D9B9a703833eD",
+            "impl": "0xbdD8e1a1C4833204EDedC41d1bBae0211d6a0446"
         }
     },
     "arb": {

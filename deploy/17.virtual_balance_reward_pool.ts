@@ -14,7 +14,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const bribeManager = "0x9bB0cE4a4000c1127E3D420713E0c77d7E32086b";
+  const bribeManager = "0x2906d3392d90563DaB2548C0F353a4491F8E9bCc";
 
   const data = await deploy("VirtualBalanceRewardPool", {
     from: deployer,

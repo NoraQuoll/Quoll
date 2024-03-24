@@ -1,13 +1,3 @@
-// setParams
-
-// Contract Wom depositor
-
-// _wom: WOM token 
-// _voterProxy: wombatVoterProxy contract
-// _qWOM: qWOM
-// _qWomRewardPool
-
-
 import Web3 from "web3";
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
@@ -15,7 +5,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import * as fs from "fs";
-import { saveContract, getContracts, sleep } from "../utils";
+import { saveContract, getContracts, sleep } from "../../utils";
 
 const web3 = new Web3(process.env.RPC!);
 
@@ -23,27 +13,31 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-const wom = "0x7BFC90abeEB4138e583bfC46aBC69De34c9ABb8B";
-const voterProxy = "0x81eFaFf9Ea94c424eB48c408303Ff37562e3E537";
-const qWom = "0xA22e2f3047e7D1F0cD864A4EB9A89D298Ca171C5";
-const qWomRewardPool = "0xC549B2917A1e4a5263eD9cF5950A417E3B3e8e87"
-
 async function main() {
-  const wom_depositor = "0x7a08F6e28D9508A812Ad2CCa1d6207B5eCf063C4"
+  const address = "0x745047ee5EEf7644CC4CB26c6188cF39aD225493";
 
-  const WomDepositor = JSON.parse(
-    fs.readFileSync(
-      "./artifacts/contracts/WomDepositor.sol/WomDepositor.json",
-      "utf-8"
-    )
-  ).abi;
+  const ContractABI: any = [
+    {
+      inputs: [
+        {
+          internalType: "contract IWhitelist",
+          name: "_whitelist",
+          type: "address",
+        },
+      ],
+      name: "setWhitelist",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+  ];
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(WomDepositor);
+  const contract = new web3.eth.Contract(ContractABI);
 
   const txData = contract.methods
-    .setParams(wom, voterProxy, qWom, qWomRewardPool)
+    .setWhitelist("0x6627b414dEFEF421C395037c580694F21228276d")
     .encodeABI();
   console.log(txData);
 
@@ -52,7 +46,7 @@ async function main() {
     nonce: txCount,
     gasLimit: web3.utils.toHex("3000000"),
     data: txData,
-    to: wom_depositor,
+    to: address,
     from: user,
   };
 

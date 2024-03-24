@@ -4,7 +4,6 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import * as fs from "fs";
-import { getContracts } from "../../utils";
 
 const web3 = new Web3(process.env.RPC!);
 
@@ -12,8 +11,11 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
+const to = "0xd67520e6076e4ddc1166024050c67c71acb4bfc2";
+
 async function main() {
-  const quoll_token = "0x4F62160edB7584Bca1436e8eAD3F58325e6298eD"
+  const quoll_token = "0x4F62160edB7584Bca1436e8eAD3F58325e6298eD";
+
   const Token = JSON.parse(
     fs.readFileSync(
       "./artifacts/contracts/QuollToken.sol/QuollToken.json",
@@ -23,21 +25,13 @@ async function main() {
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(Token, quoll_token);
+  const contract = new web3.eth.Contract(Token);
 
-  const txData = contract.methods
-    .mint(user, "10000000000000000000000000")
-    .encodeABI();
-
-  const estGas = Math.ceil(
-    (await contract.methods
-      .mint(user, "10000000000000000000000000")
-      .estimateGas({from: user})) * 1.1
-  );
+  const txData = contract.methods.transfer(to, "10000000000000000").encodeABI();
 
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex(estGas),
+    gasLimit: web3.utils.toHex("300000"),
     data: txData,
     to: quoll_token,
     from: user,
