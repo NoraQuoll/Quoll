@@ -149,6 +149,7 @@ contract CampaignRewardPoolV2 is ManagerUpgradeable {
 
     function stake(uint256 _amount) external updateReward(msg.sender) {
         require(_amount > 0, "RewardPool : Cannot stake 0");
+        require(rewardRate > 0, "Only when Campaign ready");
 
         _totalSupply = _totalSupply.add(_amount);
         _balances[msg.sender] = _balances[msg.sender].add(_amount);
@@ -165,6 +166,7 @@ contract CampaignRewardPoolV2 is ManagerUpgradeable {
         bool _lock
     ) external updateReward(msg.sender) {
         require(_amount > 0, "RewardPool : Cannot withdraw 0");
+        require(rewardRate > 0, "Only when Campaign ready");
 
         _totalSupply = _totalSupply.sub(_amount);
         _balances[msg.sender] = _balances[msg.sender].sub(_amount);

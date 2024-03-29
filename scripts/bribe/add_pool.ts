@@ -30,8 +30,8 @@ async function main() {
   // lp + reward
   const txData = contract.methods
     .addPool(
-      "0xaA0811AfF60Fbe2d7D7D0A18F26e584b8C148Ee8",
-      "0x68a239Fc3c4c5d192F2df2950d1D9B9a703833eD"
+      "0xdFDE04743d88B58F36dF1834BC0969DAc9B2A9b3",
+      "0x5d7B0d6Ea4Bcd11167c07A1eFCcAf0d61905fcE6"
     )
     .encodeABI();
   console.log(txData);

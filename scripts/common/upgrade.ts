@@ -13,9 +13,9 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-const upgradesContract = ["0x81eFaFf9Ea94c424eB48c408303Ff37562e3E537"];
+const upgradesContract = ["0x6FCA396A8a2b623b24A998A5808c0E144Aa0689a"];
 async function main() {
-  const proxyAdmin = "0xd8751F87f90D7459A3500D974C9363302c67E7e8";
+  const proxyAdmin = "0x16821E45d208D8369c135f546759Fd9849e76433";
 
   const ProxyAdmin: any = [
     {
@@ -144,7 +144,8 @@ async function main() {
     const txData = contract.methods
       .upgrade(
         upgradesContract[i],
-        "0x353E47a6af1B2D7EFEb81eC12EB54BC85413179C"
+        // "0x91c0855ca33807619599c50867e4D9E0FC5c617a",
+        "0x8c54D3bE3b32BF12A420E6BD5608930C037Df59E"
       )
       .encodeABI();
     console.log(txData);
@@ -152,7 +153,7 @@ async function main() {
     //using ETH
     const txObj = {
       nonce: txCount,
-      gasLimit: web3.utils.toHex("3000000"),
+      gasLimit: web3.utils.toHex("1000000"),
       data: txData,
       to: proxyAdmin,
       from: user,

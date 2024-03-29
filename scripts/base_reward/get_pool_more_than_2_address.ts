@@ -23,7 +23,7 @@ import { saveContract, getContracts, sleep } from "../utils";
 const web3 = new Web3(process.env.RPC!);
 
 async function main() {
-  const booster = "0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54";
+  const booster = "0x6FCA396A8a2b623b24A998A5808c0E144Aa0689a";
 
   const WombatBooster = JSON.parse(
     fs.readFileSync(
@@ -35,7 +35,7 @@ async function main() {
   const contract = new web3.eth.Contract(WombatBooster, booster);
 
   // get all pool from 0 to 50
-  for (let i = 0; i < 52; i++) {
+  for (let i = 0; i < 100; i++) {
     const data = await contract.methods.poolInfo(i).call();
     // console.log(data);
     const BaseRewardPool = JSON.parse(

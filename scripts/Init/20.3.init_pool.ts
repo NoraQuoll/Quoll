@@ -4,6 +4,11 @@
 // address: wombatBooster
 // status: true
 
+// Quo_amount: 10M
+// lockWeeks: 26
+// penalty: 70%
+// duration: 15 days
+
 import Web3 from "web3";
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
@@ -20,7 +25,7 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const address = "0xD67520E6076E4DDC1166024050c67c71ACB4BFc2";
+  const address = "0x25430b479ea82180b7f5fdadbbb27c311d61e778";
 
   const CampaignRewardPoolV2 = JSON.parse(
     fs.readFileSync(
@@ -33,7 +38,7 @@ async function main() {
 
   const contract = new web3.eth.Contract(CampaignRewardPoolV2);
 
-  const txData = contract.methods.initPool(2, 1000, 360000).encodeABI();
+  const txData = contract.methods.initPool(26, 7000, 1296000).encodeABI();
   console.log(txData);
 
   //using ETH
