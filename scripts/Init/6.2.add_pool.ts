@@ -27,9 +27,9 @@ const USDT = "0x55d398326f99059fF775485246999027B3197955";
 const masterWombat = "0x489833311676B566f888119c29bd997Dc6C95830";
 
 const data = {
-  _masterWombatPid: "62",
-  _token: "0x4e43CF9Bb7300C76cFe5dd5ccEf19DC31358187b",
-  _rewardPool: "0x0aBd42Ac2Ef70c0D7AB012b6B5c00e25b35f5b1E",
+  _masterWombatPid: "55",
+  _token: "0xAdb7E966a2C740A4FbA5da11F6aEBAe4D3b6fcAE",
+  _rewardPool: "0x3B4e48265aD0806309F29E0776FB6DB5E6AE881c",
 };
 async function main() {
   const booster = "0x6FCA396A8a2b623b24A998A5808c0E144Aa0689a";

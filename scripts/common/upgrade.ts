@@ -144,8 +144,12 @@ async function main() {
     const txData = contract.methods
       .upgrade(
         upgradesContract[i],
+        // contract booster
+        // addPool
         // "0x91c0855ca33807619599c50867e4D9E0FC5c617a",
+        // current
         "0x8c54D3bE3b32BF12A420E6BD5608930C037Df59E"
+        // "0xE170FfAdc7c1853483E5d4dfd7ae5Fd1400d296c"
       )
       .encodeABI();
     console.log(txData);

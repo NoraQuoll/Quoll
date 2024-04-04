@@ -15,15 +15,16 @@ const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
   const base_reward_pools = [
-    "0x921f5F899955168254f61BE9a98c359c3fa085E3",
-    "0xa67181a5643Bf1d0778f849032214861Db462714",
-    "0x92a5A6ce9D562000be824d27C3da66Ac92944dc5",
-    "0x645AC47112251F7ca2519F8F93845a6408d06266",
-    "0xC0967970b153D8f8DF7Cf9529c288CcCf258cEf0",
-    "0xe189032a19e02745E1bf319914279e14731c2D62",
-    "0xe6c19054a903D6A57ab0Ed07425949e168248868",
-    "0x0aBd42Ac2Ef70c0D7AB012b6B5c00e25b35f5b1E",
+    "0x525fEd1fce20e64baAf27f5883C37b31773eb729",
+    "0x83998D9DDBa0281102f15f2B08eCa9B3400886CE",
+    "0x8C8194b75cE095124A32dCfA05B7a41e8F23d1BE",
+    "0x255436BC0f2e9000565671F106bb20DbcBc2A83D",
+    "0xfD8b81786e714Bc2DbA94Af89d8566e85fb98EBF",
+    "0x98cAFa03c410B8F1E4Be7AF1863Cc05976C7a2Fd",
+    "0x3B4e48265aD0806309F29E0776FB6DB5E6AE881c",
   ];
+
+  const quollZap = "0xC17ADEE898ba323242B7C9654F617F7542128322";
 
   for (let i = 0; i < base_reward_pools.length; i++) {
     const BaseRewardPoolV2 = JSON.parse(
@@ -37,9 +38,7 @@ async function main() {
 
     const contract = new web3.eth.Contract(BaseRewardPoolV2);
 
-    const txData = contract.methods
-      .grant("0xC17ADEE898ba323242B7C9654F617F7542128322", true)
-      .encodeABI();
+    const txData = contract.methods.grant(quollZap, true).encodeABI();
     console.log(txData);
 
     //using ETH

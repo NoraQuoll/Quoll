@@ -1394,6 +1394,104 @@
     "verification": "https://bscscan.com/address/0x0A9674E7ecd7Bd7286b010A3cf41d05c7fFD5390#code",
     "implVerification": "https://bscscan.com/address/0x95196Ee6f02d64d259A0fb291a9f238a7CFA55d9#code"
   },
+  "depositToken-60": {
+    "address": "0x1407d105d0583272615eb138583647D06494C3f6",
+    "implAddress": "0xC5488951002E255Bef213976b4367bC238B77755",
+    "txHash": "0xed50acb1920c6214094a6c92928ae8a560267e6a8b96e00bb21b7d7d7edba125",
+    "verification": "https://bscscan.com/address/0xA93BB6515F03b141f29A9a8b150349baa4ad2E19#code",
+    "implVerification": "https://bscscan.com/address/0x2550A7e9356a3210F884A4B4AEe681050a73c5e8#code"
+  },
+  "rewardPool-60": {
+    "address": "0x525fEd1fce20e64baAf27f5883C37b31773eb729",
+    "implAddress": "0x03B61Cf942234a45219a97D891bBEAd0423e2b28",
+    "txHash": "0x7a957e138e78843608852a76cf71dc55e8804c22f51ee9e43066fbd1760a845f",
+    "verification": "https://bscscan.com/address/0x0A9674E7ecd7Bd7286b010A3cf41d05c7fFD5390#code",
+    "implVerification": "https://bscscan.com/address/0x95196Ee6f02d64d259A0fb291a9f238a7CFA55d9#code"
+  },
+  "depositToken-61": {
+    "address": "0x556CaD790a7D684b6D09e1FAf22e9b20eDbF693C",
+    "implAddress": "0xC5488951002E255Bef213976b4367bC238B77755",
+    "txHash": "0xed50acb1920c6214094a6c92928ae8a560267e6a8b96e00bb21b7d7d7edba125",
+    "verification": "https://bscscan.com/address/0xA93BB6515F03b141f29A9a8b150349baa4ad2E19#code",
+    "implVerification": "https://bscscan.com/address/0x2550A7e9356a3210F884A4B4AEe681050a73c5e8#code"
+  },
+  "rewardPool-61": {
+    "address": "0x83998D9DDBa0281102f15f2B08eCa9B3400886CE",
+    "implAddress": "0x03B61Cf942234a45219a97D891bBEAd0423e2b28",
+    "txHash": "0x7a957e138e78843608852a76cf71dc55e8804c22f51ee9e43066fbd1760a845f",
+    "verification": "https://bscscan.com/address/0x0A9674E7ecd7Bd7286b010A3cf41d05c7fFD5390#code",
+    "implVerification": "https://bscscan.com/address/0x95196Ee6f02d64d259A0fb291a9f238a7CFA55d9#code"
+  },
+  "depositToken-62": {
+    "address": "0x3C60d09eFE51825226673f530eA38B9c17C204e5",
+    "implAddress": "0xC5488951002E255Bef213976b4367bC238B77755",
+    "txHash": "0xed50acb1920c6214094a6c92928ae8a560267e6a8b96e00bb21b7d7d7edba125",
+    "verification": "https://bscscan.com/address/0xA93BB6515F03b141f29A9a8b150349baa4ad2E19#code",
+    "implVerification": "https://bscscan.com/address/0x2550A7e9356a3210F884A4B4AEe681050a73c5e8#code"
+  },
+  "rewardPool-62": {
+    "address": "0x8C8194b75cE095124A32dCfA05B7a41e8F23d1BE",
+    "implAddress": "0x03B61Cf942234a45219a97D891bBEAd0423e2b28",
+    "txHash": "0x7a957e138e78843608852a76cf71dc55e8804c22f51ee9e43066fbd1760a845f",
+    "verification": "https://bscscan.com/address/0x0A9674E7ecd7Bd7286b010A3cf41d05c7fFD5390#code",
+    "implVerification": "https://bscscan.com/address/0x95196Ee6f02d64d259A0fb291a9f238a7CFA55d9#code"
+  },
+  "depositToken-63": {
+    "address": "0x0d1c8FE66b4293fF3409C7013F35c9a996a3dd7B",
+    "implAddress": "0xC5488951002E255Bef213976b4367bC238B77755",
+    "txHash": "0xed50acb1920c6214094a6c92928ae8a560267e6a8b96e00bb21b7d7d7edba125",
+    "verification": "https://bscscan.com/address/0xA93BB6515F03b141f29A9a8b150349baa4ad2E19#code",
+    "implVerification": "https://bscscan.com/address/0x2550A7e9356a3210F884A4B4AEe681050a73c5e8#code"
+  },
+  "rewardPool-63": {
+    "address": "0x255436BC0f2e9000565671F106bb20DbcBc2A83D",
+    "implAddress": "0x03B61Cf942234a45219a97D891bBEAd0423e2b28",
+    "txHash": "0x7a957e138e78843608852a76cf71dc55e8804c22f51ee9e43066fbd1760a845f",
+    "verification": "https://bscscan.com/address/0x0A9674E7ecd7Bd7286b010A3cf41d05c7fFD5390#code",
+    "implVerification": "https://bscscan.com/address/0x95196Ee6f02d64d259A0fb291a9f238a7CFA55d9#code"
+  },
+  "depositToken-64": {
+    "address": "0xe0f00F2Ce68afc2b78351cA17d523fd43b79d4b9",
+    "implAddress": "0xC5488951002E255Bef213976b4367bC238B77755",
+    "txHash": "0xed50acb1920c6214094a6c92928ae8a560267e6a8b96e00bb21b7d7d7edba125",
+    "verification": "https://bscscan.com/address/0xA93BB6515F03b141f29A9a8b150349baa4ad2E19#code",
+    "implVerification": "https://bscscan.com/address/0x2550A7e9356a3210F884A4B4AEe681050a73c5e8#code"
+  },
+  "rewardPool-64": {
+    "address": "0xfD8b81786e714Bc2DbA94Af89d8566e85fb98EBF",
+    "implAddress": "0x03B61Cf942234a45219a97D891bBEAd0423e2b28",
+    "txHash": "0x7a957e138e78843608852a76cf71dc55e8804c22f51ee9e43066fbd1760a845f",
+    "verification": "https://bscscan.com/address/0x0A9674E7ecd7Bd7286b010A3cf41d05c7fFD5390#code",
+    "implVerification": "https://bscscan.com/address/0x95196Ee6f02d64d259A0fb291a9f238a7CFA55d9#code"
+  },
+  "depositToken-65": {
+    "address": "0x537f65187011382D214e6759Eef7F1c81c732b91",
+    "implAddress": "0xC5488951002E255Bef213976b4367bC238B77755",
+    "txHash": "0xed50acb1920c6214094a6c92928ae8a560267e6a8b96e00bb21b7d7d7edba125",
+    "verification": "https://bscscan.com/address/0xA93BB6515F03b141f29A9a8b150349baa4ad2E19#code",
+    "implVerification": "https://bscscan.com/address/0x2550A7e9356a3210F884A4B4AEe681050a73c5e8#code"
+  },
+  "rewardPool-65": {
+    "address": "0x98cAFa03c410B8F1E4Be7AF1863Cc05976C7a2Fd",
+    "implAddress": "0x03B61Cf942234a45219a97D891bBEAd0423e2b28",
+    "txHash": "0x7a957e138e78843608852a76cf71dc55e8804c22f51ee9e43066fbd1760a845f",
+    "verification": "https://bscscan.com/address/0x0A9674E7ecd7Bd7286b010A3cf41d05c7fFD5390#code",
+    "implVerification": "https://bscscan.com/address/0x95196Ee6f02d64d259A0fb291a9f238a7CFA55d9#code"
+  },
+  "depositToken-66": {
+    "address": "0xAdb7E966a2C740A4FbA5da11F6aEBAe4D3b6fcAE",
+    "implAddress": "0xC5488951002E255Bef213976b4367bC238B77755",
+    "txHash": "0xed50acb1920c6214094a6c92928ae8a560267e6a8b96e00bb21b7d7d7edba125",
+    "verification": "https://bscscan.com/address/0xA93BB6515F03b141f29A9a8b150349baa4ad2E19#code",
+    "implVerification": "https://bscscan.com/address/0x2550A7e9356a3210F884A4B4AEe681050a73c5e8#code"
+  },
+  "rewardPool-66": {
+    "address": "0x3B4e48265aD0806309F29E0776FB6DB5E6AE881c",
+    "implAddress": "0x03B61Cf942234a45219a97D891bBEAd0423e2b28",
+    "txHash": "0x7a957e138e78843608852a76cf71dc55e8804c22f51ee9e43066fbd1760a845f",
+    "verification": "https://bscscan.com/address/0x0A9674E7ecd7Bd7286b010A3cf41d05c7fFD5390#code",
+    "implVerification": "https://bscscan.com/address/0x95196Ee6f02d64d259A0fb291a9f238a7CFA55d9#code"
+  },
   "virtualBalanceRewardPool-42": {
     "address": "0xe67E673393D78a4dA029e642345B993F805f1EDA",
     "implAddress": "0xC717c6A2bC03bED5c9c83B3AFca2A0ED4d06eC28",

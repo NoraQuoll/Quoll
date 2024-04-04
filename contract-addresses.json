@@ -218,10 +218,72 @@
         "CampaignRewardPoolV2": {
             "address": "0x25430b479EA82180b7F5fDadbBB27C311D61e778",
             "impl": "0x1136B371B4bdDEdAD3679eFA8240F9c084E4Be67"
+        },
+        "Reward_Pool-1712230056787": {
+            "address": "0x525fEd1fce20e64baAf27f5883C37b31773eb729",
+            "impl": "0xE97709de9774c1305AdFADfD7f8e2053D0B854dd"
+        },
+        "DepositToken0x93012ad2367E247ca4275270CfC0BbCbf098ABBC": {
+            "address": "0x1407d105d0583272615eb138583647D06494C3f6",
+            "impl": "0xC5488951002E255Bef213976b4367bC238B77755"
+        },
+        "Reward_Pool-1712230510697": {
+            "address": "0x83998D9DDBa0281102f15f2B08eCa9B3400886CE",
+            "impl": "0xE97709de9774c1305AdFADfD7f8e2053D0B854dd"
+        },
+        "DepositToken0xD55d010C647104E26e86D0cdd62dEB48D487a521": {
+            "address": "0x556CaD790a7D684b6D09e1FAf22e9b20eDbF693C",
+            "impl": "0xC5488951002E255Bef213976b4367bC238B77755"
+        },
+        "Reward_Pool-1712230729737": {
+            "address": "0x8C8194b75cE095124A32dCfA05B7a41e8F23d1BE",
+            "impl": "0xE97709de9774c1305AdFADfD7f8e2053D0B854dd"
+        },
+        "DepositToken0xbCd5E80dAc3925416A8605b158Cac3a2cc1EBd6E": {
+            "address": "0x3C60d09eFE51825226673f530eA38B9c17C204e5",
+            "impl": "0xC5488951002E255Bef213976b4367bC238B77755"
+        },
+        "Reward_Pool-1712230813335": {
+            "address": "0x8C8194b75cE095124A32dCfA05B7a41e8F23d1BE",
+            "impl": "0xE97709de9774c1305AdFADfD7f8e2053D0B854dd"
+        },
+        "Reward_Pool-1712230852948": {
+            "address": "0x255436BC0f2e9000565671F106bb20DbcBc2A83D",
+            "impl": "0xE97709de9774c1305AdFADfD7f8e2053D0B854dd"
+        },
+        "DepositToken0x591cCb3Bac62f1710d013E090E36Ee760D70EF87": {
+            "address": "0x0d1c8FE66b4293fF3409C7013F35c9a996a3dd7B",
+            "impl": "0xC5488951002E255Bef213976b4367bC238B77755"
+        },
+        "Reward_Pool-1712230935031": {
+            "address": "0xfD8b81786e714Bc2DbA94Af89d8566e85fb98EBF",
+            "impl": "0xE97709de9774c1305AdFADfD7f8e2053D0B854dd"
+        },
+        "DepositToken0x17AdeD6D50d9f9311cEE5C1746a0284F4d163500": {
+            "address": "0xe0f00F2Ce68afc2b78351cA17d523fd43b79d4b9",
+            "impl": "0xC5488951002E255Bef213976b4367bC238B77755"
+        },
+        "Reward_Pool-1712231251404": {
+            "address": "0x98cAFa03c410B8F1E4Be7AF1863Cc05976C7a2Fd",
+            "impl": "0xE97709de9774c1305AdFADfD7f8e2053D0B854dd"
+        },
+        "DepositToken0x082059Fd29672d59CE582176cF2CF6d0da8c9078": {
+            "address": "0x537f65187011382D214e6759Eef7F1c81c732b91",
+            "impl": "0xC5488951002E255Bef213976b4367bC238B77755"
+        },
+        "Reward_Pool-1712231416997": {
+            "address": "0x3B4e48265aD0806309F29E0776FB6DB5E6AE881c",
+            "impl": "0xE97709de9774c1305AdFADfD7f8e2053D0B854dd"
+        },
+        "DepositToken0xAD87CB711ADF067e0D6F0Ed6867bF23C00d930d6": {
+            "address": "0xAdb7E966a2C740A4FbA5da11F6aEBAe4D3b6fcAE",
+            "impl": "0xC5488951002E255Bef213976b4367bC238B77755"
         }
     },
     "arb": {
-        "DefaultProxyAdmin": {},
+        "DefaultProxyAdmin": {
+            "address": "0x4020fEEc96B541D1Af6489437C3C2794De6Dc495"
+        },
         "VirtualBalanceRewardPool": {
             "address": "0x1F20519deA03ee6a06ED479d530aCB63c0A9f69A",
             "impl": "0x521E61D65e8570509571f5B4eD8fD1d35315C8b4"
@@ -236,6 +298,10 @@
         "Reward_Pool-1710941389107": {
             "address": "0x6c75F223b24CB892FA9F4B99847F26bFb7674514",
             "impl": "0xEECc2A5D7E0B4E34238618Be8fD64dfcCF0B438A"
+        },
+        "QuollZap": {
+            "address": "0x0029A6Ac902980574eB61D5115249e2dcD6Ee955",
+            "impl": "0xE170FfAdc7c1853483E5d4dfd7ae5Fd1400d296c"
         }
     }
 }
