@@ -11,7 +11,7 @@ pragma solidity 0.6.12;
 /___/ \_, //_//_/\__//_//_/\__/ \__//_/ /_\_\
      /___/
 
-* Synthetix: BaseRewardPool.sol
+* Synthetix: BaseRewardPoolV1.sol
 *
 * Docs: https://docs.synthetix.io/
 *
@@ -43,13 +43,13 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "./Interfaces/IBaseRewardPool.sol";
+import "./Interfaces/IBaseRewardPoolV1.sol";
 import "./Interfaces/IWombatBooster.sol";
 import "./Interfaces/IPancakePath.sol";
 import "./Interfaces/Pancake/IPancakeRouter.sol";
 import "./lib/TransferHelper.sol";
 
-contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
+contract BaseRewardPoolV1 is IBaseRewardPoolV1, OwnableUpgradeable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     using TransferHelper for address;
@@ -278,46 +278,19 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
         stakingToken.safeTransfer(_account, _amount);
         emit Withdrawn(_account, _amount);
 
-        getReward(_account, false);
+        getReward(_account);
     }
 
     // Return amount of Quo will get
     function getReward(
-        address _account,
-        bool isSwap
-    ) public override updateReward(_account) returns (uint256) {
-        uint256 sumToUSDT = 0;
+        address _account
+    ) public override updateReward(_account) {
         for (uint256 i = 0; i < rewardTokens.length; i++) {
             address rewardToken = rewardTokens[i];
             uint256 reward = earned(_account, rewardToken);
             if (reward > 0) {
                 userRewards[_account][rewardToken].rewards = 0;
-
-                // if isSwap = true then transfer to owner, else transfer to account
-                if (isSwap) {
-                    // get USDT value from rewardToken
-                    // get path from rewardToken to USDT
-                    address[] memory paths = IPancakePath(pancakePath).getPath(
-                        rewardToken,
-                        usdtAddress
-                    );
-                    // from path getAmountOut from reward to USDT
-                    uint256[] memory amounts = IPancakeRouter02(pancakeRouter)
-                        .getAmountsOut(reward, paths);
-
-                    // emit event
-                    emit SwapRewardToUSDT(
-                        rewardToken,
-                        reward,
-                        amounts[amounts.length - 1]
-                    );
-
-                    // add to sum quo
-                    sumToUSDT += amounts[amounts.length - 1];
-                    rewardToken.safeTransferToken(owner(), reward);
-                } else {
-                    rewardToken.safeTransferToken(_account, reward);
-                }
+                rewardToken.safeTransferToken(_account, reward);
                 IWombatBooster(booster).rewardClaimed(
                     pid,
                     _account,
@@ -327,8 +300,6 @@ contract BaseRewardPool is IBaseRewardPool, OwnableUpgradeable {
                 emit RewardPaid(_account, rewardToken, reward);
             }
         }
-
-        return sumToUSDT;
     }
 
     function donate(

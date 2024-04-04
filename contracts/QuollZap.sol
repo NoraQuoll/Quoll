@@ -9,7 +9,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./lib/TransferHelper.sol";
 import "./lib/Interfaces/IWNative.sol";
 import "./lib/Interfaces/IWNativeRelayer.sol";
-import "./Interfaces/IBaseRewardPool.sol";
+import "./Interfaces/IBaseRewardPoolV2.sol";
 import "./Interfaces/IWombatBooster.sol";
 import "./Interfaces/Wombat/IAsset.sol";
 import "./Interfaces/Wombat/IPool.sol";
@@ -110,7 +110,7 @@ contract QuollZap is OwnableUpgradeable {
     if (_stake) {
       IERC20(token).safeApprove(rewardPool, 0);
       IERC20(token).safeApprove(rewardPool, tokenAmount);
-      IBaseRewardPool(rewardPool).stakeFor(msg.sender, tokenAmount);
+      IBaseRewardPoolV2(rewardPool).stakeFor(msg.sender, tokenAmount);
     } else {
       IERC20(token).safeTransfer(msg.sender, tokenAmount);
     }
@@ -120,7 +120,7 @@ contract QuollZap is OwnableUpgradeable {
     (address lptoken, address token, , address rewardPool, ) = booster.poolInfo(
       _pid
     );
-    IBaseRewardPool(rewardPool).withdrawFor(msg.sender, _amount);
+    IBaseRewardPoolV2(rewardPool).withdrawFor(msg.sender, _amount);
     IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
     uint256 lptokenBal = IERC20(lptoken).balanceOf(address(this));
     booster.withdraw(_pid, _amount);
@@ -141,7 +141,7 @@ contract QuollZap is OwnableUpgradeable {
     );
 
     if (_stake) {
-      IBaseRewardPool(rewardPool).withdrawFor(msg.sender, _amount);
+      IBaseRewardPoolV2(rewardPool).withdrawFor(msg.sender, _amount);
     }
 
     IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
@@ -183,7 +183,7 @@ contract QuollZap is OwnableUpgradeable {
     for (uint256 i = 0; i < _pids.length; i++) {
       (, , , address rewardPool, ) = booster.poolInfo(_pids[i]);
       require(rewardPool != address(0), "invalid _pids");
-      uint256 rewardInUSDT = IBaseRewardPool(rewardPool).getReward(
+      uint256 rewardInUSDT = IBaseRewardPoolV2(rewardPool).getReward(
         msg.sender,
         isSwap
       );

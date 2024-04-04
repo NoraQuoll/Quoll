@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "./Interfaces/IBaseRewardPool.sol";
+import "./Interfaces/IBaseRewardPoolV1.sol";
 import "./Interfaces/IVlQuoV2.sol";
 
 contract VlQuo is OwnableUpgradeable {
@@ -407,7 +407,7 @@ contract VlQuo is OwnableUpgradeable {
                     if (_stake) {
                         qWomToken.safeApprove(qWomRewards, 0);
                         qWomToken.safeApprove(qWomRewards, reward);
-                        IBaseRewardPool(qWomRewards).stakeFor(_user, reward);
+                        IBaseRewardPoolV1(qWomRewards).stakeFor(_user, reward);
                     } else {
                         qWomToken.safeTransfer(_user, reward);
                     }

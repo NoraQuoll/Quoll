@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.12;
 
-import "../BaseRewardPool.sol";
+import "../BaseRewardPoolV2.sol";
 
-contract BaseRewardPoolLocked is BaseRewardPool {
+contract BaseRewardPoolLocked is BaseRewardPoolV2 {
     uint256 public unlockAt;
     address public lockManager;
 

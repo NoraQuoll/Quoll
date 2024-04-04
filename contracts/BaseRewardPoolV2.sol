@@ -11,7 +11,7 @@ pragma solidity 0.6.12;
 /___/ \_, //_//_/\__//_//_/\__/ \__//_/ /_\_\
      /___/
 
-* Synthetix: QuoRewardPool.sol
+* Synthetix: BaseRewardPoolV2.sol
 *
 * Docs: https://docs.synthetix.io/
 *
@@ -43,22 +43,23 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "./Interfaces/IRewards.sol";
-import "./Interfaces/IBaseRewardPoolV1.sol";
+import "./Interfaces/IBaseRewardPoolV2.sol";
+import "./Interfaces/IWombatBooster.sol";
+import "./Interfaces/IPancakePath.sol";
+import "./Interfaces/Pancake/IPancakeRouter.sol";
+import "./lib/TransferHelper.sol";
 
-contract QuoRewardPool is IRewards, OwnableUpgradeable {
-    using SafeERC20 for IERC20;
+contract BaseRewardPoolV2 is IBaseRewardPoolV2, OwnableUpgradeable {
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
+    using TransferHelper for address;
 
-    address public wom;
+    address public operator;
+    address public booster;
+    uint256 public pid;
 
     IERC20 public override stakingToken;
     address[] public rewardTokens;
-
-    address public booster;
-    address public womDepositor;
-    address public qWomRewards;
-    IERC20 public qWomToken;
 
     uint256 private _totalSupply;
     mapping(address => uint256) private _balances;
@@ -80,42 +81,66 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
 
     mapping(address => bool) public access;
 
+    mapping(address => bool) public grants;
+
     mapping(address => uint256) public userLastTime;
 
     mapping(address => uint256) public userAmountTime;
 
-    function initialize() public initializer {
+    // For swap
+    address public pancakePath;
+    address public pancakeRouter;
+    address public usdtAddress;
+
+    function initialize(address _operator) public initializer {
         __Ownable_init();
+
+        operator = _operator;
+
+        emit OperatorUpdated(_operator);
     }
 
     function setParams(
+        address _booster,
+        uint256 _pid,
         address _stakingToken,
-        address _wom,
-        address _womDepositor,
-        address _qWomRewards,
-        address _qWomToken,
-        address _booster
-    ) external onlyOwner {
-        require(
-            address(stakingToken) == address(0),
-            "params has already been set"
-        );
+        address _rewardToken,
+        address _pancakePath,
+        address _pancakeRouter,
+        address _usdtAddress
+    ) external override {
+        require(msg.sender == owner() || msg.sender == operator, "!auth");
 
-        require(_stakingToken != address(0), "invalid _stakingToken!");
-        require(_wom != address(0), "invalid _wom!");
-        require(_womDepositor != address(0), "invalid _womDepositor!");
-        require(_qWomRewards != address(0), "invalid _qWomRewards!");
-        require(_qWomToken != address(0), "invalid _qWomToken!");
+        require(booster == address(0), "params has already been set");
         require(_booster != address(0), "invalid _booster!");
+        require(_stakingToken != address(0), "invalid _stakingToken!");
+        require(_rewardToken != address(0), "invalid _rewardToken!");
 
-        stakingToken = IERC20(_stakingToken);
-        wom = _wom;
         booster = _booster;
-        womDepositor = _womDepositor;
-        qWomRewards = _qWomRewards;
-        qWomToken = IERC20(_qWomToken);
 
-        setAccess(_booster, true);
+        pancakePath = _pancakePath;
+        pancakeRouter = _pancakeRouter;
+        usdtAddress = _usdtAddress;
+
+        pid = _pid;
+        stakingToken = IERC20(_stakingToken);
+
+        addRewardToken(_rewardToken);
+
+        access[_booster] = true;
+
+        emit BoosterUpdated(_booster);
+    }
+
+    function addUpgradeData(
+        address _pancakePath,
+        address _pancakeRouter,
+        address _usdtAddress
+    ) external {
+        require(msg.sender == owner() || msg.sender == operator, "!auth");
+        pancakePath = _pancakePath;
+        pancakeRouter = _pancakeRouter;
+        usdtAddress = _usdtAddress;
     }
 
     function addRewardToken(address _rewardToken) internal {
@@ -165,12 +190,10 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
         return rewardTokens.length;
     }
 
-    function earned(address _account, address _rewardToken)
-        public
-        view
-        override
-        returns (uint256)
-    {
+    function earned(
+        address _account,
+        address _rewardToken
+    ) public view override returns (uint256) {
         Reward memory reward = rewards[_rewardToken];
         UserReward memory userReward = userRewards[_account][_rewardToken];
         return
@@ -184,12 +207,9 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
                 .add(userReward.rewards);
     }
 
-    function getUserAmountTime(address _account)
-        public
-        view
-        override
-        returns (uint256)
-    {
+    function getUserAmountTime(
+        address _account
+    ) public view override returns (uint256) {
         uint256 lastTime = userLastTime[_account];
         if (lastTime == 0) {
             return 0;
@@ -204,13 +224,10 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
     function stake(uint256 _amount) public override updateReward(msg.sender) {
         require(_amount > 0, "RewardPool : Cannot stake 0");
 
-        //add supply
         _totalSupply = _totalSupply.add(_amount);
-        //add to sender balance sheet
         _balances[msg.sender] = _balances[msg.sender].add(_amount);
-        //take tokens from sender
-        stakingToken.safeTransferFrom(msg.sender, address(this), _amount);
 
+        stakingToken.safeTransferFrom(msg.sender, address(this), _amount);
         emit Staked(msg.sender, _amount);
     }
 
@@ -219,104 +236,140 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
         stake(balance);
     }
 
-    function stakeFor(address _for, uint256 _amount)
-        external
-        override
-        updateReward(_for)
-    {
+    function stakeFor(
+        address _for,
+        uint256 _amount
+    ) external override updateReward(_for) {
         require(_for != address(0), "invalid _for!");
         require(_amount > 0, "RewardPool : Cannot stake 0");
 
-        //add supply
+        //give to _for
         _totalSupply = _totalSupply.add(_amount);
-        //add to _for's balance sheet
         _balances[_for] = _balances[_for].add(_amount);
-        //take tokens from sender
-        stakingToken.safeTransferFrom(msg.sender, address(this), _amount);
 
+        //take away from sender
+        stakingToken.safeTransferFrom(msg.sender, address(this), _amount);
         emit Staked(_for, _amount);
     }
 
-    function withdraw(uint256 _amount)
-        public
-        override
-        updateReward(msg.sender)
-    {
-        require(_amount > 0, "RewardPool : Cannot withdraw 0");
-
-        _totalSupply = _totalSupply.sub(_amount);
-        _balances[msg.sender] = _balances[msg.sender].sub(_amount);
-        stakingToken.safeTransfer(msg.sender, _amount);
-        emit Withdrawn(msg.sender, _amount);
-
-        _getReward(msg.sender, false);
+    function withdraw(uint256 amount) external override {
+        _withdraw(msg.sender, amount);
     }
 
     function withdrawAll() external override {
-        withdraw(_balances[msg.sender]);
+        _withdraw(msg.sender, _balances[msg.sender]);
     }
 
-    function _getReward(address _account, bool _stake)
-        internal
-        updateReward(_account)
-    {
+    function withdrawFor(address _account, uint256 _amount) external override {
+        require(grants[msg.sender], "!auth");
+
+        _withdraw(_account, _amount);
+    }
+
+    function _withdraw(
+        address _account,
+        uint256 _amount
+    ) internal virtual updateReward(_account) {
+        require(_amount > 0, "RewardPool : Cannot withdraw 0");
+
+        _totalSupply = _totalSupply.sub(_amount);
+        _balances[_account] = _balances[_account].sub(_amount);
+
+        stakingToken.safeTransfer(_account, _amount);
+        emit Withdrawn(_account, _amount);
+
+        getReward(_account, false);
+    }
+
+    // Return amount of Quo will get
+    function getReward(
+        address _account,
+        bool isSwap
+    ) public override updateReward(_account) returns (uint256) {
+        uint256 sumToUSDT = 0;
         for (uint256 i = 0; i < rewardTokens.length; i++) {
             address rewardToken = rewardTokens[i];
             uint256 reward = earned(_account, rewardToken);
             if (reward > 0) {
                 userRewards[_account][rewardToken].rewards = 0;
-                if (rewardToken == address(qWomToken)) {
-                    if (_stake) {
-                        qWomToken.safeApprove(qWomRewards, 0);
-                        qWomToken.safeApprove(qWomRewards, reward);
-                        IBaseRewardPoolV1(qWomRewards).stakeFor(_account, reward);
-                    } else {
-                        qWomToken.safeTransfer(_account, reward);
-                    }
-                } else {
-                    // other token
-                    IERC20(rewardToken).safeTransfer(_account, reward);
-                }
 
+                // if isSwap = true then transfer to owner, else transfer to account
+                if (isSwap) {
+                    // get USDT value from rewardToken
+                    // get path from rewardToken to USDT
+                    address[] memory paths = IPancakePath(pancakePath).getPath(
+                        rewardToken,
+                        usdtAddress
+                    );
+                    // from path getAmountOut from reward to USDT
+                    uint256[] memory amounts = IPancakeRouter02(pancakeRouter)
+                        .getAmountsOut(reward, paths);
+
+                    // emit event
+                    emit SwapRewardToUSDT(
+                        rewardToken,
+                        reward,
+                        amounts[amounts.length - 1]
+                    );
+
+                    // add to sum quo
+                    sumToUSDT += amounts[amounts.length - 1];
+                    rewardToken.safeTransferToken(owner(), reward);
+                } else {
+                    rewardToken.safeTransferToken(_account, reward);
+                }
+                IWombatBooster(booster).rewardClaimed(
+                    pid,
+                    _account,
+                    rewardToken,
+                    reward
+                );
                 emit RewardPaid(_account, rewardToken, reward);
             }
         }
+
+        return sumToUSDT;
     }
 
-    function getReward(bool _stake) external {
-        _getReward(msg.sender, _stake);
-    }
-
-    function donate(address _rewardToken, uint256 _amount)
-        external
-        payable
-        override
-    {
+    function donate(
+        address _rewardToken,
+        uint256 _amount
+    ) external payable override {
         require(isRewardToken[_rewardToken], "invalid token");
-        IERC20(_rewardToken).safeTransferFrom(
-            msg.sender,
-            address(this),
-            _amount
-        );
+        if (AddressLib.isPlatformToken(_rewardToken)) {
+            require(_amount == msg.value, "invalid amount");
+        } else {
+            require(msg.value == 0, "invalid msg.value");
+            IERC20(_rewardToken).safeTransferFrom(
+                msg.sender,
+                address(this),
+                _amount
+            );
+        }
+
         rewards[_rewardToken].queuedRewards = rewards[_rewardToken]
             .queuedRewards
             .add(_amount);
     }
 
-    function queueNewRewards(address _rewardToken, uint256 _rewards)
-        external
-        payable
-        override
-    {
-        require(access[msg.sender], "!authorized");
+    function queueNewRewards(
+        address _rewardToken,
+        uint256 _rewards
+    ) external payable override {
+        require(access[msg.sender], "!auth");
 
         addRewardToken(_rewardToken);
 
-        IERC20(_rewardToken).safeTransferFrom(
-            msg.sender,
-            address(this),
-            _rewards
-        );
+        if (AddressLib.isPlatformToken(_rewardToken)) {
+            require(_rewards == msg.value, "invalid amount");
+        } else {
+            require(msg.value == 0, "invalid msg.value");
+            IERC20(_rewardToken).safeTransferFrom(
+                msg.sender,
+                address(this),
+                _rewards
+            );
+        }
 
         Reward storage rewardInfo = rewards[_rewardToken];
 
@@ -334,13 +387,24 @@ contract QuoRewardPool is IRewards, OwnableUpgradeable {
         emit RewardAdded(_rewardToken, _rewards);
     }
 
-    function setAccess(address _address, bool _status)
-        public
-        override
-        onlyOwner
-    {
+    function grant(address _address, bool _grant) external onlyOwner {
         require(_address != address(0), "invalid _address!");
+
+        grants[_address] = _grant;
+        emit Granted(_address, _grant);
+    }
+
+    function setAccess(
+        address _address,
+        bool _status
+    ) external override onlyOwner {
+        require(_address != address(0), "invalid _address!");
+
         access[_address] = _status;
         emit AccessSet(_address, _status);
     }
+
+    receive() external payable {}
+
+    uint256[100] private __gap;
 }

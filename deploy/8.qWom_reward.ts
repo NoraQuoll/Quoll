@@ -14,7 +14,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const data = await deploy("BaseRewardPool", {
+  const data = await deploy("BaseRewardPoolV1", {
     from: deployer,
     args: [],
     log: true,

@@ -12,7 +12,7 @@ import "./Interfaces/IWombatVoterProxy.sol";
 import "./Interfaces/IDepositToken.sol";
 import "./Interfaces/IWomDepositor.sol";
 import "./Interfaces/IQuollToken.sol";
-import "./Interfaces/IBaseRewardPool.sol";
+import "./Interfaces/IBaseRewardPoolV2.sol";
 import "./lib/TransferHelper.sol";
 
 contract WombatBooster is IWombatBooster, OwnableUpgradeable {
@@ -203,7 +203,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     uint256 pid = poolInfo.length;
 
     // config wom rewards
-    IBaseRewardPool(_rewardPool).setParams(
+    IBaseRewardPoolV2(_rewardPool).setParams(
       address(this),
       pid,
       _token,
@@ -347,7 +347,7 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
       IDepositToken(token).mint(address(this), _amount);
       address rewardContract = pool.rewardPool;
       _approveTokenIfNeeded(token, rewardContract, _amount);
-      IBaseRewardPool(rewardContract).stakeFor(msg.sender, _amount);
+      IBaseRewardPoolV2(rewardContract).stakeFor(msg.sender, _amount);
     } else {
       //add user balance directly
       IDepositToken(token).mint(msg.sender, _amount);

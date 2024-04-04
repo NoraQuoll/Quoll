@@ -38,15 +38,15 @@ async function main() {
   for (let i = 0; i < 100; i++) {
     const data = await contract.methods.poolInfo(i).call();
     // console.log(data);
-    const BaseRewardPool = JSON.parse(
+    const BaseRewardPoolV2 = JSON.parse(
       fs.readFileSync(
-        "./artifacts/contracts/BaseRewardPool.sol/BaseRewardPool.json",
+        "./artifacts/contracts/BaseRewardPoolV2.sol/BaseRewardPoolV2.json",
         "utf-8"
       )
     ).abi;
 
     const contract_reward = new web3.eth.Contract(
-      BaseRewardPool,
+      BaseRewardPoolV2,
       data.rewardPool
     );
 

@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "./Interfaces/IBaseRewardPool.sol";
+import "./Interfaces/IBaseRewardPoolV1.sol";
 import "./Interfaces/IWomDepositor.sol";
 import "./Interfaces/IWombatVoterProxy.sol";
 import "./Interfaces/IQuollExternalToken.sol";
@@ -106,7 +106,7 @@ contract WomDepositor is IWomDepositor, OwnableUpgradeable {
             //stake for msg.sender
             IERC20(qWOM).safeApprove(qWomRewardPool, 0);
             IERC20(qWOM).safeApprove(qWomRewardPool, _amount);
-            IBaseRewardPool(qWomRewardPool).stakeFor(msg.sender, _amount);
+            IBaseRewardPoolV1(qWomRewardPool).stakeFor(msg.sender, _amount);
         }
 
         emit Deposited(msg.sender, _amount);

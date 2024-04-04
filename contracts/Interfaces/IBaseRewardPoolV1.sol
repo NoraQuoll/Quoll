@@ -4,7 +4,7 @@ pragma solidity 0.6.12;
 
 import "./IRewards.sol";
 
-interface IBaseRewardPool is IRewards {
+interface IBaseRewardPoolV1 is IRewards {
     function setParams(
         address _booster,
         uint256 _pid,
@@ -15,7 +15,7 @@ interface IBaseRewardPool is IRewards {
         address _usdtAddress
     ) external;
 
-    function getReward(address, bool isSwap) external returns (uint256);
+    function getReward(address) external ;
 
     function withdrawFor(address _account, uint256 _amount) external;
 

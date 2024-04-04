@@ -75,9 +75,9 @@ async function main() {
     "0x0A9674E7ecd7Bd7286b010A3cf41d05c7fFD5390",
   ];
 
-  const BaseRewardPool = JSON.parse(
+  const BaseRewardPoolV2 = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/BaseRewardPool.sol/BaseRewardPool.json",
+      "./artifacts/contracts/BaseRewardPoolV2.sol/BaseRewardPoolV2.json",
       "utf-8"
     )
   ).abi;
@@ -85,7 +85,7 @@ async function main() {
   for (let i = 0; i < addressses.length; i++) {
     const txCount = await web3.eth.getTransactionCount(user);
 
-    const contract = new web3.eth.Contract(BaseRewardPool, addressses[i]);
+    const contract = new web3.eth.Contract(BaseRewardPoolV2, addressses[i]);
 
     const txData = contract.methods
       .addUpgradeData(pancakePath, pancakeRouter, USDT)

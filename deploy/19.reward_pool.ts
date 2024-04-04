@@ -17,7 +17,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   // booster
   const operator = "0x6FCA396A8a2b623b24A998A5808c0E144Aa0689a"
 
-  const data = await deploy("BaseRewardPool", {
+  const data = await deploy("BaseRewardPoolV2", {
     from: deployer,
     args: [],
     log: true,
