@@ -302,6 +302,46 @@
         "QuollZap": {
             "address": "0x0029A6Ac902980574eB61D5115249e2dcD6Ee955",
             "impl": "0xE170FfAdc7c1853483E5d4dfd7ae5Fd1400d296c"
+        },
+        "DepositToken0x9a24055aF7dc84df05906aCfbf5DE694cd3e975D": {
+            "address": "0xDEa8a3E587256C858f92cc22b33EF0b52C99CdD2",
+            "impl": "0xBdC61EcB725cFf83e4259bf39B005EE71E4f2dc0"
+        },
+        "Reward_Pool-1712314827280": {
+            "address": "0xeE7BED6C37b8cDA71Ac56099996daC3F51508EBe",
+            "impl": "0x1A9b056Cc62881B890F3cE2e305B4FadE4b7cd97"
+        },
+        "Reward_Pool-1712314957725": {
+            "address": "0xe94259F185Aa1824E82Ee46317A1877d59C7BF07",
+            "impl": "0x1A9b056Cc62881B890F3cE2e305B4FadE4b7cd97"
+        },
+        "DepositToken0x9121af8B7Bbdd76dc6f67051c417D007483C6BE2": {
+            "address": "0xa38EDAb4dd70DB94f85Da46d95a39B9aC3325b3f",
+            "impl": "0xBdC61EcB725cFf83e4259bf39B005EE71E4f2dc0"
+        },
+        "DepositToken0x35876Fd35cfe001c9Ff20d96E9e3C40D21dC6563": {
+            "address": "0x647fF309D0Ad251957BD720F9564962aEC14E4Ec",
+            "impl": "0xBdC61EcB725cFf83e4259bf39B005EE71E4f2dc0"
+        },
+        "Reward_Pool-1712315293998": {
+            "address": "0xFe4a7B6623e8ea70ED3317b7eFfE1D2Cb5f3C754",
+            "impl": "0x1A9b056Cc62881B890F3cE2e305B4FadE4b7cd97"
+        },
+        "Reward_Pool-1712315511496": {
+            "address": "0xE08d8f553Ad90F351a41De61Dc472252cE248aa7",
+            "impl": "0x1A9b056Cc62881B890F3cE2e305B4FadE4b7cd97"
+        },
+        "DepositToken0x08C6E91BDF4b7133381a3CC06e497bF14Bd3Fd4D": {
+            "address": "0x5e2BeD93147EE0a70c3B6Ad432DD0dA0c338fD67",
+            "impl": "0xBdC61EcB725cFf83e4259bf39B005EE71E4f2dc0"
+        },
+        "DepositToken0x87800497C0f2b565578A483E6Ea06744F15eD525": {
+            "address": "0xC9b6aCFB6BeB6Ee62e581D97290CEe0Ef375f796",
+            "impl": "0xBdC61EcB725cFf83e4259bf39B005EE71E4f2dc0"
+        },
+        "Reward_Pool-1712315618441": {
+            "address": "0x2AF9E77432efa95b35B5d3ef3DC34f8863C4ABC2",
+            "impl": "0x1A9b056Cc62881B890F3cE2e305B4FadE4b7cd97"
         }
     }
 }

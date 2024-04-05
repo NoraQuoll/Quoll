@@ -15,16 +15,14 @@ const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
   const base_reward_pools = [
-    "0x525fEd1fce20e64baAf27f5883C37b31773eb729",
-    "0x83998D9DDBa0281102f15f2B08eCa9B3400886CE",
-    "0x8C8194b75cE095124A32dCfA05B7a41e8F23d1BE",
-    "0x255436BC0f2e9000565671F106bb20DbcBc2A83D",
-    "0xfD8b81786e714Bc2DbA94Af89d8566e85fb98EBF",
-    "0x98cAFa03c410B8F1E4Be7AF1863Cc05976C7a2Fd",
-    "0x3B4e48265aD0806309F29E0776FB6DB5E6AE881c",
+    "0xeE7BED6C37b8cDA71Ac56099996daC3F51508EBe",
+    "0xe94259F185Aa1824E82Ee46317A1877d59C7BF07",
+    "0xFe4a7B6623e8ea70ED3317b7eFfE1D2Cb5f3C754",
+    "0xE08d8f553Ad90F351a41De61Dc472252cE248aa7",
+    "0x2AF9E77432efa95b35B5d3ef3DC34f8863C4ABC2",
   ];
 
-  const quollZap = "0xC17ADEE898ba323242B7C9654F617F7542128322";
+  const quollZap = "0x1EffF8c5157c7912c289a7EF721009f17504F940";
 
   for (let i = 0; i < base_reward_pools.length; i++) {
     const BaseRewardPoolV2 = JSON.parse(

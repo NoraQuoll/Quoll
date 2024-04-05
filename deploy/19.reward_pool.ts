@@ -15,7 +15,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const web3 = new Web3(process.env.RPC!);
 
   // booster
-  const operator = "0x6FCA396A8a2b623b24A998A5808c0E144Aa0689a"
+  const operator = "0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54"
 
   const data = await deploy("BaseRewardPoolV2", {
     from: deployer,
