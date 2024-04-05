@@ -14,41 +14,55 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const bribeManager = "0x2906d3392d90563DaB2548C0F353a4491F8E9bCc";
+  const bribeManager = "0x9bB0cE4a4000c1127E3D420713E0c77d7E32086b";
 
-  const BribeManager = JSON.parse(
-    fs.readFileSync(
-      "./artifacts/contracts/BribeManager.sol/BribeManager.json",
-      "utf-8"
-    )
-  ).abi;
+  const lps = [
+    "0x9a24055aF7dc84df05906aCfbf5DE694cd3e975D",
+    "0x9121af8B7Bbdd76dc6f67051c417D007483C6BE2",
+    "0x35876Fd35cfe001c9Ff20d96E9e3C40D21dC6563",
+    "0x08C6E91BDF4b7133381a3CC06e497bF14Bd3Fd4D",
+    "0x87800497C0f2b565578A483E6Ea06744F15eD525"
+  ];
+  const rewards = [
+    "0x450D7c3090CECB5448ab42407B4aa683C3e15395",
+    "0xe9d76b3Bb66fB5a438067d216F49b9A20f0183B2",
+    "0xEeC7eB3Aa3e1C50297b2aa2B8AfBd9440746a809",
+    "0x5CC1e4fa464F7adcF6f4d1DE76E761Dc54ab8eE3",
+    "0xD03a0671b5F52A5287ce876CC61990fADdC8265a",
+  ];
 
-  const txCount = await web3.eth.getTransactionCount(user);
+  for (let i = 0; i < lps.length; i++) {
+    const BribeManager = JSON.parse(
+      fs.readFileSync(
+        "./artifacts/contracts/BribeManager.sol/BribeManager.json",
+        "utf-8"
+      )
+    ).abi;
 
-  const contract = new web3.eth.Contract(BribeManager);
+    const txCount = await web3.eth.getTransactionCount(user);
 
-  // lp + reward
-  const txData = contract.methods
-    .addPool(
-      "0xdFDE04743d88B58F36dF1834BC0969DAc9B2A9b3",
-      "0x5d7B0d6Ea4Bcd11167c07A1eFCcAf0d61905fcE6"
-    )
-    .encodeABI();
-  console.log(txData);
+    const contract = new web3.eth.Contract(BribeManager);
 
-  //using ETH
-  const txObj = {
-    nonce: txCount,
-    gasLimit: web3.utils.toHex("3000000"),
-    data: txData,
-    to: bribeManager,
-    from: user,
-  };
+    // lp + reward
+    const txData = contract.methods.addPool(lps[i], rewards[i]).encodeABI();
+    console.log(txData);
 
-  const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);
+    //using ETH
+    const txObj = {
+      nonce: txCount,
+      gasLimit: web3.utils.toHex("3000000"),
+      data: txData,
+      to: bribeManager,
+      from: user,
+    };
 
-  const result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction!);
-  console.log(result);
+    const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);
+
+    const result = await web3.eth.sendSignedTransaction(
+      signedTx.rawTransaction!
+    );
+    console.log(result);
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere

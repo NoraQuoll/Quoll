@@ -813,5 +813,40 @@
     "txHash": "0x0f2270139f97c2a5b277effdb07d9a65aa14c1696378fad686a725f698475ef9",
     "verification": "https://arbiscan.io/address/0x7De15C00f5c29315F7E58332f7eF3cBd263c0e49#code",
     "implVerification": "https://arbiscan.io/address/0xd198212607b5493B97BC908462cEF1Cf509296F0#code"
+  },
+  "virtualBalanceRewardPool-31": {
+    "address": "0x450D7c3090CECB5448ab42407B4aa683C3e15395",
+    "implAddress": "0xd3D28eF12863462aAe33A331D4C4964933D1e5D1",
+    "txHash": "0xf6116dd0e33c0f8efad2779c99b8827bc78ed2e6e394be75b32e0872d44be399",
+    "verification": "https://arbiscan.io/address/0xC17ADEE898ba323242B7C9654F617F7542128322#code",
+    "implVerification": "https://arbiscan.io/address/0xd3D28eF12863462aAe33A331D4C4964933D1e5D1#code"
+  },
+  "virtualBalanceRewardPool-32": {
+    "address": "0xe9d76b3Bb66fB5a438067d216F49b9A20f0183B2",
+    "implAddress": "0xd3D28eF12863462aAe33A331D4C4964933D1e5D1",
+    "txHash": "0xf6116dd0e33c0f8efad2779c99b8827bc78ed2e6e394be75b32e0872d44be399",
+    "verification": "https://arbiscan.io/address/0xC17ADEE898ba323242B7C9654F617F7542128322#code",
+    "implVerification": "https://arbiscan.io/address/0xd3D28eF12863462aAe33A331D4C4964933D1e5D1#code"
+  },
+  "virtualBalanceRewardPool-33": {
+    "address": "0xEeC7eB3Aa3e1C50297b2aa2B8AfBd9440746a809",
+    "implAddress": "0xd3D28eF12863462aAe33A331D4C4964933D1e5D1",
+    "txHash": "0xf6116dd0e33c0f8efad2779c99b8827bc78ed2e6e394be75b32e0872d44be399",
+    "verification": "https://arbiscan.io/address/0xC17ADEE898ba323242B7C9654F617F7542128322#code",
+    "implVerification": "https://arbiscan.io/address/0xd3D28eF12863462aAe33A331D4C4964933D1e5D1#code"
+  },
+  "virtualBalanceRewardPool-34": {
+    "address": "0x5CC1e4fa464F7adcF6f4d1DE76E761Dc54ab8eE3",
+    "implAddress": "0xd3D28eF12863462aAe33A331D4C4964933D1e5D1",
+    "txHash": "0xf6116dd0e33c0f8efad2779c99b8827bc78ed2e6e394be75b32e0872d44be399",
+    "verification": "https://arbiscan.io/address/0xC17ADEE898ba323242B7C9654F617F7542128322#code",
+    "implVerification": "https://arbiscan.io/address/0xd3D28eF12863462aAe33A331D4C4964933D1e5D1#code"
+  },
+  "virtualBalanceRewardPool-35": {
+    "address": "0xD03a0671b5F52A5287ce876CC61990fADdC8265a",
+    "implAddress": "0xd3D28eF12863462aAe33A331D4C4964933D1e5D1",
+    "txHash": "0xf6116dd0e33c0f8efad2779c99b8827bc78ed2e6e394be75b32e0872d44be399",
+    "verification": "https://arbiscan.io/address/0xC17ADEE898ba323242B7C9654F617F7542128322#code",
+    "implVerification": "https://arbiscan.io/address/0xd3D28eF12863462aAe33A331D4C4964933D1e5D1#code"
   }
 }

@@ -15,7 +15,7 @@ const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
   const base_reward_pools = [
-    "0xeE7BED6C37b8cDA71Ac56099996daC3F51508EBe",
+    // "0xeE7BED6C37b8cDA71Ac56099996daC3F51508EBe",
     "0xe94259F185Aa1824E82Ee46317A1877d59C7BF07",
     "0xFe4a7B6623e8ea70ED3317b7eFfE1D2Cb5f3C754",
     "0xE08d8f553Ad90F351a41De61Dc472252cE248aa7",

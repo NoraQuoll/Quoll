@@ -285,7 +285,7 @@
             "address": "0x4020fEEc96B541D1Af6489437C3C2794De6Dc495"
         },
         "VirtualBalanceRewardPool": {
-            "address": "0x1F20519deA03ee6a06ED479d530aCB63c0A9f69A",
+            "address": "0xD03a0671b5F52A5287ce876CC61990fADdC8265a",
             "impl": "0x521E61D65e8570509571f5B4eD8fD1d35315C8b4"
         },
         "WombatBooster": {
