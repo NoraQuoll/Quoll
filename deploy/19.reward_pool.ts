@@ -22,7 +22,9 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     args: [],
     log: true,
     deterministicDeployment: false,
-    gasPrice: await web3.eth.getGasPrice(),
+    // gasPrice: await web3.eth.getGasPrice(),
+    maxFeePerGas: "76292000",
+
     proxy: {
       proxyContract: "OptimizedTransparentProxy",
       owner: deployer,

@@ -52,7 +52,7 @@ async function main() {
 
     const dataReward = await contract_reward.methods.getRewardTokens().call();
 
-    console.log(i, ":", data.lptoken, ":", data.rewardPool, ":", dataReward);
+    console.log(i, ":", data.lptoken, ":", data.rewardPool, ":", dataReward, ":", data.masterWombatPid);
   }
 }
 
