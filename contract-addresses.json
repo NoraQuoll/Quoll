@@ -118,6 +118,10 @@
         "MockWhitelist": {
             "address": "0x6627b414dEFEF421C395037c580694F21228276d",
             "impl": "0xAe78508c473E84832A64F741133eceF5097F2d87"
+        },
+        "CakeLpLocker-2": {
+            "address": "0x442a7358caE394c796ca4Bed8aB0e3f5Ed22f1aB",
+            "impl": "0x45f9Dbe095618d1BB5367522a5A3078E0CC009d2"
         }
     },
     "bsc": {
@@ -278,6 +282,10 @@
         "DepositToken0xAD87CB711ADF067e0D6F0Ed6867bF23C00d930d6": {
             "address": "0xAdb7E966a2C740A4FbA5da11F6aEBAe4D3b6fcAE",
             "impl": "0xC5488951002E255Bef213976b4367bC238B77755"
+        },
+        "CakeLpLocker-2": {
+            "address": "0x0FFd14D28Af0fc1A64d7d63Bc64C45551078D01E",
+            "impl": "0x41Bc9506242bdA019Efb286A33cB33778d0e6733"
         }
     },
     "arb": {

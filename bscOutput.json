@@ -1596,5 +1596,12 @@
     "txHash": "0x78ec6e0c8341f870b669feb207c017b3ab9c07ee1e1eb2148b4828b8ec32e6d8",
     "verification": "https://bscscan.com/address/0x25430b479EA82180b7F5fDadbBB27C311D61e778#code",
     "implVerification": "https://bscscan.com/address/0x1136B371B4bdDEdAD3679eFA8240F9c084E4Be67#code"
+  },
+  "cakeLpLocker-2": {
+    "address": "0x0FFd14D28Af0fc1A64d7d63Bc64C45551078D01E",
+    "implAddress": "0xF6E97145502250077bb0C5AC7826acc7Ac93361D",
+    "txHash": "0xd989f41c25b628c0c05b5db6c16c6df980b4249ddce2cbdd484c78ea99704440",
+    "verification": "https://bscscan.com/address/0x0FFd14D28Af0fc1A64d7d63Bc64C45551078D01E#code",
+    "implVerification": "https://bscscan.com/address/0xF6E97145502250077bb0C5AC7826acc7Ac93361D#code"
   }
 }

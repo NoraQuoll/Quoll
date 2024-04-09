@@ -1,9 +1,10 @@
+import * as dotenv from "dotenv";
 import Web3 from "web3";
 
-import * as dotenv from "dotenv";
 dotenv.config();
 
 import * as fs from "fs";
+import { getContracts } from "../utils";
 
 const web3 = new Web3(process.env.RPC!);
 
@@ -11,36 +12,35 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-const token = "0x47a7929276efed9e02208d6f56745d97fd3afd9b";
-const contract_add = "0x442a7358caE394c796ca4Bed8aB0e3f5Ed22f1aB";
-
 async function main() {
-  const Token = JSON.parse(
+  const lp_token = "0xa387A64D4E1711442FADeF1dd4C697d901DCCf05";
+  const vlQuoV2 = "0xc634c0A24BFF88c015Ff32145CE0F8d578B02F60";
+  const treasury = "0xAB7ABCF6D4d1A75F00804dCBF5551794eB6c87B1";
+  
+  const cakeLpLocker = "0x0FFd14D28Af0fc1A64d7d63Bc64C45551078D01E";
+
+  const CakeLpLocker = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/QuollToken.sol/QuollToken.json",
+      "./artifacts/contracts/CakeLpLocker.sol/CakeLpLocker.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(Token, token);
+  const contract = new web3.eth.Contract(CakeLpLocker);
 
   const txData = contract.methods
-    .approve(contract_add, "1000000000000000010000000000000000")
+    .setParams(lp_token, vlQuoV2, treasury)
     .encodeABI();
+  console.log(txData);
 
-  const estGas = Math.ceil(
-    (await contract.methods
-      .approve(contract_add, "1000000000000000010000000000000000")
-      .estimateGas({ from: user })) * 1.1
-  );
-
+  //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex(estGas),
+    gasLimit: web3.utils.toHex("300000"),
     data: txData,
-    to: token,
+    to: cakeLpLocker,
     from: user,
   };
 

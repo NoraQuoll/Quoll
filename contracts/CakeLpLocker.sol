@@ -52,6 +52,8 @@ contract CakeLpLocker is
     uint256 private _totalSupply;
     mapping(address => uint256) private _balances;
 
+    bool public isBlockLock;
+
     function initialize() public initializer {
         __ManagerUpgradeable_init();
 
@@ -78,10 +80,15 @@ contract CakeLpLocker is
 
         maxLockLength = 10000;
         multiplier = 10000;
+        isBlockLock = false;
     }
 
     function setMultiplier(uint256 _multiplier) external onlyManager {
         multiplier = _multiplier;
+    }
+
+    function setBlock(bool _isBlock) external onlyManager {
+        isBlockLock = _isBlock;
     }
 
     function pause() external onlyManager {
@@ -111,6 +118,7 @@ contract CakeLpLocker is
         uint256 _amount,
         uint256 _weeks
     ) external override nonReentrant whenNotPaused {
+        require(!isBlockLock, "This pool have blocked lock");
         require(_user != address(0), "invalid _user!");
         require(
             msg.sender == _user || !vlQuoV2.blockThirdPartyActions(_user),

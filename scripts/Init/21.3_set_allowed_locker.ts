@@ -1,9 +1,17 @@
-import Web3 from "web3";
+// setAccess
 
+// Contract vlQuoV2
+// address: wombatBooster
+// status: true
+
+import Web3 from "web3";
+import { ethers } from "ethers";
 import * as dotenv from "dotenv";
+
 dotenv.config();
 
 import * as fs from "fs";
+import { saveContract, getContracts, sleep } from "../utils";
 
 const web3 = new Web3(process.env.RPC!);
 
@@ -11,36 +19,29 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-const token = "0x47a7929276efed9e02208d6f56745d97fd3afd9b";
-const contract_add = "0x442a7358caE394c796ca4Bed8aB0e3f5Ed22f1aB";
-
 async function main() {
-  const Token = JSON.parse(
-    fs.readFileSync(
-      "./artifacts/contracts/QuollToken.sol/QuollToken.json",
-      "utf-8"
-    )
+    const vlQuoV2 = "0xc634c0A24BFF88c015Ff32145CE0F8d578B02F60";
+    const cake_lp_locker = "0x0FFd14D28Af0fc1A64d7d63Bc64C45551078D01E";
+
+  const VlQuoV2 = JSON.parse(
+    fs.readFileSync("./artifacts/contracts/VlQuoV2.sol/VlQuoV2.json", "utf-8")
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(Token, token);
+  const contract = new web3.eth.Contract(VlQuoV2);
 
   const txData = contract.methods
-    .approve(contract_add, "1000000000000000010000000000000000")
+    .setAllowedLocker(cake_lp_locker, true)
     .encodeABI();
+  console.log(txData);
 
-  const estGas = Math.ceil(
-    (await contract.methods
-      .approve(contract_add, "1000000000000000010000000000000000")
-      .estimateGas({ from: user })) * 1.1
-  );
-
+  //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex(estGas),
+    gasLimit: web3.utils.toHex("300000"),
     data: txData,
-    to: token,
+    to: vlQuoV2,
     from: user,
   };
 
