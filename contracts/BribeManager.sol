@@ -369,6 +369,8 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
         finalFeeAmounts[i] = feeAmounts[i];
       }
     }
+
+    IDelegateVotePool(delegatePool).harvestManually();
   }
 
   /// @notice Cast a zero vote to harvest the bribes of selected pools

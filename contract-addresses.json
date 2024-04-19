@@ -294,6 +294,10 @@
         "VestedEscrow": {
             "address": "0x3476CAd19EDfaa0b57336Fe31b43a985Ed2A9E2e",
             "impl": "0x4609b15D9EA58e924CE707eB5410ec537977Ff8F"
+        },
+        "BribeManager": {
+            "address": "0xA87fD77790466cD8Ee7bE6F27AFD4304FB2a8d5f",
+            "impl": "0x65892c1B197eeAe00F024aD346091467B1DA8a29"
         }
     },
     "arb": {
@@ -406,6 +410,10 @@
         "Reward_Pool-1712319402703": {
             "address": "0xdb6B5DA83fc1c68F94BFaB82bE242b4AE597e29c",
             "impl": "0x1A9b056Cc62881B890F3cE2e305B4FadE4b7cd97"
+        },
+        "BribeManager": {
+            "address": "0xA7E19AE169d474a07Da4c28C058f3E8A5A329746",
+            "impl": "0x7281C2d24869f2524EE42b85a592d7c534A95eEC"
         }
     }
 }

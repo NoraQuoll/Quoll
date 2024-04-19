@@ -9,4 +9,6 @@ interface IDelegateVotePool {
             address[] memory rewardTokensList,
             uint256[] memory earnedRewards
         );
+
+    function harvestManually() external;
 }

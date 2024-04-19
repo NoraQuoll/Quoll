@@ -13,9 +13,9 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-const upgradesContract = ["0x29E41CaD80233287202dc884C3BC766255b0A96c"];
+const upgradesContract = ["0x9bB0cE4a4000c1127E3D420713E0c77d7E32086b"];
 async function main() {
-  const proxyAdmin = "0x16821E45d208D8369c135f546759Fd9849e76433";
+  const proxyAdmin = "0x4F878DCa03d9970Bb2a9B770Df7f7E49226510bC";
 
   const ProxyAdmin: any = [
     {
@@ -148,7 +148,7 @@ async function main() {
         // addPool
         // "0x91c0855ca33807619599c50867e4D9E0FC5c617a",
         // current
-        "0x4609b15D9EA58e924CE707eB5410ec537977Ff8F"
+        "0x7281C2d24869f2524EE42b85a592d7c534A95eEC"
         // "0xE170FfAdc7c1853483E5d4dfd7ae5Fd1400d296c"
       )
       .encodeABI();
