@@ -122,6 +122,10 @@
         "CakeLpLocker-2": {
             "address": "0x442a7358caE394c796ca4Bed8aB0e3f5Ed22f1aB",
             "impl": "0x45f9Dbe095618d1BB5367522a5A3078E0CC009d2"
+        },
+        "VestedEscrow": {
+            "address": "0x020e4aB9a3C4eBfF64Cd8205b5252accECe0cc71",
+            "impl": "0x992b197Ae34Aadb05f02c3AA6cF551449840A570"
         }
     },
     "bsc": {
@@ -286,6 +290,10 @@
         "CakeLpLocker-2": {
             "address": "0x0FFd14D28Af0fc1A64d7d63Bc64C45551078D01E",
             "impl": "0x41Bc9506242bdA019Efb286A33cB33778d0e6733"
+        },
+        "VestedEscrow": {
+            "address": "0x3476CAd19EDfaa0b57336Fe31b43a985Ed2A9E2e",
+            "impl": "0x4609b15D9EA58e924CE707eB5410ec537977Ff8F"
         }
     },
     "arb": {

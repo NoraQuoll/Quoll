@@ -29,6 +29,8 @@ contract VestedEscrow is ManagerUpgradeable {
     event Funded(address indexed _recipient, uint256 _amount);
     event Claimed(address indexed _recipient, uint256 _amount);
 
+    event TransferToAnotherAddress(address oldAddr, address newAddr);
+
     function initialize(
         address _token,
         uint256 _startTime,
@@ -49,10 +51,30 @@ contract VestedEscrow is ManagerUpgradeable {
         releaseDuration = _releaseDuration;
     }
 
-    function fund(address[] calldata _recipients, uint256[] calldata _amounts)
-        external
-        onlyManager
-    {
+    function changeVestingAddr(
+        address oldAddr,
+        address newAddr
+    ) public onlyManager {
+        require(totalAmounts[oldAddr] > 0, "Need user have amount");
+
+        require(
+            totalAmounts[newAddr] == 0,
+            "New addr need to dont have any reward"
+        );
+
+        totalAmounts[newAddr] = totalAmounts[oldAddr];
+        claimedAmounts[newAddr] = claimedAmounts[oldAddr];
+
+        totalAmounts[oldAddr] = 0;
+        claimedAmounts[oldAddr] = 0;
+
+        emit TransferToAnotherAddress(oldAddr, newAddr);
+    }
+
+    function fund(
+        address[] calldata _recipients,
+        uint256[] calldata _amounts
+    ) external onlyManager {
         require(
             _recipients.length == _amounts.length && _recipients.length > 0,
             "invalid _recipients or _amounts"

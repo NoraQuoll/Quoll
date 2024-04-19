@@ -1,3 +1,7 @@
+// Set Access wombatBooster to contract QUO
+// Contract QUO
+// Accessable to wombatBooster
+
 import Web3 from "web3";
 import { ethers } from "ethers";
 import * as dotenv from "dotenv";
@@ -14,21 +18,20 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const bribeManager = "0x2906d3392d90563DaB2548C0F353a4491F8E9bCc"
+  const vestedEscrow = "0x020e4aB9a3C4eBfF64Cd8205b5252accECe0cc71";
 
-  const BribeManager = JSON.parse(
+  const VestedEscrow = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/BribeManager.sol/BribeManager.json",
+      "./artifacts/contracts/VestedEscrow.sol/VestedEscrow.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(BribeManager);
+  const contract = new web3.eth.Contract(VestedEscrow);
 
-  //172800
-  const txData = contract.methods.setCastVoteCoolDown(0).encodeABI();
+  const txData = contract.methods.fund([user], [1000000]).encodeABI();
   console.log(txData);
 
   //using ETH
@@ -36,7 +39,7 @@ async function main() {
     nonce: txCount,
     gasLimit: web3.utils.toHex("300000"),
     data: txData,
-    to: bribeManager,
+    to: vestedEscrow,
     from: user,
   };
 

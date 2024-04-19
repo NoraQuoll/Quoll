@@ -13,11 +13,11 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deployer } = await getNamedAccounts();
 
   const web3 = new Web3(process.env.RPC!);
-  const _token = "";
-  const _startTime = "";
-  const _lockDuration = "";
-  const _lockPercent = "";
-  const _releaseDuration = "";
+  // const _token = "0x4F62160edB7584Bca1436e8eAD3F58325e6298eD";
+  // const _startTime = "100000000";
+  // const _lockDuration = "0";
+  // const _lockPercent = "10";
+  // const _releaseDuration = "10000";
 
   const data = await deploy("VestedEscrow", {
     from: deployer,
@@ -28,16 +28,16 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     proxy: {
       proxyContract: "OptimizedTransparentProxy",
       owner: deployer,
-      execute: {
-        methodName: "initialize",
-        args: [
-          _token,
-          _startTime,
-          _lockDuration,
-          _lockPercent,
-          _releaseDuration,
-        ],
-      },
+      // execute: {
+      //   methodName: "initialize",
+      //   args: [
+      //     _token,
+      //     _startTime,
+      //     _lockDuration,
+      //     _lockPercent,
+      //     _releaseDuration,
+      //   ],
+      // },
     },
   });
 
