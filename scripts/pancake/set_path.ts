@@ -37,9 +37,10 @@ async function main() {
 
   const txData = contract.methods
     .setPath(
-      "0x55d398326f99059fF775485246999027B3197955",
+      "0x0782b6d8c4551b9760e74c0545a9bcd90bdc41e5",
       "0x08b450e4a48C04CDF6DB2bD4cf24057f7B9563fF",
       [
+        "0x0782b6d8c4551b9760e74c0545a9bcd90bdc41e5",
         "0x55d398326f99059fF775485246999027B3197955",
         "0x08b450e4a48C04CDF6DB2bD4cf24057f7B9563fF",
       ]

@@ -370,6 +370,7 @@ contract BribeManager is IBribeManager, OwnableUpgradeable {
       }
     }
 
+    // cmt this for ARB
     IDelegateVotePool(delegatePool).harvestManually();
   }
 
