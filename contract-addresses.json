@@ -17,19 +17,19 @@
         },
         "qWOM": {
             "address": "0xA22e2f3047e7D1F0cD864A4EB9A89D298Ca171C5",
-            "impl": "0xba8230D34E2dB54f18bb3916C0b64CDd4f327794"
+            "impl": "0xbdc2Aeb30105a21c691Ed66aD00ed6b04A0A497c"
         },
         "WombatVoterProxy": {
             "address": "0xF93620e056Fdd00fEF0ef52F3D0C6bBEd2f01a8D",
             "impl": "0x353E47a6af1B2D7EFEb81eC12EB54BC85413179C"
         },
         "WombatBooster": {
-            "address": "0xCb773F03281a1361E4b70A0d7f7477D008Fb8988",
-            "impl": "0xfcECc7f2224F72f741aAeE849d1Cb5D370bc3fb7"
+            "address": "0x8DFA987C3bE619C8e8B8B68B12e2A38852E8a5FB",
+            "impl": "0xaeA6bfE140556d35992263c1B151220304B9c6fA"
         },
         "WomDepositor": {
-            "address": "0x7a08F6e28D9508A812Ad2CCa1d6207B5eCf063C4",
-            "impl": "0x7b3e81a3E909B36b8A43Cee8e1D03A36f7FadD32"
+            "address": "0x9E27d59Cef58D08b8a3be3010478250B426d4705",
+            "impl": "0x81C5B7Fa54b445c35FA997Be6834D5dCD845ad07"
         },
         "qWOMReward": {
             "address": "0xC549B2917A1e4a5263eD9cF5950A417E3B3e8e87",
@@ -126,6 +126,10 @@
         "VestedEscrow": {
             "address": "0x020e4aB9a3C4eBfF64Cd8205b5252accECe0cc71",
             "impl": "0x992b197Ae34Aadb05f02c3AA6cF551449840A570"
+        },
+        "BaseRewardqWomLock": {
+            "address": "0x5b37CdFE77250F56A75c8550391F1D06912E05F0",
+            "impl": "0x71FB61faAa395ec2b9b735BdF4Aa01C3aADFBf28"
         }
     },
     "bsc": {

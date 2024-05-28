@@ -67,6 +67,8 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
   address public quoMinter;
 
+  address public qWomRewardLockPool;
+
   function initialize() public initializer {
     __Ownable_init();
   }
@@ -123,6 +125,14 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     vlQuo = _vlQuo;
 
     emit VlQuoAddressChanged(_vlQuo);
+  }
+
+  function setqWomRewardLockPool(
+    address _qWomRewardLockPool
+  ) external onlyOwner {
+    require(_qWomRewardLockPool != address(0), "invalid _vlQuo!");
+
+    qWomRewardLockPool = _qWomRewardLockPool;
   }
 
   function setFees(

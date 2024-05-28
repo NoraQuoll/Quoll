@@ -14,7 +14,10 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const data = await deploy("WombatBooster", {
+  // booster
+  const operator = "0x8DFA987C3bE619C8e8B8B68B12e2A38852E8a5FB";
+
+  const data = await deploy("BaseRewardPoolV1WithLockqWom", {
     from: deployer,
     args: [],
     log: true,
@@ -23,17 +26,17 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     proxy: {
       proxyContract: "OptimizedTransparentProxy",
       owner: deployer,
-      execute: {
-        methodName: "initialize",
-        args: [],
-      },
+      // execute: {
+      //   methodName: "initialize",
+      //   args: [operator],
+      // },
     },
   });
 
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
   await saveContract(
     network.name,
-    "WombatBooster",
+    `BaseRewardqWomLock`,
     data.address,
     data.implementation!
   );
@@ -41,7 +44,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   try {
     // verify
     await hre.run("verify:verify", {
-      address: data.address,
+      address: data.implementation,
       constructorArguments: [],
     });
   } catch (e) {
@@ -49,6 +52,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-deploy.tags = ["WombatBooster"];
+deploy.tags = ["BaseRewardqWomLock"];
 
 export default deploy;

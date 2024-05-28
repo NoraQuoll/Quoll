@@ -1,9 +1,24 @@
-import Web3 from "web3";
+// setParams
 
+// contract WombatBooster
+// _wom
+// _voterProxy
+// _womDepositor
+// _qWom
+// _quo
+// _vlQuo
+// _quoRewardPool
+// _qWomRewardPool
+// _treasury: Address
+
+import Web3 from "web3";
+import { ethers } from "ethers";
 import * as dotenv from "dotenv";
+
 dotenv.config();
 
 import * as fs from "fs";
+import { saveContract, getContracts, sleep } from "../utils";
 
 const web3 = new Web3(process.env.RPC!);
 
@@ -11,36 +26,29 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-const token = "0xA22e2f3047e7D1F0cD864A4EB9A89D298Ca171C5";
-const contract_add = "0x5b37CdFE77250F56A75c8550391F1D06912E05F0";
-
 async function main() {
-  const Token = JSON.parse(
+  const contract_address = "0xaD6f9D7555dc4219eE502465EdC18C99F5405314";
+
+  const BaseRewardPoolV1WithLockqWom = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/QuollToken.sol/QuollToken.json",
+      "./artifacts/contracts/BaseRewardPoolV1WithLockqWom.sol/BaseRewardPoolV1WithLockqWom.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(Token, token);
+  const contract = new web3.eth.Contract(BaseRewardPoolV1WithLockqWom);
 
-  const txData = contract.methods
-    .approve(contract_add, "1000000000000000010000000000000000")
-    .encodeABI();
+  const txData = contract.methods.setLockTime(1800).encodeABI();
+  console.log(txData);
 
-  const estGas = Math.ceil(
-    (await contract.methods
-      .approve(contract_add, "1000000000000000010000000000000000")
-      .estimateGas({ from: user })) * 1.1
-  );
-
+  //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex(estGas),
+    gasLimit: web3.utils.toHex("30000000"),
     data: txData,
-    to: token,
+    to: contract_address,
     from: user,
   };
 

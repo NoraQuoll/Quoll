@@ -68,33 +68,9 @@ async function main() {
 
   const contract = new web3.eth.Contract(WombatBooster);
 
-  // const txData = contract.methods
-  //   .setParams(
-  //     process.env.WOM,
-  //     voter_proxy,
-  //     wom_depositor,
-  //     qWom,
-  //     quo,
-  //     vlQuo,
-  //     quoRewardPool,
-  //     qWomRewardPool,
-  //     process.env.TREASURY
-  //   )
-  //   .encodeABI();
-
   // testnet
   const txData = contract.methods
-    .setParams(
-      "0x7BFC90abeEB4138e583bfC46aBC69De34c9ABb8B",
-      "0xF93620e056Fdd00fEF0ef52F3D0C6bBEd2f01a8D",
-      "0x9E27d59Cef58D08b8a3be3010478250B426d4705",
-      "0xA22e2f3047e7D1F0cD864A4EB9A89D298Ca171C5",
-      "0x4F62160edB7584Bca1436e8eAD3F58325e6298eD",
-      "0x494d1dC23e342156c3A3ea9007A70681B81928D7",
-      "0x5B87ACabB607D4d14D2A795884Dbcb669A3b495A",
-      "0xC549B2917A1e4a5263eD9cF5950A417E3B3e8e87",
-      process.env.TREASURY
-    )
+    .setqWomRewardLockPool("0x5b37CdFE77250F56A75c8550391F1D06912E05F0")
     .encodeABI();
   console.log(txData);
 
