@@ -23,10 +23,10 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     proxy: {
       proxyContract: "OptimizedTransparentProxy",
       owner: deployer,
-      execute: {
-        methodName: "initialize",
-        args: [],
-      },
+      // execute: {
+      //   methodName: "initialize",
+      //   args: [],
+      // },
     },
   });
 
@@ -41,7 +41,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   try {
     // verify
     await hre.run("verify:verify", {
-      address: data.address,
+      address: data.implementation,
       constructorArguments: [],
     });
   } catch (e) {

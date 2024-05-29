@@ -268,9 +268,14 @@ contract BaseRewardPoolV1WithLockqWom is
             i++
         ) {
             LockState memory localState = userState[user].lockStates[i];
-            if (localState.timeUnlock > block.timestamp) {
+            if (localState.timeUnlock >= block.timestamp) {
                 newStartIndex = i;
                 break;
+            } else if (
+                localState.timeUnlock < block.timestamp &&
+                i == userState[user].lockStates.length - 1
+            ) {
+                newStartIndex = i + 1;
             } else {
                 // pendingRewards += userState[user].lockStates[i].
                 for (uint256 j = 0; j < localState.tokensReward.length; j++) {

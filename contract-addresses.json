@@ -25,7 +25,7 @@
         },
         "WombatBooster": {
             "address": "0x8DFA987C3bE619C8e8B8B68B12e2A38852E8a5FB",
-            "impl": "0xaeA6bfE140556d35992263c1B151220304B9c6fA"
+            "impl": "0x9a5A20f84c15F94EC144E688183B157d79F679e1"
         },
         "WomDepositor": {
             "address": "0x9E27d59Cef58D08b8a3be3010478250B426d4705",
@@ -129,7 +129,7 @@
         },
         "BaseRewardqWomLock": {
             "address": "0x5b37CdFE77250F56A75c8550391F1D06912E05F0",
-            "impl": "0x71FB61faAa395ec2b9b735BdF4Aa01C3aADFBf28"
+            "impl": "0xb5bb9289dcd71bEb6046c7e2E5Ce1438B886a9A8"
         }
     },
     "bsc": {

@@ -15,7 +15,7 @@ const user_pk =
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const contract = "0xDbE717a72fa40dFd67A5c9FAF61b0a7d9595a826";
+  const contract = "0x5b37CdFE77250F56A75c8550391F1D06912E05F0";
 
   const operator = await getContracts()[process.env.NETWORK_NAME!][
     "WombatBooster"
@@ -31,7 +31,7 @@ async function main() {
   const txCount = await web3.eth.getTransactionCount(user);
 
   const txData =
-    "0xbc908f10000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000038d7ea4c680000000000000000000000000000000000000000000000000000002d79883d200000000000000000000000000000000000000000000000000000000000000000001";
+    "0xa69df4b5";
   console.log(txData);
 
   //using ETH

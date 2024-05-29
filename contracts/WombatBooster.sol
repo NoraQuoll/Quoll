@@ -602,9 +602,15 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     address _token,
     uint256 _amount
   ) external override {
-    address rewardContract = poolInfo[_pid].rewardPool;
+    address rewardContract;
+    if (poolInfo.length > 0) {
+      rewardContract = poolInfo[_pid].rewardPool;
+    }
+
     require(
-      msg.sender == rewardContract || msg.sender == qWomRewardPool,
+      msg.sender == rewardContract ||
+        msg.sender == qWomRewardPool ||
+        msg.sender == qWomRewardLockPool,
       "!auth"
     );
 
