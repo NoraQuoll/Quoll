@@ -275,7 +275,13 @@ contract BaseRewardPoolV1WithLockqWom is
                 localState.timeUnlock < block.timestamp &&
                 i == userState[user].lockStates.length - 1
             ) {
+                for (uint256 j = 0; j < localState.tokensReward.length; j++) {
+                    pendingRewardsToken[j] = localState.tokensReward[j];
+                    pendingRewards[j] += localState.rewards[j];
+                }
+                amountOfStakingToken += localState.amountStaking;
                 newStartIndex = i + 1;
+                break;
             } else {
                 // pendingRewards += userState[user].lockStates[i].
                 for (uint256 j = 0; j < localState.tokensReward.length; j++) {
@@ -335,6 +341,8 @@ contract BaseRewardPoolV1WithLockqWom is
                     timeUnlock: block.timestamp + lockTime
                 })
             );
+
+            emit Relock(_account, stakingAmount);
             // stakingToken.safeTransfer(_account, stakingAmount);
         }
     }

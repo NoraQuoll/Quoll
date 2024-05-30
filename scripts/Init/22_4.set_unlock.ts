@@ -27,7 +27,7 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const contract_address = "0xaD6f9D7555dc4219eE502465EdC18C99F5405314";
+  const contract_address = "0x5b37cdfe77250f56a75c8550391f1d06912e05f0";
 
   const BaseRewardPoolV1WithLockqWom = JSON.parse(
     fs.readFileSync(

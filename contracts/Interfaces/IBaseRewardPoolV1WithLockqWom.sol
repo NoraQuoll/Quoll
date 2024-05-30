@@ -18,6 +18,8 @@ interface IBaseRewardPoolV1WithLockqWom {
     event OperatorUpdated(address _operator);
     event Granted(address _address, bool _grant);
 
+    event Relock(address user, uint256 amount);
+
     event SwapRewardToUSDT(address reward, uint256 amountIn, uint256 amountOut);
 
     // inherit IReward
