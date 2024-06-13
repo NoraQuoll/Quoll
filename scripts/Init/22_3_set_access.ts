@@ -20,7 +20,7 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const address = "0x5b37CdFE77250F56A75c8550391F1D06912E05F0";
+  const address = "0x9eFD7DB4cd66C4b8B7Ef89bfcCd4eB47B08227BF";
   const wombatBooster = user;
 
   const VlQuoV2 = JSON.parse(

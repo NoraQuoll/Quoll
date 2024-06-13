@@ -1603,5 +1603,12 @@
     "txHash": "0xd989f41c25b628c0c05b5db6c16c6df980b4249ddce2cbdd484c78ea99704440",
     "verification": "https://bscscan.com/address/0x0FFd14D28Af0fc1A64d7d63Bc64C45551078D01E#code",
     "implVerification": "https://bscscan.com/address/0xF6E97145502250077bb0C5AC7826acc7Ac93361D#code"
+  },
+  "BaseRewardqWomLock": {
+    "address": "0x9eFD7DB4cd66C4b8B7Ef89bfcCd4eB47B08227BF",
+    "implAddress": "0x963D79a62B5fDbF0F97C7BDEb7d15dC3cE9D3281",
+    "txHash": "0xd989f41c25b628c0c05b5db6c16c6df980b4249ddce2cbdd484c78ea99704440",
+    "verification": "https://bscscan.com/address/0x0FFd14D28Af0fc1A64d7d63Bc64C45551078D01E#code",
+    "implVerification": "https://bscscan.com/address/0xF6E97145502250077bb0C5AC7826acc7Ac93361D#code"
   }
 }

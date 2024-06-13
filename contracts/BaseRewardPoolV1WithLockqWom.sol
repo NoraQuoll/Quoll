@@ -293,6 +293,60 @@ contract BaseRewardPoolV1WithLockqWom is
         }
     }
 
+    function getPendingRewardDisplay(
+        address user
+    )
+        public
+        view
+        returns (
+            address[] memory pendingRewardsToken,
+            uint256[] memory pendingRewards,
+            uint256 newStartIndex,
+            uint256 amountOfStakingToken
+        )
+    {
+        pendingRewardsToken = new address[](rewardTokens.length);
+        pendingRewards = new uint256[](rewardTokens.length);
+        for (
+            uint256 i = userState[user].startIndex;
+            i < userState[user].lockStates.length;
+            i++
+        ) {
+            LockState memory localState = userState[user].lockStates[i];
+            if (localState.timeUnlock >= block.timestamp) {
+                newStartIndex = i;
+
+                for (uint256 j = 0; j < localState.tokensReward.length; j++) {
+                    pendingRewardsToken[j] = localState.tokensReward[j];
+                    pendingRewards[j] +=
+                        (localState.rewards[j] *
+                            (block.timestamp - localState.timeStartLock)) /
+                        (localState.timeUnlock - localState.timeStartLock);
+                }
+                amountOfStakingToken += localState.amountStaking;
+                // break;
+            } else if (
+                localState.timeUnlock < block.timestamp &&
+                i == userState[user].lockStates.length - 1
+            ) {
+                for (uint256 j = 0; j < localState.tokensReward.length; j++) {
+                    pendingRewardsToken[j] = localState.tokensReward[j];
+                    pendingRewards[j] += localState.rewards[j];
+                }
+                amountOfStakingToken += localState.amountStaking;
+                newStartIndex = i + 1;
+                break;
+            } else {
+                // pendingRewards += userState[user].lockStates[i].
+                for (uint256 j = 0; j < localState.tokensReward.length; j++) {
+                    pendingRewardsToken[j] = localState.tokensReward[j];
+                    pendingRewards[j] += localState.rewards[j];
+                }
+                amountOfStakingToken += localState.amountStaking;
+            }
+        }
+    }
+
     function relock() external {
         _relock(msg.sender);
     }
@@ -303,7 +357,7 @@ contract BaseRewardPoolV1WithLockqWom is
             uint256[] memory pendingRewards,
             uint256 newStartIndex,
             uint256 amountOfStakingToken
-        ) = getPendingReward(user);
+        ) = getPendingRewardDisplay(user);
 
         for (uint256 i = 0; i < pendingRewardsToken.length; i++) {
             if (token == pendingRewardsToken[i]) return pendingRewards[i];

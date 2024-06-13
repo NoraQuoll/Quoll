@@ -27,7 +27,7 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const contract_address = "0x5b37cdfe77250f56a75c8550391f1d06912e05f0";
+  const contract_address = "0x9eFD7DB4cd66C4b8B7Ef89bfcCd4eB47B08227BF";
 
   const BaseRewardPoolV1WithLockqWom = JSON.parse(
     fs.readFileSync(
@@ -39,14 +39,14 @@ async function main() {
   const txCount = await web3.eth.getTransactionCount(user);
 
   const contract = new web3.eth.Contract(BaseRewardPoolV1WithLockqWom);
-
-  const txData = contract.methods.setLockTime(1800).encodeABI();
+//7776000
+  const txData = contract.methods.setLockTime(7776000).encodeABI();
   console.log(txData);
 
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
+    gasLimit: web3.utils.toHex("300000"),
     data: txData,
     to: contract_address,
     from: user,

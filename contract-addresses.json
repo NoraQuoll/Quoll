@@ -145,7 +145,8 @@
             "impl": "0x03B61Cf942234a45219a97D891bBEAd0423e2b28"
         },
         "WombatBooster": {
-            "address": "0x8c54D3bE3b32BF12A420E6BD5608930C037Df59E"
+            "address": "0x47fa2B7F712711C05247F189B9A66DA6C469c7f7",
+            "impl": "0xc032E9c1EB96Cd48940c82E96946fb145F3dC9B8"
         },
         "Reward_Pool-1710936953019": {
             "address": "0x921f5F899955168254f61BE9a98c359c3fa085E3",
@@ -302,6 +303,26 @@
         "BribeManager": {
             "address": "0xA87fD77790466cD8Ee7bE6F27AFD4304FB2a8d5f",
             "impl": "0x65892c1B197eeAe00F024aD346091467B1DA8a29"
+        },
+        "WomDepositor": {
+            "address": "0x016db2AB9a7F3Cd45598A87E4970eb83F2887cc0",
+            "impl": "0x41BF41E3DD638F9630d3cc76037F9a9647D042FB"
+        },
+        "BaseRewardqWomLock": {
+            "address": "0x9eFD7DB4cd66C4b8B7Ef89bfcCd4eB47B08227BF",
+            "impl": "0xcF585bafCf854EF716dCB5cE0d0d3D896eDb4ef5"
+        },
+        "QuollZap": {
+            "address": "0x9178F168A9202B4021bBC8b3d2732631584c138E",
+            "impl": "0xb912DA4C8f461768bc506bDDA5a838A2a070251B"
+        },
+        "Reward_Pool-1718188032017": {
+            "address": "0x3B4e48265aD0806309F29E0776FB6DB5E6AE881c",
+            "impl": "0xa2D55CeC47c8875d0d4E407f7996b6CE83e59319"
+        },
+        "Reward_Pool-1718188090860": {
+            "address": "0x3B4e48265aD0806309F29E0776FB6DB5E6AE881c",
+            "impl": "0xa2D55CeC47c8875d0d4E407f7996b6CE83e59319"
         }
     },
     "arb": {
