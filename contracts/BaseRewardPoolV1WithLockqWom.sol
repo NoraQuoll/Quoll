@@ -92,6 +92,12 @@ contract BaseRewardPoolV1WithLockqWom is
 
     mapping(address => UserState) public userState;
 
+    // struct UserStateClaimedAmount {
+    //     uint256 claimedAmount;
+    // }
+
+    mapping(address => mapping(address => uint256)) public claimedAmount;
+
     function initialize(address _operator) public initializer {
         __Ownable_init();
 
@@ -360,7 +366,10 @@ contract BaseRewardPoolV1WithLockqWom is
         ) = getPendingRewardDisplay(user);
 
         for (uint256 i = 0; i < pendingRewardsToken.length; i++) {
-            if (token == pendingRewardsToken[i]) return pendingRewards[i];
+            if (token == pendingRewardsToken[i])
+                return
+                    pendingRewards[i] -
+                    claimedAmount[user][pendingRewardsToken[i]];
         }
         return 0;
     }
@@ -427,45 +436,67 @@ contract BaseRewardPoolV1WithLockqWom is
             uint256 amountOfStakingToken
         ) = getPendingReward(_account);
 
-        if (pendingRewardsToken.length == 0) {
+        (
+            address[] memory pendingRewardsTokenRealTime,
+            uint256[] memory pendingRewardsRealTime,
+            ,
+
+        ) = getPendingRewardDisplay(_account);
+
+        if (pendingRewardsTokenRealTime.length == 0) {
             return 0;
         }
 
-        for (uint256 i = 0; i < pendingRewardsToken.length; i++) {
-            if (pendingRewards[i] > 0) {
-                pendingRewardsToken[i].safeTransferToken(
+        for (uint256 i = 0; i < pendingRewardsTokenRealTime.length; i++) {
+            if (
+                pendingRewardsRealTime[i] -
+                    claimedAmount[_account][pendingRewardsTokenRealTime[i]] >
+                0
+            ) {
+                pendingRewardsTokenRealTime[i].safeTransferToken(
                     _account,
-                    pendingRewards[i]
+                    pendingRewardsRealTime[i] -
+                        claimedAmount[_account][pendingRewardsTokenRealTime[i]]
                 );
 
                 IWombatBooster(booster).rewardClaimed(
                     pid,
                     _account,
-                    pendingRewardsToken[i],
-                    pendingRewards[i]
+                    pendingRewardsTokenRealTime[i],
+                    pendingRewardsRealTime[i] -
+                        claimedAmount[_account][pendingRewardsTokenRealTime[i]]
                 );
                 emit RewardPaid(
                     _account,
-                    pendingRewardsToken[i],
-                    pendingRewards[i]
+                    pendingRewardsTokenRealTime[i],
+                    pendingRewardsRealTime[i] -
+                        claimedAmount[_account][pendingRewardsTokenRealTime[i]]
                 );
+
+                // change claimedAmount
+                claimedAmount[_account][pendingRewardsTokenRealTime[i]] =
+                    pendingRewardsRealTime[i] -
+                    (pendingRewards.length <= i ? 0 : pendingRewards[i]);
             }
         }
 
-        userState[_account].startIndex = newStartIndex - 1;
-        userState[_account]
-            .lockStates[newStartIndex - 1]
-            .amountStaking = amountOfStakingToken;
-        userState[_account]
-            .lockStates[newStartIndex - 1]
-            .tokensReward = new address[](0);
-        userState[_account]
-            .lockStates[newStartIndex - 1]
-            .rewards = new uint256[](0);
-        userState[_account].lockStates[newStartIndex - 1].timeStartLock = block
-            .timestamp;
-        userState[_account].lockStates[newStartIndex - 1].timeUnlock = block
-            .timestamp;
+        if (userState[_account].startIndex != newStartIndex) {
+            userState[_account].startIndex = newStartIndex - 1;
+            userState[_account]
+                .lockStates[newStartIndex - 1]
+                .amountStaking = amountOfStakingToken;
+            userState[_account]
+                .lockStates[newStartIndex - 1]
+                .tokensReward = new address[](0);
+            userState[_account]
+                .lockStates[newStartIndex - 1]
+                .rewards = new uint256[](0);
+            userState[_account]
+                .lockStates[newStartIndex - 1]
+                .timeStartLock = block.timestamp;
+            userState[_account].lockStates[newStartIndex - 1].timeUnlock = block
+                .timestamp;
+        }
 
         return amountOfStakingToken;
     }
