@@ -319,6 +319,10 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     }
   }
 
+  function setMasterWombat(uint256 _pid, address masterWombat) public onlyOwner {
+    pidToMasterWombat[_pid] = masterWombat;
+  }
+
   //deposit lp tokens and stake
   function deposit(uint256 _pid, uint256 _amount, bool _stake) public override {
     require(!isShutdown, "shutdown");

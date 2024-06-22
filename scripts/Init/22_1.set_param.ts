@@ -27,11 +27,11 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const contract_address = "0x5b37CdFE77250F56A75c8550391F1D06912E05F0";
-  const booster = "0x8DFA987C3bE619C8e8B8B68B12e2A38852E8a5FB";
+  const contract_address = "0x9eFD7DB4cd66C4b8B7Ef89bfcCd4eB47B08227BF";
+  const booster = "0x6FCA396A8a2b623b24A998A5808c0E144Aa0689a";
   const pid = "0";
-  const stakingToken = "0xA22e2f3047e7D1F0cD864A4EB9A89D298Ca171C5";
-  const rewardToken = "0x7BFC90abeEB4138e583bfC46aBC69De34c9ABb8B";
+  const stakingToken = "0x0fE34B8aaAf3f522A6088E278936D10F934c0b19";
+  const rewardToken = "0x08b450e4a48C04CDF6DB2bD4cf24057f7B9563fF";
   const BaseRewardPoolV1WithLockqWom = JSON.parse(
     fs.readFileSync(
       "./artifacts/contracts/BaseRewardPoolV1WithLockqWom.sol/BaseRewardPoolV1WithLockqWom.json",
@@ -51,7 +51,7 @@ async function main() {
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
+    gasLimit: web3.utils.toHex("300000"),
     data: txData,
     to: contract_address,
     from: user,

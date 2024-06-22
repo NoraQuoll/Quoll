@@ -27,9 +27,9 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const contract_address = "0x5b37CdFE77250F56A75c8550391F1D06912E05F0";
+  const contract_address = "0x9eFD7DB4cd66C4b8B7Ef89bfcCd4eB47B08227BF";
  
-  const rewardToken = "0x7BFC90abeEB4138e583bfC46aBC69De34c9ABb8B";
+  const rewardToken = "0x08b450e4a48C04CDF6DB2bD4cf24057f7B9563fF";
   const BaseRewardPoolV1WithLockqWom = JSON.parse(
     fs.readFileSync(
       "./artifacts/contracts/BaseRewardPoolV1WithLockqWom.sol/BaseRewardPoolV1WithLockqWom.json",
@@ -42,14 +42,14 @@ async function main() {
   const contract = new web3.eth.Contract(BaseRewardPoolV1WithLockqWom);
 
   const txData = contract.methods
-    .setRewardRate(rewardToken, 5000000000)
+    .setRewardRate(rewardToken, "1500000000000000000")
     .encodeABI();
   console.log(txData);
 
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
+    gasLimit: web3.utils.toHex("300000"),
     data: txData,
     to: contract_address,
     from: user,

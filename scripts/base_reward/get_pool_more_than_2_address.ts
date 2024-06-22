@@ -52,7 +52,30 @@ async function main() {
 
     const dataReward = await contract_reward.methods.getRewardTokens().call();
 
-    console.log(i, ":", data.lptoken, ":", data.rewardPool, ":", dataReward, ":", data.masterWombatPid);
+    const ERC20 = JSON.parse(
+      fs.readFileSync(
+        "./artifacts/@openzeppelin/contracts/token/ERC20/ERC20.sol/ERC20.json",
+        "utf-8"
+      )
+    ).abi;
+
+    const contract_lp = new web3.eth.Contract(ERC20, data.lptoken);
+
+    const lp_name = await contract_lp.methods.name().call();
+
+    console.log(
+      i,
+      ":",
+      data.lptoken,
+      ":",
+      lp_name,
+      ":",
+      data.rewardPool,
+      ":",
+      dataReward,
+      ":",
+      data.masterWombatPid
+    );
   }
 }
 
