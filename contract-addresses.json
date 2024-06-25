@@ -130,6 +130,10 @@
         "BaseRewardqWomLock": {
             "address": "0x5b37CdFE77250F56A75c8550391F1D06912E05F0",
             "impl": "0x7525D3228B48dc75aFAFCccFe0c315426AEBE916"
+        },
+        "NoniHolderReward": {
+            "address": "0x84e7fFb28Ddfb41B780BEeDEeC14fC04343f6533",
+            "impl": "0x7011857651FB5f089B2b611A1ceCA5b2cc2CBcd1"
         }
     },
     "bsc": {
@@ -323,6 +327,10 @@
         "Reward_Pool-1718188090860": {
             "address": "0x3B4e48265aD0806309F29E0776FB6DB5E6AE881c",
             "impl": "0xa2D55CeC47c8875d0d4E407f7996b6CE83e59319"
+        },
+        "NoniHolderReward": {
+            "address": "0xDcf1E13cB140cF90AA1aeDE3f5cff8C3987125f9",
+            "impl": "0xbfa72808eDff7Fc8BF88A510563e16f642dFDdF1"
         }
     },
     "arb": {

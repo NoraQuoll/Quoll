@@ -1,9 +1,11 @@
 import Web3 from "web3";
-
+import { ethers } from "ethers";
 import * as dotenv from "dotenv";
+
 dotenv.config();
 
 import * as fs from "fs";
+import { saveContract, getContracts, sleep } from "../utils";
 
 const web3 = new Web3(process.env.RPC!);
 
@@ -11,36 +13,31 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-const token = "0x3826f9505a039c5f92d3a2f4f1ae743934207ffb";
-const contract_add = "0x84e7fFb28Ddfb41B780BEeDEeC14fC04343f6533";
+const slots = ["0"];
 
 async function main() {
-  const Token = JSON.parse(
+  const contract_address = "0x84e7fFb28Ddfb41B780BEeDEeC14fC04343f6533";
+
+  const NoniHolderReward = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/QuollToken.sol/QuollToken.json",
+      "./artifacts/contracts/NoniHolderReward.sol/NoniHolderReward.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(Token, token);
+  const contract = new web3.eth.Contract(NoniHolderReward);
+  //7776000
+  const txData = contract.methods.claimRewards(slots).encodeABI();
+  console.log(txData);
 
-  const txData = contract.methods
-    .approve(contract_add, "1000000000000000010000000000000000")
-    .encodeABI();
-
-  const estGas = Math.ceil(
-    (await contract.methods
-      .approve(contract_add, "1000000000000000010000000000000000")
-      .estimateGas({ from: user })) * 1.1
-  );
-
+  //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex(estGas),
+    gasLimit: web3.utils.toHex("3000000"),
     data: txData,
-    to: token,
+    to: contract_address,
     from: user,
   };
 
