@@ -155,13 +155,33 @@ contract NoniHolderReward is OwnableUpgradeable {
 
     function snapshotData(
         address lp
-    ) public view returns (address[] memory users, uint256[] memory amount) {
-        users = getAllUser();
-        amount = new uint256[](users.length);
+    ) public view returns (address[] memory, uint256[] memory) {
+        address[] memory users = getAllUser();
+        uint256[] memory amount = new uint256[](users.length);
+
+        uint256 realUserLength = 0;
 
         for (uint256 i = 0; i < users.length; i++) {
             amount[i] = getUserVotedForPool(users[i], lp);
+            if (amount[i] > 0) {
+                realUserLength++;
+            }
         }
+
+        address[] memory usersValid = new address[](realUserLength);
+        uint256[] memory amountValid = new uint256[](realUserLength);
+
+        uint256 index = 0;
+
+        for (uint256 i = 0; i < users.length; i++) {
+            if (amount[i] > 0) {
+                usersValid[index] = users[i];
+                amountValid[index] = amount[i];
+                index++;
+            }
+        }
+
+        return (usersValid, amountValid);
     }
 
     function getAllUser() public view returns (address[] memory _users) {

@@ -14,12 +14,12 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 const users = [
-  "0x2Aa20A96e8a00Ce6e38EF215B2310efc539dC87D",
+  "0xc3a20F9D15cfD2224038EcCC8186C216366c4BFd",
   "0x3f3c56118f54bfDE0d0f752074F094E42d708a9F",
-  "0x5ab345eFDb9A2A1f9753f73fDaA684dc9133D214",
+  "0x15c7b6117E286AeDcF75B0B8f3777C23a7a62F30",
 ];
 
-const data = ["6000", "7000", "8000"];
+const data = ["6000", "7000", "80000"];
 
 const rewardsToken = [
   "0xab1a4d4f1d656d2450692d237fdd6c7f9146e814",
