@@ -17,11 +17,9 @@ interface IVlQuoV2 {
 
     function unlockPunishment() external view returns (uint256);
 
-    function lock(
-        address _user,
-        uint256 _amount,
-        uint256 _weeks
-    ) external;
+    function lock(address _user, uint256 _amount, uint256 _weeks) external;
+
+    function lockCustomForUser(uint256 _weeks) external;
 
     function increaseBalance(address _user, uint256 _amount) external;
 

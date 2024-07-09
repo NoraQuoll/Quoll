@@ -13,6 +13,8 @@ import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 import "./Interfaces/IVlQuoV2.sol";
 import "./Interfaces/IBribeManager.sol";
 
+import "./VlQuoV2Lens.sol";
+
 contract VlQuoV2 is
     IVlQuoV2,
     OwnableUpgradeable,
@@ -118,10 +120,9 @@ contract VlQuoV2 is
         maxLockLength = _maxLockLength;
     }
 
-    function setUnlockGracePeriod(uint256 _unlockGracePeriod)
-        external
-        onlyOwner
-    {
+    function setUnlockGracePeriod(
+        uint256 _unlockGracePeriod
+    ) external onlyOwner {
         unlockGracePeriod = _unlockGracePeriod;
     }
 
@@ -142,11 +143,9 @@ contract VlQuoV2 is
         return _balances[_user];
     }
 
-    function getUserLocks(address _user)
-        external
-        view
-        returns (LockInfo[] memory)
-    {
+    function getUserLocks(
+        address _user
+    ) external view returns (LockInfo[] memory) {
         return userLocks[_user];
     }
 
@@ -189,6 +188,44 @@ contract VlQuoV2 is
         }
 
         emit Locked(_user, _amount, _weeks);
+    }
+
+    function lockCustomForUser(
+        uint256 _weeks
+    ) external override nonReentrant whenNotPaused {
+        uint256 _amount = VlQuoV2Lens(getVlQuoLens()).getUserData(
+            msg.sender,
+            _weeks
+        );
+        require(_amount > 0, "Amount must be nonzero");
+
+        require(userLocks[msg.sender].length < maxLockLength, "locks too much");
+
+        uint256 vlQuoAmount = _amount.mul(_weeks);
+
+        uint256 unlockTime = _getNextWeek().add(_weeks.mul(WEEK));
+        userLocks[msg.sender].push(
+            LockInfo(_amount, vlQuoAmount, block.timestamp, unlockTime)
+        );
+
+        _increaseBalance(address(0), msg.sender, vlQuoAmount);
+
+         for (uint256 week = _getNextWeek(); week < unlockTime; week += WEEK) {
+            weeklyTotalWeight[week] = weeklyTotalWeight[week].add(vlQuoAmount);
+            weeklyUserWeight[msg.sender][week] = weeklyUserWeight[msg.sender][week].add(
+                vlQuoAmount
+            );
+        }
+
+        if (lastClaimedWeek[msg.sender] == 0) {
+            lastClaimedWeek[msg.sender] = _getCurWeek();
+        }
+
+        emit Locked(msg.sender, _amount, _weeks);
+    }
+
+    function getVlQuoLens() public pure returns (address) {
+        return 0xc634c0A24BFF88c015Ff32145CE0F8d578B02F60;
     }
 
     function unlock(uint256 _slot) external nonReentrant whenNotPaused {
@@ -267,11 +304,10 @@ contract VlQuoV2 is
         emit RewardTokenAdded(_rewardToken);
     }
 
-    function earned(address _user, address _rewardToken)
-        public
-        view
-        returns (uint256)
-    {
+    function earned(
+        address _user,
+        address _rewardToken
+    ) public view returns (uint256) {
         // return 0 if user has never locked
         if (lastClaimedWeek[_user] == 0) {
             return 0;
@@ -345,29 +381,27 @@ contract VlQuoV2 is
         emit AccessSet(_address, _status);
     }
 
-    function setAllowedLocker(address _locker, bool _allowed)
-        external
-        onlyOwner
-    {
+    function setAllowedLocker(
+        address _locker,
+        bool _allowed
+    ) external onlyOwner {
         require(_locker != address(0), "invalid _address!");
 
         allowedLocker[_locker] = _allowed;
         emit AllowedLockerSet(_locker, _allowed);
     }
 
-    function increaseBalance(address _user, uint256 _amount)
-        external
-        override
-        onlyAllowedLocker
-    {
+    function increaseBalance(
+        address _user,
+        uint256 _amount
+    ) external override onlyAllowedLocker {
         _increaseBalance(msg.sender, _user, _amount);
     }
 
-    function decreaseBalance(address _user, uint256 _amount)
-        external
-        override
-        onlyAllowedLocker
-    {
+    function decreaseBalance(
+        address _user,
+        uint256 _amount
+    ) external override onlyAllowedLocker {
         _decreaseBalance(msg.sender, _user, _amount);
     }
 
