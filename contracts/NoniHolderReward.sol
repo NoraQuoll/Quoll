@@ -154,7 +154,7 @@ contract NoniHolderReward is OwnableUpgradeable {
     }
 
     function snapshotData(
-        address lp
+        address[] memory lps
     ) public view returns (address[] memory, uint256[] memory) {
         address[] memory users = getAllUser();
         uint256[] memory amount = new uint256[](users.length);
@@ -162,7 +162,7 @@ contract NoniHolderReward is OwnableUpgradeable {
         uint256 realUserLength = 0;
 
         for (uint256 i = 0; i < users.length; i++) {
-            amount[i] = getUserVotedForPool(users[i], lp);
+            amount[i] = getUserVotedForPool(users[i], lps);
             if (amount[i] > 0) {
                 realUserLength++;
             }
@@ -207,10 +207,16 @@ contract NoniHolderReward is OwnableUpgradeable {
 
     function getUserVotedForPool(
         address _user,
-        address pool
+        address[] memory pools
     ) public view returns (uint256) {
-        return
-            BribeManager(payable(bribeManager)).getUserVoteForPool(pool, _user);
+        uint256 sum;
+        for (uint256 i = 0; i < pools.length; i++) {
+            sum += BribeManager(payable(bribeManager)).getUserVoteForPool(
+                pools[i],
+                _user
+            );
+        }
+        return sum;
     }
 
     function isContains(
