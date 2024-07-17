@@ -33,7 +33,7 @@
   },
   "wombatBooster": {
     "address": "0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54",
-    "implAddress": "0xfcECc7f2224F72f741aAeE849d1Cb5D370bc3fb7",
+    "implAddress": "0xEEc9675ac441d52C7Ab8F1bd0d69bD85a9A3c69B",
     "txHash": "0x08ddc8759383153a1ef53a92ef9ecd333c7798b593c46cc303f61289c8c82d95",
     "verification": "https://arbiscan.io/address/0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54#code",
     "implVerification": "https://arbiscan.io/address/0x7b6bb9Ccd8B0fAa968054D8e2adc7274830A6969#code"

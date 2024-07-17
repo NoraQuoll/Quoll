@@ -319,7 +319,10 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     }
   }
 
-  function setMasterWombat(uint256 _pid, address masterWombat) public onlyOwner {
+  function setMasterWombat(
+    uint256 _pid,
+    address masterWombat
+  ) public onlyOwner {
     pidToMasterWombat[_pid] = masterWombat;
   }
 
@@ -439,6 +442,8 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     uint256 womBal = pidToPendingRewards[_pid][wom];
     emit WomClaimed(_pid, womBal);
 
+    address rewardContract = pool.rewardPool;
+
     if (womBal > 0) {
       pidToPendingRewards[_pid][wom] = 0;
 
@@ -480,37 +485,8 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
         .sub(earmarkIncentiveAmount);
 
       //send wom to lp provider reward contract
-      address rewardContract = pool.rewardPool;
       _approveTokenIfNeeded(wom, rewardContract, womBal);
       IRewards(rewardContract).queueNewRewards(wom, womBal);
-
-      //check if there are extra rewards
-      for (uint256 i = 0; i < pidToRewardTokens[_pid].length(); i++) {
-        address bonusToken = pidToRewardTokens[_pid].at(i);
-        if (bonusToken == wom) {
-          // wom was dispersed above
-          continue;
-        }
-        uint256 bonusTokenBalance = pidToPendingRewards[_pid][bonusToken];
-        if (bonusTokenBalance > 0) {
-          if (AddressLib.isPlatformToken(bonusToken)) {
-            IRewards(rewardContract).queueNewRewards{
-              value: bonusTokenBalance
-            }(bonusToken, bonusTokenBalance);
-          } else {
-            _approveTokenIfNeeded(
-              bonusToken,
-              rewardContract,
-              bonusTokenBalance
-            );
-            IRewards(rewardContract).queueNewRewards(
-              bonusToken,
-              bonusTokenBalance
-            );
-          }
-          pidToPendingRewards[_pid][bonusToken] = 0;
-        }
-      }
 
       //send qWom to vlQuo
       if (vlQuoIncentiveAmount > 0) {
@@ -532,6 +508,31 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
 
         _approveTokenIfNeeded(qWom, quoRewardPool, qWomAmount);
         IRewards(quoRewardPool).queueNewRewards(qWom, qWomAmount);
+      }
+    }
+
+    //check if there are extra rewards
+    for (uint256 i = 0; i < pidToRewardTokens[_pid].length(); i++) {
+      address bonusToken = pidToRewardTokens[_pid].at(i);
+      if (bonusToken == wom) {
+        // wom was dispersed above
+        continue;
+      }
+      uint256 bonusTokenBalance = pidToPendingRewards[_pid][bonusToken];
+      if (bonusTokenBalance > 0) {
+        if (AddressLib.isPlatformToken(bonusToken)) {
+          IRewards(rewardContract).queueNewRewards{ value: bonusTokenBalance }(
+            bonusToken,
+            bonusTokenBalance
+          );
+        } else {
+          _approveTokenIfNeeded(bonusToken, rewardContract, bonusTokenBalance);
+          IRewards(rewardContract).queueNewRewards(
+            bonusToken,
+            bonusTokenBalance
+          );
+        }
+        pidToPendingRewards[_pid][bonusToken] = 0;
       }
     }
   }
