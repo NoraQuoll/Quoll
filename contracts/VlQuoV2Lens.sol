@@ -28,9 +28,9 @@ contract VlQuoV2Lens is OwnableUpgradeable {
 
     uint256 public startTime;
 
-    address public wom;
+    address public quo;
 
-    uint256 public constant DENOMINATOR = 1000;
+    uint256 public constant DENOMINATOR = 100;
     uint256 public penalty;
 
     function initialize() external initializer {
@@ -39,9 +39,9 @@ contract VlQuoV2Lens is OwnableUpgradeable {
 
     function initUserGetReward(
         address[] calldata users,
-        uint256[] memory amounts,
+        uint256[] calldata amounts,
         uint256 _startTime,
-        address _wom,
+        address _quo,
         uint256 _penalty,
         address _vlQuoV2
     ) public onlyOwner {
@@ -52,15 +52,20 @@ contract VlQuoV2Lens is OwnableUpgradeable {
 
         require(users.length == amounts.length, "Invalid args");
 
+        uint256 sum;
+
         for (uint256 i = 0; i < users.length; i++) {
             if (amounts[i] > 0) {
                 userData[users[i]] = UserReward(users[i], amounts[i], false);
+                sum += amounts[i];
             }
         }
 
-        wom = _wom;
+        quo = _quo;
         penalty = _penalty;
         vlQuoV2 = _vlQuoV2;
+
+        IERC20(quo).transferFrom(msg.sender, address(this), sum);
     }
 
     function claimTokenWom() public onlyOwner {
@@ -70,9 +75,9 @@ contract VlQuoV2Lens is OwnableUpgradeable {
             "Could not claim token before 30 days"
         );
 
-        IERC20(wom).safeTransfer(
+        IERC20(quo).safeTransfer(
             msg.sender,
-            IERC20(wom).balanceOf(address(this))
+            IERC20(quo).balanceOf(address(this))
         );
     }
 
@@ -108,11 +113,11 @@ contract VlQuoV2Lens is OwnableUpgradeable {
                 (userData[_user].amountQuo * penalty) /
                 DENOMINATOR;
 
-            IERC20(wom).transfer(vlQuoV2, amountToTransfer);
+            IERC20(quo).transfer(vlQuoV2, amountToTransfer);
             return amountToTransfer;
         } else {
             uint256 amountToTransfer = userData[_user].amountQuo;
-            IERC20(wom).transfer(vlQuoV2, amountToTransfer);
+            IERC20(quo).transfer(vlQuoV2, amountToTransfer);
             return amountToTransfer;
         }
     }

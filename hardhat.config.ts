@@ -1,11 +1,9 @@
 import { HardhatUserConfig } from "hardhat/config";
-import { HttpNetworkConfig } from "hardhat/src/types";
 import "hardhat-contract-sizer";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
-import "@nomicfoundation/hardhat-chai-matchers";
-import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-ethers";
+import "@nomicfoundation/hardhat-toolbox";
 
 import * as dotenv from "dotenv";
 dotenv.config();
