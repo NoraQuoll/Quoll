@@ -76,6 +76,8 @@ contract VlQuoV2 is
     mapping(address => uint256) private _lockerTotalSupply;
     mapping(address => mapping(address => uint256)) private _lockerBalances;
 
+    address public vlQuoLens;
+
     modifier onlyAllowedLocker() {
         require(allowedLocker[msg.sender], "!auth");
         _;
@@ -210,11 +212,11 @@ contract VlQuoV2 is
 
         _increaseBalance(address(0), msg.sender, vlQuoAmount);
 
-         for (uint256 week = _getNextWeek(); week < unlockTime; week += WEEK) {
+        for (uint256 week = _getNextWeek(); week < unlockTime; week += WEEK) {
             weeklyTotalWeight[week] = weeklyTotalWeight[week].add(vlQuoAmount);
-            weeklyUserWeight[msg.sender][week] = weeklyUserWeight[msg.sender][week].add(
-                vlQuoAmount
-            );
+            weeklyUserWeight[msg.sender][week] = weeklyUserWeight[msg.sender][
+                week
+            ].add(vlQuoAmount);
         }
 
         if (lastClaimedWeek[msg.sender] == 0) {
@@ -224,8 +226,12 @@ contract VlQuoV2 is
         emit Locked(msg.sender, _amount, _weeks);
     }
 
-    function getVlQuoLens() public pure returns (address) {
-        return 0xc634c0A24BFF88c015Ff32145CE0F8d578B02F60;
+    function getVlQuoLens() public view returns (address) {
+        return vlQuoLens;
+    }
+
+    function setVlQuoLens(address newVlQuoLens) public onlyOwner {
+        vlQuoLens = newVlQuoLens;
     }
 
     function unlock(uint256 _slot) external nonReentrant whenNotPaused {
