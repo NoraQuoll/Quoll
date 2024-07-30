@@ -23,8 +23,14 @@ contract ReferralCampaignLens is OwnableUpgradeable {
     uint256 public welcomeOfferMinDeposit;
     uint256 public welcomeOfferForReferredUser;
     uint256 public minimumDepositToGetOffer;
+    address public referralAddress;
 
-    mapping(address => uint256) public userDepositedAmount;
+    struct UserDataStruct {
+        uint256 depositAmount;
+        uint256 currentPointThe;
+    }
+
+    mapping(address => UserDataStruct) public userDepositedAmount;
 
     RefMulti[] public refMuliplier;
     PointPerTHEStruct[] public pointPerTHE;
@@ -44,6 +50,7 @@ contract ReferralCampaignLens is OwnableUpgradeable {
         uint256 _welcomeOfferForReferredUser,
         uint256 _welcomeOfferMinDeposit,
         uint256 _minimumDepositToGetOffer,
+        address _referralAddress,
         uint256[] memory _fromAmountOfRef,
         uint256[] memory _additionBase,
         uint256[] memory _fromAmount,
@@ -53,6 +60,7 @@ contract ReferralCampaignLens is OwnableUpgradeable {
         welcomeOfferMinDeposit = _welcomeOfferMinDeposit;
         minimumDepositToGetOffer = _minimumDepositToGetOffer;
         welcomeOfferForReferredUser = _welcomeOfferForReferredUser;
+        referralAddress = _referralAddress;
 
         require(
             _fromAmountOfRef.length == _additionBase.length,
@@ -100,10 +108,39 @@ contract ReferralCampaignLens is OwnableUpgradeable {
         }
     }
 
-    function getTokenWillGetForUser(address _user, uint256 stakeAmount) public view returns(uint256 welcomeOffer, uint256[] memory, uint256[] memory) {
+    function getTokenWillGetForUser(
+        string memory _linkReferral,
+        address _user,
+        uint256 _stakeAmount
+    )
+        public
+        view
+        returns (uint256 _welcomeOffer, uint256[] memory, uint256[] memory)
+    {
+        // get current staked amount
         uint256 currentStaked = userDepositedAmount[_user];
-        if (currentStaked < welcomeOfferMinDeposit && currentStaked + stakeAmount >= welcomeOfferMinDeposit) {
-            welcomeOffer = welcomeOfferForReferredUser;
+
+        // Frist case: get welcome, 2 conditions
+        // 1. deposit amount > 200
+        // 2. users have a refferral link
+        if (
+            currentStaked < welcomeOfferMinDeposit &&
+            currentStaked + _stakeAmount >= welcomeOfferMinDeposit &&
+            keccak256(abi.encodePacked(_linkReferral)) !=
+            keccak256(abi.encodePacked(""))
+        ) {
+            _welcomeOffer = welcomeOfferForReferredUser;
+        } else {
+            _welcomeOffer = 0;
+        }
+
+        for (
+            uint256 i = userDepositedAmount[_user].currentPointThe;
+            i < pointPerTHE.length;
+            i++
+        ) {
+
+            
         }
     }
 }

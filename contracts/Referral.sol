@@ -58,6 +58,7 @@ contract Referral is IReferral, OwnableUpgradeable {
         string memory linkReferral,
         address _user
     ) public view returns (bool, string memory) {
+        // check is user that have a referral link before
         if (
             keccak256(abi.encodePacked(referral[_user])) !=
             keccak256(abi.encodePacked(""))
@@ -65,6 +66,7 @@ contract Referral is IReferral, OwnableUpgradeable {
             return (false, "User already have referral");
         }
 
+        // check is that link is a empty link
         if (
             keccak256(abi.encodePacked(linkReferral)) ==
             keccak256(abi.encodePacked(""))
@@ -72,10 +74,12 @@ contract Referral is IReferral, OwnableUpgradeable {
             return (false, "Invalid Referral Link");
         }
 
+        // check is that link, link to a user
         if (usedLink[linkReferral] == address(0)) {
             return (false, "Can not find referralLink");
         }
 
+        // user could not invite themself
         if (usedLink[linkReferral] == _user) {
             return (false, "Can not referral for yourselve");
         }
