@@ -22,6 +22,10 @@ contract Referral is IReferral, OwnableUpgradeable {
         __Ownable_init();
     }
 
+    function getRefAmountFromUser(address _user) public view returns (uint256) {
+        return referralLinkFromUser[_user].refAmount;
+    }
+
     function setAccess(
         address _address,
         bool _status
@@ -103,6 +107,15 @@ contract Referral is IReferral, OwnableUpgradeable {
         referralLinkFromUser[usedLink[linkReferral]].refAmount++;
 
         emit ReferralRegister(_user, linkReferral, usedLink[linkReferral]);
+    }
+
+    function referralRegister(
+        string memory _linkReferral,
+        address _user
+    ) public {
+        require(access[msg.sender], "!auth");
+
+        _referralRegister(_linkReferral, _user);
     }
 
     receive() external payable {}
