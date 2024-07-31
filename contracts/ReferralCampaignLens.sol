@@ -30,7 +30,7 @@ contract ReferralCampaignLens is OwnableUpgradeable {
     uint256 public minimumDepositToGetRef;
     uint256 public welcomeOfferMinDeposit;
     uint256 public welcomeOfferForReferredUser;
-    uint256 public minimumDepositToGetOffer;
+    // uint256 public minimumDepositToGetOffer;
     address public referralAddress;
     address public qMileAddress;
 
@@ -63,7 +63,7 @@ contract ReferralCampaignLens is OwnableUpgradeable {
         uint256 _minimumDepositToGetRef,
         uint256 _welcomeOfferForReferredUser,
         uint256 _welcomeOfferMinDeposit,
-        uint256 _minimumDepositToGetOffer,
+        // uint256 _minimumDepositToGetOffer,
         address _referralAddress,
         address _qMileAddress,
         uint256[] memory _fromAmountOfRef,
@@ -73,7 +73,7 @@ contract ReferralCampaignLens is OwnableUpgradeable {
     ) external onlyOwner {
         minimumDepositToGetRef = _minimumDepositToGetRef;
         welcomeOfferMinDeposit = _welcomeOfferMinDeposit;
-        minimumDepositToGetOffer = _minimumDepositToGetOffer;
+        // minimumDepositToGetOffer = _minimumDepositToGetOffer;
         welcomeOfferForReferredUser = _welcomeOfferForReferredUser;
         referralAddress = _referralAddress;
         qMileAddress = _qMileAddress;
@@ -180,6 +180,8 @@ contract ReferralCampaignLens is OwnableUpgradeable {
                             pointPerTHE[i].pointPerTHE) /
                         10 ** 18;
 
+                    if (theWillGet < 0) break;
+
                     emit AmountOfTokenInStatus(
                         _user,
                         currentStaked +
@@ -206,6 +208,9 @@ contract ReferralCampaignLens is OwnableUpgradeable {
                         pointPerTHE[i].pointPerTHE
                     );
                 }
+
+                // update index of current status
+                userDepositedAmount[_user].currentPointThe = i;
             } else {
                 // case that not in current data
                 // two case
@@ -321,12 +326,22 @@ contract ReferralCampaignLens is OwnableUpgradeable {
         uint256 getRefAmount = Referral(payable(referralAddress))
             .getRefAmountFromUser(_user);
 
+        uint256 sum = BASE_REFERRAL;
+
         for (uint256 i = 0; i < refMuliplier.length; i++) {
             if (
                 refMuliplier[i].fromAmountOfRef <= getRefAmount &&
                 getRefAmount <= refMuliplier[i].toAmountOfRef
             ) {
-                return refMuliplier[i].additionBase;
+                return
+                    sum +=
+                        (getRefAmount - refMuliplier[i].fromAmountOfRef) *
+                        refMuliplier[i].additionBase;
+            } else {
+                sum +=
+                    (refMuliplier[i].toAmountOfRef -
+                        refMuliplier[i].fromAmountOfRef) *
+                    refMuliplier[i].additionBase;
             }
         }
     }

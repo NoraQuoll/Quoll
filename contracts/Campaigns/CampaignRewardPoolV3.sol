@@ -81,6 +81,8 @@ contract CampaignRewardPoolV3 is ManagerUpgradeable {
         _approveTokenIfNeeded(thena, thenaDepositor, _amount);
         IThenaDepositor(thenaDepositor).deposit(_amount, false);
 
+        IERC20(stakingToken).safeTransfer(msg.sender, _amount);
+
         ReferralCampaignLens(referralLensAddress).deposit(
             _linkReferral,
             msg.sender,
