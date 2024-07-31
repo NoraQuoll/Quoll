@@ -141,7 +141,7 @@
         },
         "qTHE": {
             "address": "0x1bA22379bC3D9a38424D5a706ca00bf91a259072",
-            "impl": "0x8a1b7dBaeBF049ba3896C08D3EF5E348B97DE6dF"
+            "impl": "0x520333c4070A83F19d7295629Ade9Ee3d509C610"
         },
         "ThenaDepositor": {
             "address": "0xD64B85961DA4A113d41f6cA471265bB57e8B136d",
@@ -153,7 +153,7 @@
         },
         "ReferralCampaignLens": {
             "address": "0xBc710660864ACdD187107386FAe4a7513206d99F",
-            "impl": "0x65189D01488419D607b133EdAF53C2045B92A983"
+            "impl": "0xc44BeDb5E38a15881Cf037473cb8F24931F501B4"
         },
         "QMilesPts": {
             "address": "0x59dF79BbdCD482bE5011058229Be2215469Bb4fD",

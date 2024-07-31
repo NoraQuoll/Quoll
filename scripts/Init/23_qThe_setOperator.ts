@@ -24,7 +24,7 @@ async function main() {
   ];
 
   const operator = await getContracts()[process.env.NETWORK_NAME!][
-    "ReferralCampaignLens"
+    "ThenaDepositor"
   ]["address"];
 
   const QuollExternalToken = JSON.parse(

@@ -29,7 +29,7 @@ contract QuollExternalToken is
     }
 
     function setOperator(address _operator) external onlyOwner {
-        require(operator == address(0), "already set!");
+        // require(operator == address(0), "already set!");
         operator = _operator;
 
         emit OperatorUpdated(_operator);
