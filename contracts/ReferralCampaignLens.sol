@@ -2,6 +2,8 @@
 pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
+import "hardhat/console.sol";
+
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "./Referral.sol";
@@ -211,6 +213,7 @@ contract ReferralCampaignLens is OwnableUpgradeable {
 
                 // update index of current status
                 userDepositedAmount[_user].currentPointThe = i;
+                break;
             } else {
                 // case that not in current data
                 // two case
@@ -337,6 +340,8 @@ contract ReferralCampaignLens is OwnableUpgradeable {
                     sum +=
                         (getRefAmount - refMuliplier[i].fromAmountOfRef) *
                         refMuliplier[i].additionBase;
+            } else if (refMuliplier[i].fromAmountOfRef > getRefAmount) {
+                break;
             } else {
                 sum +=
                     (refMuliplier[i].toAmountOfRef -
@@ -344,5 +349,7 @@ contract ReferralCampaignLens is OwnableUpgradeable {
                     refMuliplier[i].additionBase;
             }
         }
+
+        return sum;
     }
 }
