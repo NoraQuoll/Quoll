@@ -6,7 +6,7 @@ import * as ethersI from "ethers";
 import { currentTime, increase, increaseTo } from "./utils/time";
 import { expect } from "chai";
 
-describe("", function () {
+describe("campaignV3", function () {
   async function deployFixture() {
     const [
       owner,
@@ -237,6 +237,7 @@ describe("", function () {
 
     const mileAmount = await qMilesPts.balanceOf(user1.address);
     console.log({ mileAmount });
+
   });
 
   it("should convert < 1000 successful", async () => {
@@ -313,5 +314,416 @@ describe("", function () {
     console.log(data);
   });
 
-  it("", async () => {});
+  it("should convert after endCampaign fail", async () => {
+    const {
+      owner,
+      user1,
+      user2,
+      user3,
+      user4,
+      user5,
+      user6,
+      user7,
+      user8,
+      treasury,
+      campaignRewardPoolV3,
+      the,
+      qThe,
+      thenaDepositor,
+      referral,
+      referralCampaignLens,
+      qMilesPts,
+    } = await deployFixture();
+
+    await referralCampaignLens.setParams(
+      "1000000000000000000000",
+      "500000000000000000000",
+      "200000000000000000000",
+      referral.address,
+      qMilesPts.address,
+      ["1", "11", "51"],
+      ["100", "200", "300"],
+      [
+        "1000000000000000000",
+        "1000000000000000000001",
+        "5000000000000000000001",
+        "10000000000000000000001",
+        "50000000000000000000001",
+        "100000000000000000000001",
+      ],
+      [
+        "1000000000000000000",
+        "1250000000000000000",
+        "1500000000000000000",
+        "3000000000000000000",
+        "4000000000000000000",
+        "5000000000000000000",
+      ]
+    );
+
+    await campaignRewardPoolV3.setParams(
+      qThe.address,
+      the.address,
+      thenaDepositor.address,
+      referralCampaignLens.address
+    );
+
+    await campaignRewardPoolV3.initPool(
+      Math.floor(Date.now() / 1000) - 2592000,
+      Math.floor(Date.now() / 1000) - 1
+    );
+
+    await the.mint(user1.address, "1100000000000000000000");
+
+    await the
+      .connect(user1)
+      .approve(campaignRewardPoolV3.address, "1100000000000000000000");
+    try {
+      await campaignRewardPoolV3
+        .connect(user1)
+        .convert("1100000000000000000000", "", "newLink");
+    } catch (e) {
+      expect(e?.toString()).to.contain(
+        "Not in campaign times"
+      );
+    }
+  });
+
+  it("should ref amount increase", async () => {
+    const {
+      owner,
+      user1,
+      user2,
+      user3,
+      user4,
+      user5,
+      user6,
+      user7,
+      user8,
+      treasury,
+      campaignRewardPoolV3,
+      the,
+      qThe,
+      thenaDepositor,
+      referral,
+      referralCampaignLens,
+      qMilesPts,
+    } = await deployFixture();
+
+    await referralCampaignLens.setParams(
+      "1000000000000000000000",
+      "500000000000000000000",
+      "200000000000000000000",
+      referral.address,
+      qMilesPts.address,
+      ["1", "11", "51"],
+      ["100", "200", "300"],
+      [
+        "1000000000000000000",
+        "1000000000000000000001",
+        "5000000000000000000001",
+        "10000000000000000000001",
+        "50000000000000000000001",
+        "100000000000000000000001",
+      ],
+      [
+        "1000000000000000000",
+        "1250000000000000000",
+        "1500000000000000000",
+        "3000000000000000000",
+        "4000000000000000000",
+        "5000000000000000000",
+      ]
+    );
+
+    await campaignRewardPoolV3.setParams(
+      qThe.address,
+      the.address,
+      thenaDepositor.address,
+      referralCampaignLens.address
+    );
+
+    await campaignRewardPoolV3.initPool(
+      Math.floor(Date.now() / 1000),
+      Math.floor(Date.now() / 1000) + 2592000
+    );
+
+    await the.mint(user1.address, "1100000000000000000000");
+    await the.mint(user2.address, "1100000000000000000000");
+    await the.mint(user3.address, "1100000000000000000000");
+    await the.mint(user4.address, "1100000000000000000000");
+
+    await the
+      .connect(user1)
+      .approve(campaignRewardPoolV3.address, "1100000000000000000000");
+
+    await the
+    .connect(user2)
+    .approve(campaignRewardPoolV3.address, "1100000000000000000000");
+
+    await the
+    .connect(user3)
+    .approve(campaignRewardPoolV3.address, "1100000000000000000000");
+
+    await the
+    .connect(user4)
+    .approve(campaignRewardPoolV3.address, "1100000000000000000000");
+
+
+    await campaignRewardPoolV3
+      .connect(user1)
+      .convert("1100000000000000000000", "", "newLink");
+
+    assert("0" == (await referral.getRefAmountFromUser(user1.address)).toString());
+   
+    await campaignRewardPoolV3
+    .connect(user2)
+    .convert("200000000000000000000", "newLink", "newLink2");
+    
+    // ref amount of user 1 should increase by 1
+    assert("1" == (await referral.getRefAmountFromUser(user1.address)).toString());
+    
+    await campaignRewardPoolV3
+    .connect(user3)
+    .convert("200000000000000000000", "newLink", "newLink3");
+    await campaignRewardPoolV3
+    .connect(user4)
+    .convert("200000000000000000000", "newLink", "newLink4");
+    
+    // ref amount of user 1 should increase by 2
+    assert("3" == (await referral.getRefAmountFromUser(user1.address)).toString());
+
+  });
+  
+  it ("should convert correct PTS amount", async () => {
+    const {
+      owner,
+      user1,
+      user2,
+      user3,
+      user4,
+      user5,
+      user6,
+      user7,
+      user8,
+      treasury,
+      campaignRewardPoolV3,
+      the,
+      qThe,
+      thenaDepositor,
+      referral,
+      referralCampaignLens,
+      qMilesPts,
+    } = await deployFixture();
+
+    await referralCampaignLens.setParams(
+      "1000000000000000000000",
+      "500000000000000000000",
+      "200000000000000000000",
+      referral.address,
+      qMilesPts.address,
+      ["1", "11", "51"],
+      ["100", "200", "300"],
+      [
+        "1000000000000000000",
+        "1000000000000000000001",
+        "5000000000000000000001",
+        "10000000000000000000001",
+        "50000000000000000000001",
+        "100000000000000000000001",
+      ],
+      [
+        "1000000000000000000",
+        "1250000000000000000",
+        "1500000000000000000",
+        "3000000000000000000",
+        "4000000000000000000",
+        "5000000000000000000",
+      ]
+    );
+
+    await campaignRewardPoolV3.setParams(
+      qThe.address,
+      the.address,
+      thenaDepositor.address,
+      referralCampaignLens.address
+    );
+
+    await campaignRewardPoolV3.initPool(
+      Math.floor(Date.now() / 1000),
+      Math.floor(Date.now() / 1000) + 2592000
+    );
+
+    await the.mint(user1.address, "1100000000000000000000");
+    await the.mint(user2.address, "1100000000000000000000");
+    await the.mint(user3.address, "1100000000000000000000");
+    await the.mint(user4.address, "1100000000000000000000");
+
+    await the
+      .connect(user1)
+      .approve(campaignRewardPoolV3.address, "1100000000000000000000");
+
+    await the
+    .connect(user2)
+    .approve(campaignRewardPoolV3.address, "1100000000000000000000");
+
+    await the
+    .connect(user3)
+    .approve(campaignRewardPoolV3.address, "1100000000000000000000");
+
+    await the
+    .connect(user4)
+    .approve(campaignRewardPoolV3.address, "1100000000000000000000");
+
+
+    await campaignRewardPoolV3
+      .connect(user1)
+      .convert("1000000000000000000000", "", "newLink");
+
+    assert("999000000000000000000" == (await  qMilesPts.balanceOf(user1.address)).toString());
+    const qMilePts  = await qMilesPts.balanceOf(user1.address);
+    console.log(qMilePts);
+
+    await campaignRewardPoolV3
+    .connect(user2)
+    .convert("1000000000000000000000", "newLink", "newLink2");
+    
+    assert("1499000000000000000000" == (await  qMilesPts.balanceOf(user2.address)).toString());
+    const qMilePts2  = await qMilesPts.balanceOf(user2.address);
+    console.log(qMilePts2);
+      
+  });
+
+  it ("should find correct multiplier", async () => {
+    const {
+      owner,
+      user1,
+      user2,
+      user3,
+      user4,
+      user5,
+      user6,
+      user7,
+      user8,
+      treasury,
+      campaignRewardPoolV3,
+      the,
+      qThe,
+      thenaDepositor,
+      referral,
+      referralCampaignLens,
+      qMilesPts,
+    } = await deployFixture();
+
+    await referralCampaignLens.setParams(
+      "1000000000000000000000",
+      "500000000000000000000",
+      "200000000000000000000",
+      referral.address,
+      qMilesPts.address,
+      ["1", "11", "51"],
+      ["100", "200", "300"],
+      [
+        "1000000000000000000",
+        "1000000000000000000001",
+        "5000000000000000000001",
+        "10000000000000000000001",
+        "50000000000000000000001",
+        "100000000000000000000001",
+      ],
+      [
+        "1000000000000000000",
+        "1250000000000000000",
+        "1500000000000000000",
+        "3000000000000000000",
+        "4000000000000000000",
+        "5000000000000000000",
+      ]
+    );
+
+    await campaignRewardPoolV3.setParams(
+      qThe.address,
+      the.address,
+      thenaDepositor.address,
+      referralCampaignLens.address
+    );
+
+    await campaignRewardPoolV3.initPool(
+      Math.floor(Date.now() / 1000),
+      Math.floor(Date.now() / 1000) + 2592000
+    );
+
+    await the.mint(user1.address, "1100000000000000000000");
+    await the.mint(user2.address, "1100000000000000000000");
+    await the.mint(user3.address, "1100000000000000000000");
+    await the.mint(user4.address, "1100000000000000000000");
+
+    await the
+      .connect(user1)
+      .approve(campaignRewardPoolV3.address, "1100000000000000000000");
+
+    await the
+    .connect(user2)
+    .approve(campaignRewardPoolV3.address, "1100000000000000000000");
+
+    await the
+    .connect(user3)
+    .approve(campaignRewardPoolV3.address, "1100000000000000000000");
+
+    await the
+    .connect(user4)
+    .approve(campaignRewardPoolV3.address, "1100000000000000000000");
+
+
+    await campaignRewardPoolV3
+      .connect(user1)
+      .convert("1000000000000000000000", "", "newLink");
+
+ 
+    assert ("10000" == (await  referralCampaignLens.findRefMultiplier(user1.address)).toString() );
+
+    await referral.setAccess(owner.address, true);
+    await referral.referralRegister("newLink", user2.address);
+    await referral.referralRegister("newLink", user3.address);
+    await referral.referralRegister("newLink", user4.address);
+    await referral.referralRegister("newLink", user5.address);
+  
+    const multiplier = await referralCampaignLens.findRefMultiplier(user1.address);
+    
+    console.log(multiplier);
+    assert ("10400" == (await  referralCampaignLens.findRefMultiplier(user1.address)).toString() );
+    
+
+    const [
+      
+      user9,
+  
+      user21,
+      user22,
+      user23,
+      user24, user25
+    ] = await ethers.getSigners();
+    console.log( (await ethers.getSigners()).length);
+    await referral.referralRegister("newLink", user6.address);
+    await referral.referralRegister("newLink", user7.address);
+    await referral.referralRegister("newLink", user8.address);
+    await referral.referralRegister("newLink", user9.address);
+    await referral.referralRegister("newLink", user21.address);
+    await referral.referralRegister("newLink", user22.address);
+    await referral.referralRegister("newLink", user23.address);
+   
+   
+   
+    console.log( await referralCampaignLens.findRefMultiplier(user1.address));
+    assert ("10800" == (await  referralCampaignLens.findRefMultiplier(user1.address)).toString() );
+
+    await referral.referralRegister("newLink", user24.address);
+    await referral.referralRegister("newLink", user25.address);
+    console.log( await referralCampaignLens.findRefMultiplier(user1.address));
+    assert ("10800" == (await  referralCampaignLens.findRefMultiplier(user1.address)).toString() );
+    console.log( await referralCampaignLens.findRefMultiplier(user1.address));
+  })
+  
 });
+
+
