@@ -302,6 +302,8 @@ contract ReferralCampaignLens is OwnableUpgradeable {
             _registerTempRefLink(_linkReferral, _user);
         }
 
+        uint256 oldDeposit = userDepositedAmount[_user].depositAmount;
+
         (uint256 _welcomeOffer, uint256 theWillGet) = _getTokenWillGetForUser(
             tempMapReferral[_user],
             _user,
@@ -315,8 +317,8 @@ contract ReferralCampaignLens is OwnableUpgradeable {
         QMilesPts(qMileAddress).mint(_user, mintPtsAmount);
 
         if (
-            _stakeAmount + userDepositedAmount[_user].depositAmount >=
-            minimumDepositToGetRef
+            _stakeAmount + oldDeposit >= minimumDepositToGetRef &&
+            oldDeposit < minimumDepositToGetRef
         ) {
             Referral(payable(referralAddress)).createReferralLink(
                 _user,
