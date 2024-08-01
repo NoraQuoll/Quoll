@@ -338,14 +338,15 @@ contract ReferralCampaignLens is OwnableUpgradeable {
             ) {
                 return
                     sum +=
-                        (getRefAmount - refMuliplier[i].fromAmountOfRef) *
+                        (getRefAmount - refMuliplier[i].fromAmountOfRef + 1) *
                         refMuliplier[i].additionBase;
             } else if (refMuliplier[i].fromAmountOfRef > getRefAmount) {
                 break;
             } else {
                 sum +=
                     (refMuliplier[i].toAmountOfRef -
-                        refMuliplier[i].fromAmountOfRef) *
+                        refMuliplier[i].fromAmountOfRef +
+                        1) *
                     refMuliplier[i].additionBase;
             }
         }

@@ -233,11 +233,10 @@ describe("", function () {
     console.log(data);
 
     const qTheAmount = await qThe.balanceOf(user1.address);
-    console.log({qTheAmount});
+    console.log({ qTheAmount });
 
     const mileAmount = await qMilesPts.balanceOf(user1.address);
-    console.log({mileAmount});
-
+    console.log({ mileAmount });
   });
 
   it("should convert < 1000 successful", async () => {
@@ -313,4 +312,6 @@ describe("", function () {
     const data = await referral.referralLinkFromUser(user1.address);
     console.log(data);
   });
+
+  it("", async () => {});
 });
