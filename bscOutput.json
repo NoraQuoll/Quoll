@@ -40,7 +40,7 @@
   },
   "wombatBooster": {
     "address": "0x6FCA396A8a2b623b24A998A5808c0E144Aa0689a",
-    "implAddress": "0x0a297DD0b32797D9B04673Dc4B49278A3Cf82a32",
+    "implAddress": "0xc4eEbD32dbde6cC440B1fb506DCc3d6Bd8A1BFDD",
     "txHash": "0x94d97e778c382bd69123cbf248d3806253f8617a3accbd8649926f760f4d1da1",
     "verification": "https://bscscan.com/address/0x6FCA396A8a2b623b24A998A5808c0E144Aa0689a#code",
     "implVerification": "https://bscscan.com/address/0x0a297DD0b32797D9B04673Dc4B49278A3Cf82a32#code"

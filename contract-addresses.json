@@ -174,7 +174,7 @@
         },
         "WombatBooster": {
             "address": "0x47fa2B7F712711C05247F189B9A66DA6C469c7f7",
-            "impl": "0xc032E9c1EB96Cd48940c82E96946fb145F3dC9B8"
+            "impl": "0xc4eEbD32dbde6cC440B1fb506DCc3d6Bd8A1BFDD"
         },
         "Reward_Pool-1710936953019": {
             "address": "0x921f5F899955168254f61BE9a98c359c3fa085E3",
@@ -378,7 +378,8 @@
             "impl": "0x521E61D65e8570509571f5B4eD8fD1d35315C8b4"
         },
         "WombatBooster": {
-            "address": "0xf2D050845E1cfb09a1AD3e5a87F14449FedEde7E"
+            "address": "0xb7e165642562Fa45FE066D5a4c7d91D8B4699ECE",
+            "impl": "0xEEc9675ac441d52C7Ab8F1bd0d69bD85a9A3c69B"
         },
         "DepositToken0x5aD0b68c8544D475ee73ffd4c8dfe7E273b01266": {
             "address": "0x1F970663a14F7d779C2d40F4E34ea9f3340F90f4",
