@@ -351,6 +351,22 @@
         "Reward_Pool-1718188090860": {
             "address": "0x3B4e48265aD0806309F29E0776FB6DB5E6AE881c",
             "impl": "0xa2D55CeC47c8875d0d4E407f7996b6CE83e59319"
+        },
+        "CampaignRewardPoolV3": {
+            "address": "0x272de3b04288610E0aB48FCD1bf172f76f5d12Fc",
+            "impl": "0xD74b9c8f8C0ffe8244a51228bEb479DB0F1dd8aA"
+        },
+        "Referral": {
+            "address": "0xBBce084A2A3Cf22B64CAEC29ac0511B17B445e44",
+            "impl": "0xA4A45078f9382f22fcBF7a121B85724F6Fee4766"
+        },
+        "ReferralCampaignLens": {
+            "address": "0x3B29DA50936922461bdf62a2D1f99D9AD8f0eCc1",
+            "impl": "0xd1D100175172203eDe33A4a93EEa7ee3e94b8Ba6"
+        },
+        "QMilesPts": {
+            "address": "0x61bE96F350e173Ed56Ca22dD3472f3c7BcdEB2C7",
+            "impl": "0x5e83f2f467b4809ED7cad49aC0049ecA48818554"
         }
     },
     "arb": {

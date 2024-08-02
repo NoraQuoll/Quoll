@@ -18,17 +18,23 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const campaignLens = await getContracts()[process.env.NETWORK_NAME!][
-    "ReferralCampaignLens"
-  ]["address"];
+//   const campaignLens = await getContracts()[process.env.NETWORK_NAME!][
+//     "ReferralCampaignLens"
+//   ]["address"];
 
-  const referral = await getContracts()[process.env.NETWORK_NAME!][
-    "Referral"
-  ]["address"];
+//   const referral = await getContracts()[process.env.NETWORK_NAME!][
+//     "Referral"
+//   ]["address"];
 
-  const qMilesPts = await getContracts()[process.env.NETWORK_NAME!][
-    "QMilesPts"
-  ]["address"];
+//   const qMilesPts = await getContracts()[process.env.NETWORK_NAME!][
+//     "QMilesPts"
+//   ]["address"];
+
+const campaignLens = "0x3B29DA50936922461bdf62a2D1f99D9AD8f0eCc1";
+
+  const referral = "0xBBce084A2A3Cf22B64CAEC29ac0511B17B445e44";
+
+  const qMilesPts = "0x61bE96F350e173Ed56Ca22dD3472f3c7BcdEB2C7";
 
   const ReferralCampaignLens = JSON.parse(
     fs.readFileSync(
@@ -73,7 +79,7 @@ async function main() {
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
+    gasLimit: web3.utils.toHex("10000000"),
     data: txData,
     to: campaignLens,
     from: user,

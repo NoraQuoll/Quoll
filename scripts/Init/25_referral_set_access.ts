@@ -18,13 +18,17 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const quoll_token = await getContracts()[process.env.NETWORK_NAME!][
-    "Referral"
-  ]["address"];
+//   const quoll_token = await getContracts()[process.env.NETWORK_NAME!][
+//     "Referral"
+//   ]["address"];
 
-  const operator = await getContracts()[process.env.NETWORK_NAME!][
-    "ReferralCampaignLens"
-  ]["address"];
+//   const operator = await getContracts()[process.env.NETWORK_NAME!][
+//     "ReferralCampaignLens"
+//   ]["address"];
+
+  const quoll_token = "0xBBce084A2A3Cf22B64CAEC29ac0511B17B445e44";
+
+  const operator = "0x3B29DA50936922461bdf62a2D1f99D9AD8f0eCc1";
 
   const QuollToken = JSON.parse(
     fs.readFileSync(
@@ -43,7 +47,7 @@ async function main() {
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
+    gasLimit: web3.utils.toHex("10000000"),
     data: txData,
     to: quoll_token,
     from: user,

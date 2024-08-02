@@ -21,23 +21,33 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const campaign = await getContracts()[process.env.NETWORK_NAME!][
-    "CampaignRewardPoolV3"
-  ]["address"];
+  //   const campaign = await getContracts()[process.env.NETWORK_NAME!][
+  //     "CampaignRewardPoolV3"
+  //   ]["address"];
 
-  const qThe = await getContracts()[process.env.NETWORK_NAME!]["qTHE"][
-    "address"
-  ];
+  //   const qThe = await getContracts()[process.env.NETWORK_NAME!]["qTHE"][
+  //     "address"
+  //   ];
 
-  const the = await getContracts()[process.env.NETWORK_NAME!]["THE"]["address"];
+  //   const the = await getContracts()[process.env.NETWORK_NAME!]["THE"]["address"];
 
-  const thenaDepositor = await getContracts()[process.env.NETWORK_NAME!][
-    "ThenaDepositor"
-  ]["address"];
+  //   const thenaDepositor = await getContracts()[process.env.NETWORK_NAME!][
+  //     "ThenaDepositor"
+  //   ]["address"];
 
-  const referralCampaignLens = await getContracts()[process.env.NETWORK_NAME!][
-    "ReferralCampaignLens"
-  ]["address"];
+  //   const referralCampaignLens = await getContracts()[process.env.NETWORK_NAME!][
+  //     "ReferralCampaignLens"
+  //   ]["address"];
+
+  const campaign = "0x272de3b04288610E0aB48FCD1bf172f76f5d12Fc";
+
+  const qThe = "0x0427df380aecdb4657b1334ab608da16b7526ab2";
+
+  const the = "0xF4C8E32EaDEC4BFe97E0F595AdD0f4450a863a11";
+
+  const thenaDepositor = "0xFbbC05A0AbC238FD27007884956ea3AC7F9325DD";
+
+  const referralCampaignLens = "0x3B29DA50936922461bdf62a2D1f99D9AD8f0eCc1";
 
   const CampaignRewardPoolV3 = JSON.parse(
     fs.readFileSync(
