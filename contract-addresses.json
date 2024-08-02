@@ -132,31 +132,31 @@
             "impl": "0x7525D3228B48dc75aFAFCccFe0c315426AEBE916"
         },
         "CampaignRewardPoolV3": {
-            "address": "0x0327d9c24D5240Ef0F32c2e876D018a713c51857",
-            "impl": "0x084B5190aF8bAF856C7158A803485f57496d8360"
+            "address": "0xE8Ced30F36f292476Ba19E73FdB84591bcf37F4D",
+            "impl": "0xf0C3d982cba5b6786Bb73293c27f7cc6e880da44"
         },
         "THE": {
-            "address": "0x1B1684e38a7aC5ff8fE2A512375AAd74a8078c9f",
+            "address": "0x386c7Aee7641D2D10969a3b2DE04209AAE370212",
             "impl": ""
         },
         "qTHE": {
-            "address": "0x1bA22379bC3D9a38424D5a706ca00bf91a259072",
+            "address": "0xf0759148d0573E016EE5E361C23e55d63256CdaE",
             "impl": "0x520333c4070A83F19d7295629Ade9Ee3d509C610"
         },
         "ThenaDepositor": {
-            "address": "0xD64B85961DA4A113d41f6cA471265bB57e8B136d",
+            "address": "0xDc5d3cF711635F2783aF18562760933a6eCDfE57",
             "impl": "0x397Ac85d403284f6Bea875AF42a9056A532214D5"
         },
         "Referral": {
-            "address": "0x98f7D4f30cEefA07544a00507cD46aA1e90DB649",
+            "address": "0x07575516de90F97c7fD64450CE1fA354ccF8dD9E",
             "impl": "0x5c1591e016F9f49f55361CF055D32D40F1DEfbf9"
         },
         "ReferralCampaignLens": {
-            "address": "0xBc710660864ACdD187107386FAe4a7513206d99F",
-            "impl": "0xb24926D4a2c53E9a7aA68FB34410fcdB42620635"
+            "address": "0x4D94B21B9C998C838D0fF97A97e61F961c695C76",
+            "impl": "0x5Fd15e83e408aC57d0E518D2Ff2d176e259C9984"
         },
         "QMilesPts": {
-            "address": "0x59dF79BbdCD482bE5011058229Be2215469Bb4fD",
+            "address": "0xf1D1C854294Aff36b54365Cb62EE6E97012A1Bf0",
             "impl": "0x1A16e21beA47312162f5D5419f1C96eDDF021bb2"
         }
     },

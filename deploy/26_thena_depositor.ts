@@ -7,8 +7,8 @@ dotenv.config();
 
 import Web3 from "web3";
 
-const the = "0x1B1684e38a7aC5ff8fE2A512375AAd74a8078c9f";
-const qThe = "0x1bA22379bC3D9a38424D5a706ca00bf91a259072";
+const the = "0x386c7Aee7641D2D10969a3b2DE04209AAE370212";
+const qThe = "0xf0759148d0573E016EE5E361C23e55d63256CdaE";
 
 const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deployments, getNamedAccounts, network } = hre;

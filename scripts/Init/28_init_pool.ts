@@ -25,20 +25,6 @@ async function main() {
     "CampaignRewardPoolV3"
   ]["address"];
 
-  const qThe = await getContracts()[process.env.NETWORK_NAME!]["qTHE"][
-    "address"
-  ];
-
-  const the = await getContracts()[process.env.NETWORK_NAME!]["THE"]["address"];
-
-  const thenaDepositor = await getContracts()[process.env.NETWORK_NAME!][
-    "ThenaDepositor"
-  ]["address"];
-
-  const referralCampaignLens = await getContracts()[process.env.NETWORK_NAME!][
-    "ReferralCampaignLens"
-  ]["address"];
-
   const CampaignRewardPoolV3 = JSON.parse(
     fs.readFileSync(
       "./artifacts/contracts/Campaigns/CampaignRewardPoolV3.sol/CampaignRewardPoolV3.json",
