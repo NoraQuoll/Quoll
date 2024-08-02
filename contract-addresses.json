@@ -130,6 +130,34 @@
         "BaseRewardqWomLock": {
             "address": "0x5b37CdFE77250F56A75c8550391F1D06912E05F0",
             "impl": "0x7525D3228B48dc75aFAFCccFe0c315426AEBE916"
+        },
+        "CampaignRewardPoolV3": {
+            "address": "0xE8Ced30F36f292476Ba19E73FdB84591bcf37F4D",
+            "impl": "0xf0C3d982cba5b6786Bb73293c27f7cc6e880da44"
+        },
+        "THE": {
+            "address": "0x386c7Aee7641D2D10969a3b2DE04209AAE370212",
+            "impl": ""
+        },
+        "qTHE": {
+            "address": "0xf0759148d0573E016EE5E361C23e55d63256CdaE",
+            "impl": "0x520333c4070A83F19d7295629Ade9Ee3d509C610"
+        },
+        "ThenaDepositor": {
+            "address": "0xDc5d3cF711635F2783aF18562760933a6eCDfE57",
+            "impl": "0x397Ac85d403284f6Bea875AF42a9056A532214D5"
+        },
+        "Referral": {
+            "address": "0x07575516de90F97c7fD64450CE1fA354ccF8dD9E",
+            "impl": "0x5c1591e016F9f49f55361CF055D32D40F1DEfbf9"
+        },
+        "ReferralCampaignLens": {
+            "address": "0x4D94B21B9C998C838D0fF97A97e61F961c695C76",
+            "impl": "0x5Fd15e83e408aC57d0E518D2Ff2d176e259C9984"
+        },
+        "QMilesPts": {
+            "address": "0xf1D1C854294Aff36b54365Cb62EE6E97012A1Bf0",
+            "impl": "0x1A16e21beA47312162f5D5419f1C96eDDF021bb2"
         }
     },
     "bsc": {
@@ -323,6 +351,22 @@
         "Reward_Pool-1718188090860": {
             "address": "0x3B4e48265aD0806309F29E0776FB6DB5E6AE881c",
             "impl": "0xa2D55CeC47c8875d0d4E407f7996b6CE83e59319"
+        },
+        "CampaignRewardPoolV3": {
+            "address": "0x272de3b04288610E0aB48FCD1bf172f76f5d12Fc",
+            "impl": "0xD74b9c8f8C0ffe8244a51228bEb479DB0F1dd8aA"
+        },
+        "Referral": {
+            "address": "0xBBce084A2A3Cf22B64CAEC29ac0511B17B445e44",
+            "impl": "0xA4A45078f9382f22fcBF7a121B85724F6Fee4766"
+        },
+        "ReferralCampaignLens": {
+            "address": "0x3B29DA50936922461bdf62a2D1f99D9AD8f0eCc1",
+            "impl": "0xd1D100175172203eDe33A4a93EEa7ee3e94b8Ba6"
+        },
+        "QMilesPts": {
+            "address": "0x61bE96F350e173Ed56Ca22dD3472f3c7BcdEB2C7",
+            "impl": "0x5e83f2f467b4809ED7cad49aC0049ecA48818554"
         }
     },
     "arb": {
