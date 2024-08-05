@@ -39,7 +39,7 @@ async function main() {
   //     "ReferralCampaignLens"
   //   ]["address"];
 
-  const campaign = "0x272de3b04288610E0aB48FCD1bf172f76f5d12Fc";
+  const campaign = "0x63bDD4feaCBA482ee1eAAb1d2f494f57f907a1bF";
 
   const qThe = "0x0427df380aecdb4657b1334ab608da16b7526ab2";
 
@@ -47,7 +47,7 @@ async function main() {
 
   const thenaDepositor = "0xFbbC05A0AbC238FD27007884956ea3AC7F9325DD";
 
-  const referralCampaignLens = "0x3B29DA50936922461bdf62a2D1f99D9AD8f0eCc1";
+  const referralCampaignLens = "0x92B667AC28773De43A3F831BCcDca2eF17a43722";
 
   const CampaignRewardPoolV3 = JSON.parse(
     fs.readFileSync(

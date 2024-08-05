@@ -26,9 +26,9 @@ async function main() {
 //     "CampaignRewardPoolV3"
 //   ]["address"];
 
-  const quoll_token = "0x3B29DA50936922461bdf62a2D1f99D9AD8f0eCc1"
+  const quoll_token = "0x92B667AC28773De43A3F831BCcDca2eF17a43722"
 
-  const operator = "0x272de3b04288610E0aB48FCD1bf172f76f5d12Fc"
+  const operator = "0x63bDD4feaCBA482ee1eAAb1d2f494f57f907a1bF"
 
   const QuollToken = JSON.parse(
     fs.readFileSync(

@@ -353,19 +353,19 @@
             "impl": "0xa2D55CeC47c8875d0d4E407f7996b6CE83e59319"
         },
         "CampaignRewardPoolV3": {
-            "address": "0x272de3b04288610E0aB48FCD1bf172f76f5d12Fc",
-            "impl": "0xD74b9c8f8C0ffe8244a51228bEb479DB0F1dd8aA"
+            "address": "0x63bDD4feaCBA482ee1eAAb1d2f494f57f907a1bF",
+            "impl": "0xCe278948b932A8b53409702C80d37Fc3073cDa13"
         },
         "Referral": {
-            "address": "0xBBce084A2A3Cf22B64CAEC29ac0511B17B445e44",
+            "address": "0xf0f00b5f9fc4D33D4B2640Aa328f4780DF8AA9F9",
             "impl": "0xA4A45078f9382f22fcBF7a121B85724F6Fee4766"
         },
         "ReferralCampaignLens": {
-            "address": "0x3B29DA50936922461bdf62a2D1f99D9AD8f0eCc1",
-            "impl": "0xd1D100175172203eDe33A4a93EEa7ee3e94b8Ba6"
+            "address": "0x92B667AC28773De43A3F831BCcDca2eF17a43722",
+            "impl": "0xb19B9E6689369E130Fbd70b32f4588795b8732E6"
         },
         "QMilesPts": {
-            "address": "0x61bE96F350e173Ed56Ca22dD3472f3c7BcdEB2C7",
+            "address": "0xCBD28bDF789422c3e4fF37834ADe0d0e804b8f50",
             "impl": "0x5e83f2f467b4809ED7cad49aC0049ecA48818554"
         }
     },

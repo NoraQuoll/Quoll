@@ -45,6 +45,8 @@ contract ReferralCampaignLens is OwnableUpgradeable {
 
     mapping(address => bool) public access;
 
+    mapping(address => uint256) public userUnClaimedPTS;
+
     event AmountOfTokenInStatus(
         address user,
         uint256 amount,
@@ -310,11 +312,15 @@ contract ReferralCampaignLens is OwnableUpgradeable {
             _stakeAmount
         );
 
-        uint256 mintPtsAmount = _welcomeOffer +
-            (theWillGet * findRefMultiplier(_user)) /
-            BASE_REFERRAL;
+        // uint256 mintPtsAmount = _welcomeOffer +
+        //     (theWillGet * findRefMultiplier(_user)) /
+        //     BASE_REFERRAL;
 
-        QMilesPts(qMileAddress).mint(_user, mintPtsAmount);
+        userUnClaimedPTS[_user] += theWillGet;
+
+        if (_welcomeOffer > 0) {
+            QMilesPts(qMileAddress).mint(_user, _welcomeOffer);
+        }
 
         if (
             _stakeAmount + oldDeposit >= minimumDepositToGetRef &&
@@ -325,6 +331,19 @@ contract ReferralCampaignLens is OwnableUpgradeable {
                 _newLinkToCreate
             );
         }
+    }
+
+    function claimPts() external {
+        uint256 claimableAmount = userUnClaimedPTS[msg.sender];
+
+        require(claimableAmount > 0, "Need to greater than 0");
+
+        userUnClaimedPTS[msg.sender] = 0;
+
+        QMilesPts(qMileAddress).mint(
+            msg.sender,
+            (claimableAmount * findRefMultiplier(msg.sender)) / BASE_REFERRAL
+        );
     }
 
     function findRefMultiplier(address _user) public view returns (uint256) {
