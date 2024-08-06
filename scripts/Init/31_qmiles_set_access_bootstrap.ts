@@ -1,7 +1,6 @@
-// set operator
-
-// contract qWOM
-// _operator: womDepositor contract
+// Set Access wombatBooster to contract QUO
+// Contract QUO
+// Accessable to wombatBooster
 
 import Web3 from "web3";
 import { ethers } from "ethers";
@@ -19,38 +18,38 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  //   const qWom = await getContracts()[process.env.NETWORK_NAME!]["qTHE"][
-  //     "address"
-  //   ];
+  const quoll_token = await getContracts()[process.env.NETWORK_NAME!][
+    "QMilesPts"
+  ]["address"];
 
-  //   const operator = await getContracts()[process.env.NETWORK_NAME!][
-  //     "ThenaDepositor"
-  //   ]["address"];
+  const operator = await getContracts()[process.env.NETWORK_NAME!][
+    "ReferralBootstrapLens"
+  ]["address"];
 
-  const qWom = "0x3822b9aba4EdA4641e4c70D5A48a8aAfd72d38b0";
+  // const quoll_token = "0xCBD28bDF789422c3e4fF37834ADe0d0e804b8f50"
 
-  const operator = "0xF5C0a4FCdEf47d5E843fa2CDF9772A7ee299E9BE";
+  // const operator = "0x92B667AC28773De43A3F831BCcDca2eF17a43722"
 
-  const QuollExternalToken = JSON.parse(
+  const QuollToken = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/QuollExternalToken.sol/QuollExternalToken.json",
+      "./artifacts/contracts/QuollToken.sol/QuollToken.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(QuollExternalToken);
+  const contract = new web3.eth.Contract(QuollToken);
 
-  const txData = contract.methods.setOperator(operator).encodeABI();
+  const txData = contract.methods.setAccess(operator, true).encodeABI();
   console.log(txData);
 
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
+    gasLimit: web3.utils.toHex("10000000"),
     data: txData,
-    to: qWom,
+    to: quoll_token,
     from: user,
   };
 

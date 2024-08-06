@@ -1,7 +1,9 @@
-// set operator
+// setParams
 
-// contract qWOM
-// _operator: womDepositor contract
+// Contract Campaign
+// _quo: quo
+// _bribeManager: bribeManager
+// _treasury: Address
 
 import Web3 from "web3";
 import { ethers } from "ethers";
@@ -19,38 +21,33 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  //   const qWom = await getContracts()[process.env.NETWORK_NAME!]["qTHE"][
-  //     "address"
-  //   ];
+  const campaign = "0x4Cc560ce2D53dCEbD26Ef92EA7E3ed523faA1b27";
 
-  //   const operator = await getContracts()[process.env.NETWORK_NAME!][
-  //     "ThenaDepositor"
-  //   ]["address"];
-
-  const qWom = "0x3822b9aba4EdA4641e4c70D5A48a8aAfd72d38b0";
-
-  const operator = "0xF5C0a4FCdEf47d5E843fa2CDF9772A7ee299E9BE";
-
-  const QuollExternalToken = JSON.parse(
+  const VeTHEbootstrap = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/QuollExternalToken.sol/QuollExternalToken.json",
+      "./artifacts/contracts/Campaigns/VeTHEbootstrap.sol/VeTHEbootstrap.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(QuollExternalToken);
+  const contract = new web3.eth.Contract(VeTHEbootstrap);
 
-  const txData = contract.methods.setOperator(operator).encodeABI();
+  const txData = contract.methods
+    .initPool(
+      Math.floor(Date.now() / 1000),
+      1723892400
+    )
+    .encodeABI();
   console.log(txData);
 
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
+    gasLimit: web3.utils.toHex("300000"),
     data: txData,
-    to: qWom,
+    to: campaign,
     from: user,
   };
 

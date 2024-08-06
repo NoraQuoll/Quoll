@@ -1,7 +1,6 @@
-// set operator
-
-// contract qWOM
-// _operator: womDepositor contract
+// Set Access wombatBooster to contract QUO
+// Contract QUO
+// Accessable to wombatBooster
 
 import Web3 from "web3";
 import { ethers } from "ethers";
@@ -18,39 +17,33 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
+const nft = "0x2b4A87Fd2b5Cf2Cbb253b5286Dfc7EED64421d15";
+
+
 async function main() {
-  //   const qWom = await getContracts()[process.env.NETWORK_NAME!]["qTHE"][
-  //     "address"
-  //   ];
 
-  //   const operator = await getContracts()[process.env.NETWORK_NAME!][
-  //     "ThenaDepositor"
-  //   ]["address"];
-
-  const qWom = "0x3822b9aba4EdA4641e4c70D5A48a8aAfd72d38b0";
-
-  const operator = "0xF5C0a4FCdEf47d5E843fa2CDF9772A7ee299E9BE";
-
-  const QuollExternalToken = JSON.parse(
+  const MockERC721 = JSON.parse(
     fs.readFileSync(
-      "./artifacts/contracts/QuollExternalToken.sol/QuollExternalToken.json",
+      "./artifacts/contracts/Mock/MockERC721.sol/MockERC721.json",
       "utf-8"
     )
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(QuollExternalToken);
+  const contract = new web3.eth.Contract(MockERC721);
 
-  const txData = contract.methods.setOperator(operator).encodeABI();
+  const txData = contract.methods
+    .mint(user, 10)
+    .encodeABI();
   console.log(txData);
 
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("30000000"),
+    gasLimit: web3.utils.toHex("3000000"),
     data: txData,
-    to: qWom,
+    to: nft,
     from: user,
   };
 

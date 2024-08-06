@@ -9,17 +9,17 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./Referral.sol";
 import "./QMilesPts.sol";
 
-contract ReferralCampaignLens is OwnableUpgradeable {
+contract ReferralBootstrapLens is OwnableUpgradeable {
     struct RefMulti {
         uint256 fromAmountOfRef;
         uint256 toAmountOfRef;
         uint256 additionBase;
     }
 
-    struct PointPerTHEStruct {
+    struct PointPerVeTheStruct {
         uint256 fromAmount;
         uint256 toAmount;
-        uint256 pointPerTHE;
+        uint256 pointPerVeTHE;
     }
 
     struct UserDataStruct {
@@ -28,18 +28,17 @@ contract ReferralCampaignLens is OwnableUpgradeable {
     }
 
     uint256 public constant BASE_REFERRAL = 10000;
-
     uint256 public minimumDepositToGetRef;
     uint256 public welcomeOfferMinDeposit;
     uint256 public welcomeOfferForReferredUser;
-    // uint256 public minimumDepositToGetOffer;
+
     address public referralAddress;
     address public qMileAddress;
 
     mapping(address => UserDataStruct) public userDepositedAmount;
 
     RefMulti[] public refMuliplier;
-    PointPerTHEStruct[] public pointPerTHE;
+    PointPerVeTheStruct[] public pointPerVeTHE;
 
     mapping(address => string) public tempMapReferral;
 
@@ -52,6 +51,7 @@ contract ReferralCampaignLens is OwnableUpgradeable {
         uint256 amount,
         uint256 multiplier
     );
+
     event UserGetWelcomePoint(address user, uint256 amount);
     event AccessSet(address indexed _address, bool _status);
 
@@ -73,7 +73,7 @@ contract ReferralCampaignLens is OwnableUpgradeable {
         uint256[] memory _fromAmountOfRef,
         uint256[] memory _additionBase,
         uint256[] memory _fromAmount,
-        uint256[] memory _pointPerTHE
+        uint256[] memory _pointPerVeTHE
     ) external onlyOwner {
         minimumDepositToGetRef = _minimumDepositToGetRef;
         welcomeOfferMinDeposit = _welcomeOfferMinDeposit;
@@ -87,7 +87,7 @@ contract ReferralCampaignLens is OwnableUpgradeable {
             "invalid length of refmulti struct"
         );
         require(
-            _fromAmount.length == _pointPerTHE.length,
+            _fromAmount.length == _pointPerVeTHE.length,
             "invalid point per the"
         );
 
@@ -109,19 +109,19 @@ contract ReferralCampaignLens is OwnableUpgradeable {
 
         for (uint256 i = 0; i < _fromAmount.length; i++) {
             if (i != _fromAmount.length - 1) {
-                pointPerTHE.push(
-                    PointPerTHEStruct(
+                pointPerVeTHE.push(
+                    PointPerVeTheStruct(
                         _fromAmount[i],
                         _fromAmount[i + 1] - 1,
-                        _pointPerTHE[i]
+                        _pointPerVeTHE[i]
                     )
                 );
             } else {
-                pointPerTHE.push(
-                    PointPerTHEStruct(
+                pointPerVeTHE.push(
+                    PointPerVeTheStruct(
                         _fromAmount[i],
                         uint256(-1),
-                        _pointPerTHE[i]
+                        _pointPerVeTHE[i]
                     )
                 );
             }
@@ -163,15 +163,15 @@ contract ReferralCampaignLens is OwnableUpgradeable {
 
         for (
             uint256 i = userDepositedAmount[_user].currentPointThe;
-            i < pointPerTHE.length;
+            i < pointPerVeTHE.length;
             i++
         ) {
             // calculate the token The stake with their status
             // First case that in the current data
-            if (currentStaked + _stakeAmount <= pointPerTHE[i].toAmount) {
+            if (currentStaked + _stakeAmount <= pointPerVeTHE[i].toAmount) {
                 // two case
                 // here that start point before current data
-                if (currentStaked < pointPerTHE[i].fromAmount) {
+                if (currentStaked < pointPerVeTHE[i].fromAmount) {
                     //                                      fromAmount       currentStake+amount           toAmount
                     //  |--------pre-status------------------«-------------------current-status--------------«------------------next-status---------------«
                     //  |                                    |                   |                           |                                            |
@@ -183,8 +183,8 @@ contract ReferralCampaignLens is OwnableUpgradeable {
                     theWillGet +=
                         ((currentStaked +
                             _stakeAmount -
-                            pointPerTHE[i].fromAmount) *
-                            pointPerTHE[i].pointPerTHE) /
+                            pointPerVeTHE[i].fromAmount) *
+                            pointPerVeTHE[i].pointPerVeTHE) /
                         10 ** 18;
 
                     if (theWillGet < 0) break;
@@ -193,8 +193,8 @@ contract ReferralCampaignLens is OwnableUpgradeable {
                         _user,
                         currentStaked +
                             _stakeAmount -
-                            pointPerTHE[i].fromAmount,
-                        pointPerTHE[i].pointPerTHE
+                            pointPerVeTHE[i].fromAmount,
+                        pointPerVeTHE[i].pointPerVeTHE
                     );
                 } else {
                     // case that start point in current data
@@ -206,13 +206,13 @@ contract ReferralCampaignLens is OwnableUpgradeable {
                     // ||------------------------------------||----------------------------------------------||-------------------------------------------||
                     //                                            «------result-------------------«
                     theWillGet +=
-                        ((_stakeAmount) * pointPerTHE[i].pointPerTHE) /
+                        ((_stakeAmount) * pointPerVeTHE[i].pointPerVeTHE) /
                         10 ** 18;
 
                     emit AmountOfTokenInStatus(
                         _user,
                         _stakeAmount,
-                        pointPerTHE[i].pointPerTHE
+                        pointPerVeTHE[i].pointPerVeTHE
                     );
                 }
 
@@ -231,16 +231,17 @@ contract ReferralCampaignLens is OwnableUpgradeable {
                 //  |                         |          |                                               |    |                                       |
                 // ||------------------------------------||----------------------------------------------||-------------------------------------------||
                 //                                       «------result-----------------------------------«
-                if (currentStaked < pointPerTHE[i].fromAmount) {
+                if (currentStaked < pointPerVeTHE[i].fromAmount) {
                     theWillGet +=
-                        ((pointPerTHE[i].toAmount - pointPerTHE[i].fromAmount) *
-                            pointPerTHE[i].pointPerTHE) /
+                        ((pointPerVeTHE[i].toAmount -
+                            pointPerVeTHE[i].fromAmount) *
+                            pointPerVeTHE[i].pointPerVeTHE) /
                         10 ** 18;
 
                     emit AmountOfTokenInStatus(
                         _user,
-                        pointPerTHE[i].toAmount - pointPerTHE[i].fromAmount,
-                        pointPerTHE[i].pointPerTHE
+                        pointPerVeTHE[i].toAmount - pointPerVeTHE[i].fromAmount,
+                        pointPerVeTHE[i].pointPerVeTHE
                     );
                 } else {
                     // case that start point in current data
@@ -252,14 +253,14 @@ contract ReferralCampaignLens is OwnableUpgradeable {
                     // ||------------------------------------||----------------------------------------------||-------------------------------------------||
                     //                                                    «------result----------------------«
                     theWillGet +=
-                        ((pointPerTHE[i].toAmount - currentStaked) *
-                            pointPerTHE[i].pointPerTHE) /
+                        ((pointPerVeTHE[i].toAmount - currentStaked) *
+                            pointPerVeTHE[i].pointPerVeTHE) /
                         10 ** 18;
 
                     emit AmountOfTokenInStatus(
                         _user,
-                        pointPerTHE[i].toAmount - currentStaked,
-                        pointPerTHE[i].pointPerTHE
+                        pointPerVeTHE[i].toAmount - currentStaked,
+                        pointPerVeTHE[i].pointPerVeTHE
                     );
                 }
             }

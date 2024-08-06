@@ -4,8 +4,8 @@
             "address": "0x9a89bbd0E48D7979aca0AE723199a80E6855F22a"
         },
         "QUO": {
-            "address": "0x4F62160edB7584Bca1436e8eAD3F58325e6298eD",
-            "impl": "0x85c8Aa45647895AD70DBdC4f8d109A91Ff5Ca2C2"
+            "address": "0x745047ee5EEf7644CC4CB26c6188cF39aD225493",
+            "impl": "0x21C98c20Afb381a8b343f35bF41d9F333E00b214"
         },
         "QuoRewardPool": {
             "address": "0x5B87ACabB607D4d14D2A795884Dbcb669A3b495A",
@@ -40,8 +40,8 @@
             "impl": "0xA8bD3C4b8b1F32E9A601912273dEd430d1e98901"
         },
         "PancakePath": {
-            "address": "0xaEDC9aa60762d72587581F243c01e38629690729",
-            "impl": "0x0072b920b23CBA1Ca35E107A58116c95A7BFC931"
+            "address": "0x1e6CFc9DE6aF9dfE4D92c9a6C95e335848cb2B71",
+            "impl": "0xC14e7224fd237D7D818d3CA570b3C201611C2bEC"
         },
         "QuollZap": {
             "address": "0x152E6088dFE1EA2eF47daD84Fe85E574bf648f1b",
@@ -140,8 +140,8 @@
             "impl": ""
         },
         "qTHE": {
-            "address": "0xf0759148d0573E016EE5E361C23e55d63256CdaE",
-            "impl": "0x520333c4070A83F19d7295629Ade9Ee3d509C610"
+            "address": "0x2ebB769F2714b0d22764a7f6A5ecD54462d1E4Dd",
+            "impl": "0x605519B1ef3E9d8490e61136cA95607040E95254"
         },
         "ThenaDepositor": {
             "address": "0xDc5d3cF711635F2783aF18562760933a6eCDfE57",
@@ -158,6 +158,22 @@
         "QMilesPts": {
             "address": "0xf1D1C854294Aff36b54365Cb62EE6E97012A1Bf0",
             "impl": "0x1A16e21beA47312162f5D5419f1C96eDDF021bb2"
+        },
+        "MockERC721": {
+            "address": "0x2b4A87Fd2b5Cf2Cbb253b5286Dfc7EED64421d15",
+            "impl": ""
+        },
+        "veTHEboostrap": {
+            "address": "0xF5C0a4FCdEf47d5E843fa2CDF9772A7ee299E9BE",
+            "impl": "0xb7D986301E56450beAB65B591A9b95ae89B473C3"
+        },
+        "ReferralBootstrapLens": {
+            "address": "0xe453CE0b5E7c10F0F5F508E7C5967129DF10Ac52",
+            "impl": "0x792F2392B0384f3bA1248d4D72A564a3EaF4568F"
+        },
+        "VeTHEbootstrap": {
+            "address": "0x4Cc560ce2D53dCEbD26Ef92EA7E3ed523faA1b27",
+            "impl": "0x7a08d7DDaF135F4108C55A6DfC49a9e72AfAE1fe"
         }
     },
     "bsc": {
