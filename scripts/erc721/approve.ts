@@ -19,7 +19,7 @@ const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 const nft = "0x2b4A87Fd2b5Cf2Cbb253b5286Dfc7EED64421d15";
 
-const bootstrap = "0xF5C0a4FCdEf47d5E843fa2CDF9772A7ee299E9BE";
+const bootstrap = "0x4Cc560ce2D53dCEbD26Ef92EA7E3ed523faA1b27";
 
 async function main() {
   const MockERC721 = JSON.parse(

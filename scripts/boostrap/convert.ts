@@ -17,7 +17,7 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-const bootstrap = "0xF5C0a4FCdEf47d5E843fa2CDF9772A7ee299E9BE";
+const bootstrap = "0x4Cc560ce2D53dCEbD26Ef92EA7E3ed523faA1b27";
 
 async function main() {
   const VeTHEbootstrap = JSON.parse(
@@ -31,7 +31,7 @@ async function main() {
 
   const contract = new web3.eth.Contract(VeTHEbootstrap);
 
-  const txData = contract.methods.convert([0, 1]).encodeABI();
+  const txData = contract.methods.convert([2, 3], "", "").encodeABI();
   console.log(txData);
 
   //using ETH
