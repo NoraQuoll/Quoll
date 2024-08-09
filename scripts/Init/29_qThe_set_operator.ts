@@ -19,17 +19,17 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-    const qWom = await getContracts()[process.env.NETWORK_NAME!]["qTHE"][
-      "address"
-    ];
+    // const qWom = await getContracts()[process.env.NETWORK_NAME!]["qTHE"][
+    //   "address"
+    // ];
 
-    const operator = await getContracts()[process.env.NETWORK_NAME!][
-      "VeTHEbootstrap"
-    ]["address"];
+    // const operator = await getContracts()[process.env.NETWORK_NAME!][
+    //   "VeTHEbootstrap"
+    // ]["address"];
 
-//   const qWom = "0x3822b9aba4EdA4641e4c70D5A48a8aAfd72d38b0";
+  const qWom = "0x342435347F5FEd4F9ACd18185883C1E2F6E26d1A";
 
-//   const operator = "0xF5C0a4FCdEf47d5E843fa2CDF9772A7ee299E9BE";
+  const operator = "0x95F2caA1d11122245B0Ad1c638C466e60AA4426E";
 
   const QuollExternalToken = JSON.parse(
     fs.readFileSync(

@@ -27,9 +27,9 @@ async function main() {
   //     "ThenaDepositor"
   //   ]["address"];
 
-  const qWom = "0x3822b9aba4EdA4641e4c70D5A48a8aAfd72d38b0";
+  const qWom = "0x342435347F5FEd4F9ACd18185883C1E2F6E26d1A";
 
-  const operator = "0xF5C0a4FCdEf47d5E843fa2CDF9772A7ee299E9BE";
+  const operator = "0x776B65B6f8dD03CD98460c9E9afbF7cA61481A10";
 
   const QuollExternalToken = JSON.parse(
     fs.readFileSync(

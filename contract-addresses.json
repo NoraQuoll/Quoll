@@ -132,31 +132,31 @@
             "impl": "0x7525D3228B48dc75aFAFCccFe0c315426AEBE916"
         },
         "CampaignRewardPoolV3": {
-            "address": "0xE8Ced30F36f292476Ba19E73FdB84591bcf37F4D",
-            "impl": "0xf0C3d982cba5b6786Bb73293c27f7cc6e880da44"
+            "address": "0xeBb023beD168ceFF7DC45a825C58A9027bc5758d",
+            "impl": "0x837c5C99a62B5679E964091E6d278f09c36690bd"
         },
         "THE": {
             "address": "0x386c7Aee7641D2D10969a3b2DE04209AAE370212",
             "impl": ""
         },
         "qTHE": {
-            "address": "0x2ebB769F2714b0d22764a7f6A5ecD54462d1E4Dd",
-            "impl": "0x605519B1ef3E9d8490e61136cA95607040E95254"
+            "address": "0x342435347F5FEd4F9ACd18185883C1E2F6E26d1A",
+            "impl": "0x6c72f0760e853B3ec2e3cA08cAB8fEA38F48DF9D"
         },
         "ThenaDepositor": {
-            "address": "0xDc5d3cF711635F2783aF18562760933a6eCDfE57",
+            "address": "0x776B65B6f8dD03CD98460c9E9afbF7cA61481A10",
             "impl": "0x397Ac85d403284f6Bea875AF42a9056A532214D5"
         },
         "Referral": {
-            "address": "0x07575516de90F97c7fD64450CE1fA354ccF8dD9E",
+            "address": "0xE54b7AcA99c5F4996Ffe5946FAD88d536A200011",
             "impl": "0x5c1591e016F9f49f55361CF055D32D40F1DEfbf9"
         },
         "ReferralCampaignLens": {
-            "address": "0x4D94B21B9C998C838D0fF97A97e61F961c695C76",
-            "impl": "0x5Fd15e83e408aC57d0E518D2Ff2d176e259C9984"
+            "address": "0x43FcD7a4f33F7a234cfE3641A7B98E8723954249",
+            "impl": "0xCA22841fb4F4514cB77B819c677DE1aCBc800a2d"
         },
         "QMilesPts": {
-            "address": "0xf1D1C854294Aff36b54365Cb62EE6E97012A1Bf0",
+            "address": "0xd36B8A9cEb69C288B393A31Cd7e0e8946F8E900c",
             "impl": "0x1A16e21beA47312162f5D5419f1C96eDDF021bb2"
         },
         "MockERC721": {
@@ -168,12 +168,12 @@
             "impl": "0xb7D986301E56450beAB65B591A9b95ae89B473C3"
         },
         "ReferralBootstrapLens": {
-            "address": "0xe453CE0b5E7c10F0F5F508E7C5967129DF10Ac52",
+            "address": "0xeE68e08e79DCb2458A3423C926e1E992675B9341",
             "impl": "0x792F2392B0384f3bA1248d4D72A564a3EaF4568F"
         },
         "VeTHEbootstrap": {
-            "address": "0x4Cc560ce2D53dCEbD26Ef92EA7E3ed523faA1b27",
-            "impl": "0x7a08d7DDaF135F4108C55A6DfC49a9e72AfAE1fe"
+            "address": "0x95F2caA1d11122245B0Ad1c638C466e60AA4426E",
+            "impl": "0x0d9066Adcb943bCe8F7DEE9E93D3f3E4e1b8e2f6"
         }
     },
     "bsc": {

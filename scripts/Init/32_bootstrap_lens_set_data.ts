@@ -18,23 +18,23 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-    const campaignLens = await getContracts()[process.env.NETWORK_NAME!][
-      "ReferralBootstrapLens"
-    ]["address"];
+  // const campaignLens = await getContracts()[process.env.NETWORK_NAME!][
+  //   "ReferralBootstrapLens"
+  // ]["address"];
 
-    const referral = await getContracts()[process.env.NETWORK_NAME!][
-      "Referral"
-    ]["address"];
+  // const referral = await getContracts()[process.env.NETWORK_NAME!]["Referral"][
+  //   "address"
+  // ];
 
-    const qMilesPts = await getContracts()[process.env.NETWORK_NAME!][
-      "QMilesPts"
-    ]["address"];
+  // const qMilesPts = await getContracts()[process.env.NETWORK_NAME!][
+  //   "QMilesPts"
+  // ]["address"];
 
-  // const campaignLens = "0x92B667AC28773De43A3F831BCcDca2eF17a43722";
+  const campaignLens = "0xeE68e08e79DCb2458A3423C926e1E992675B9341";
 
-  // const referral = "0xf0f00b5f9fc4D33D4B2640Aa328f4780DF8AA9F9";
+  const referral = "0xE54b7AcA99c5F4996Ffe5946FAD88d536A200011";
 
-  // const qMilesPts = "0xCBD28bDF789422c3e4fF37834ADe0d0e804b8f50";
+  const qMilesPts = "0xd36B8A9cEb69C288B393A31Cd7e0e8946F8E900c";
 
   const ReferralBootstrapLens = JSON.parse(
     fs.readFileSync(
@@ -49,20 +49,20 @@ async function main() {
 
   const txData = contract.methods
     .setParams(
-      "1000",
+      "1000000000000000000000",
       "500000000000000000000",
-      "200",
+      "200000000000000000000",
       referral,
       qMilesPts,
       ["1", "11", "51"],
       ["100", "200", "300"],
       [
         "0",
-        "1001",
-        "5001",
-        "10001",
-        "50001",
-        "100001",
+        "1000000000000000000001",
+        "5000000000000000000001",
+        "10000000000000000000001",
+        "50000000000000000000001",
+        "100000000000000000000001",
       ],
       [
         "1000000000000000000",

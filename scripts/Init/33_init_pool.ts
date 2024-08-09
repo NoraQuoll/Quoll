@@ -21,7 +21,7 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const campaign = "0x4Cc560ce2D53dCEbD26Ef92EA7E3ed523faA1b27";
+  const campaign = "0x95F2caA1d11122245B0Ad1c638C466e60AA4426E";
 
   const VeTHEbootstrap = JSON.parse(
     fs.readFileSync(

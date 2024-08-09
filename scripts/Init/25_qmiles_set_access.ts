@@ -26,9 +26,9 @@ async function main() {
 //     "ReferralCampaignLens"
 //   ]["address"];
 
-  const quoll_token = "0xCBD28bDF789422c3e4fF37834ADe0d0e804b8f50"
+  const quoll_token = "0xd36B8A9cEb69C288B393A31Cd7e0e8946F8E900c"
 
-  const operator = "0x92B667AC28773De43A3F831BCcDca2eF17a43722"
+  const operator = "0x43FcD7a4f33F7a234cfE3641A7B98E8723954249"
 
   const QuollToken = JSON.parse(
     fs.readFileSync(
