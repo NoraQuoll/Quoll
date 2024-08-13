@@ -62,6 +62,13 @@
     "deploy-bribe-manager:testnet": "yarn hardhat deploy --network testnet --tags BribeManager",
     "deploy-virtual-balance-reward-pool:testnet": "yarn hardhat deploy --network testnet --tags VirtualBalanceRewardPool",
     "deploy-delegate-vote-pool:testnet": "yarn hardhat deploy --network testnet --tags DelegateVotePool",
-    "deploy:testnet": "npm run deploy-quo:testnet --reset && npm run deploy-quo-reward:testnet && npm run deploy-masterchef:testnet && npm run deploy-qWom:testnet && npm run deploy-wombat-voter:testnet  && npm run deploy-wombat-booster:testnet && npm run deploy-wom-depositor:testnet && npm run deploy-qWOMReward:testnet && npm run deploy-vlquo:testnet && npm run deploy-pancake-path:testnet && npm run deploy-quollzap:testnet && npm run deploy-vested-escrow:testnet && npm run deploy-smart-convertor:testnet && npm run deploy-native-zapper:testnet && npm run deploy-bribe-manager:testnet && npm run deploy-virtual-balance-reward-pool:testnet && npm run deploy-delegate-vote-pool:testnet"
+    "deploy:testnet": "npm run deploy-quo:testnet --reset && npm run deploy-quo-reward:testnet && npm run deploy-masterchef:testnet && npm run deploy-qWom:testnet && npm run deploy-wombat-voter:testnet  && npm run deploy-wombat-booster:testnet && npm run deploy-wom-depositor:testnet && npm run deploy-qWOMReward:testnet && npm run deploy-vlquo:testnet && npm run deploy-pancake-path:testnet && npm run deploy-quollzap:testnet && npm run deploy-vested-escrow:testnet && npm run deploy-smart-convertor:testnet && npm run deploy-native-zapper:testnet && npm run deploy-bribe-manager:testnet && npm run deploy-virtual-balance-reward-pool:testnet && npm run deploy-delegate-vote-pool:testnet",
+    "delete-rewarder:arb": "rm -rf ./deployments/arb/BaseRewardPoolV2_Proxy.json && rm -rf ./deployments/arb/BaseRewardPoolV2.json",
+    "delete-rewarder:bsc": "rm -rf ./deployments/bsc/BaseRewardPoolV2_Proxy.json && rm -rf ./deployments/bsc/BaseRewardPoolV2.json",
+    "delete-rewarder:testnet": "rm -rf ./deployments/testnet/BaseRewardPoolV2_Proxy.json && rm -rf ./deployments/testnet/BaseRewardPoolV2.json",
+    "delete-depositor:arb": "rm -rf ./deployments/arb/DepositToken_Proxy.json && rm -rf ./deployments/arb/DepositToken.json",
+    "delete-depositor:bsc": "rm -rf ./deployments/bsc/DepositToken_Proxy.json && rm -rf ./deployments/bsc/DepositToken.json",
+    "delete-depositor:testnet": "rm -rf ./deployments/testnet/DepositToken_Proxy.json && rm -rf ./deployments/testnet/DepositToken.json"
+
   }
 }

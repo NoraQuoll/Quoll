@@ -7,12 +7,12 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 import "../ReferralBootstrapLens.sol";
 import "../Interfaces/IQuollExternalToken.sol";
+import "../Interfaces/IVotingEscrow.sol";
 
 contract VeTHEbootstrap is ManagerUpgradeable {
     address public voterProxy;
     address public qTHE;
     address public veTHE;
-    uint256 public rate;
     address public bootstrapLens;
 
     bool public pause;
@@ -22,13 +22,12 @@ contract VeTHEbootstrap is ManagerUpgradeable {
 
     event SetRate(uint256 newRate);
 
-    event Convert(uint256 tokenId);
+    event Convert(address indexed _user, uint256 tokenId, uint256 veTHEHolding);
 
     function initialize(
         address _voterProxy,
         address _qTHE,
         address _veTHE,
-        uint256 _rate,
         address _bootstrapLens
     ) public initializer {
         __ManagerUpgradeable_init();
@@ -36,7 +35,6 @@ contract VeTHEbootstrap is ManagerUpgradeable {
         voterProxy = _voterProxy;
         qTHE = _qTHE;
         veTHE = _veTHE;
-        rate = _rate;
         bootstrapLens = _bootstrapLens;
     }
 
@@ -51,42 +49,40 @@ contract VeTHEbootstrap is ManagerUpgradeable {
         endCampaign = _endCampaign;
     }
 
-    function setUpRate(uint256 _rate) public onlyManager {
-        require(rate != _rate, "Same old rate");
-        require(_rate > 0, "rate should greater than 0");
-
-        rate = _rate;
-
-        emit SetRate(_rate);
-    }
-
     function setPause(bool _pause) public onlyManager {
         pause = _pause;
     }
 
-    function convert(uint256[] memory tokenIds, string memory _linkReferral,
-        string memory _newLinkToCreate) public {
+    function convert(
+        uint256[] memory tokenIds,
+        string memory _linkReferral,
+        string memory _newLinkToCreate
+    ) public {
         require(tokenIds.length > 0, "Must convert greater than 0 nfts");
-
-        require(rate > 0, "Rate not set yet");
         require(startCampaign > 0, "Only when Campaign ready");
         require(
             startCampaign <= block.timestamp && block.timestamp <= endCampaign,
             "Not in campaign times"
         );
 
+        uint256 sum;
+
         for (uint256 i = 0; i < tokenIds.length; i++) {
+            uint256 veTheHoldingIn = IVotingEscrow(veTHE).balanceOfNFT(
+                tokenIds[i]
+            );
+            sum += veTheHoldingIn;
             ERC721(veTHE).transferFrom(msg.sender, voterProxy, tokenIds[i]);
 
-            emit Convert(tokenIds[i]);
+            emit Convert(msg.sender, tokenIds[i], veTheHoldingIn);
         }
 
-        IQuollExternalToken(qTHE).mint(msg.sender, tokenIds.length * rate);
+        IQuollExternalToken(qTHE).mint(msg.sender, sum);
 
         ReferralBootstrapLens(bootstrapLens).deposit(
             _linkReferral,
             msg.sender,
-            tokenIds.length,
+            sum,
             _newLinkToCreate
         );
     }

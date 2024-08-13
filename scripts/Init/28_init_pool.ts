@@ -37,7 +37,7 @@ async function main() {
   const txData = contract.methods
     .initPool(
       Math.floor(Date.now() / 1000),
-      1723892400
+      1724662800
     )
     .encodeABI();
   console.log(txData);

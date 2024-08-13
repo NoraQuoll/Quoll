@@ -18,17 +18,17 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const quoll_token = await getContracts()[process.env.NETWORK_NAME!][
-    "Referral"
-  ]["address"];
+  // const quoll_token = await getContracts()[process.env.NETWORK_NAME!][
+  //   "Referral"
+  // ]["address"];
 
-  const operator = await getContracts()[process.env.NETWORK_NAME!][
-    "ReferralBootstrapLens"
-  ]["address"];
+  // const operator = await getContracts()[process.env.NETWORK_NAME!][
+  //   "ReferralBootstrapLens"
+  // ]["address"];
 
-  // const quoll_token = "0xf0f00b5f9fc4D33D4B2640Aa328f4780DF8AA9F9";
+  const quoll_token = "0xf0f00b5f9fc4D33D4B2640Aa328f4780DF8AA9F9";
 
-  // const operator = "0x92B667AC28773De43A3F831BCcDca2eF17a43722";
+  const operator = "0x55213A3837125cb9e938585cAEa87cd76b773984";
 
   const QuollToken = JSON.parse(
     fs.readFileSync(

@@ -39,15 +39,15 @@ async function main() {
   //     "ReferralCampaignLens"
   //   ]["address"];
 
-  const campaign = "0x63bDD4feaCBA482ee1eAAb1d2f494f57f907a1bF";
+  const campaign = "0xeBb023beD168ceFF7DC45a825C58A9027bc5758d";
 
-  const qThe = "0x0427df380aecdb4657b1334ab608da16b7526ab2";
+  const qThe = "0x342435347F5FEd4F9ACd18185883C1E2F6E26d1A";
 
-  const the = "0xF4C8E32EaDEC4BFe97E0F595AdD0f4450a863a11";
+  const the = "0x386c7Aee7641D2D10969a3b2DE04209AAE370212";
 
-  const thenaDepositor = "0xFbbC05A0AbC238FD27007884956ea3AC7F9325DD";
+  const thenaDepositor = "0x776B65B6f8dD03CD98460c9E9afbF7cA61481A10";
 
-  const referralCampaignLens = "0x92B667AC28773De43A3F831BCcDca2eF17a43722";
+  const referralCampaignLens = "0x43FcD7a4f33F7a234cfE3641A7B98E8723954249";
 
   const CampaignRewardPoolV3 = JSON.parse(
     fs.readFileSync(

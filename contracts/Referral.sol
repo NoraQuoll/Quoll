@@ -26,6 +26,10 @@ contract Referral is IReferral, OwnableUpgradeable {
         return referralLinkFromUser[_user].refAmount;
     }
 
+    function getLinkRefFromUser(address _user) public view returns (string memory) {
+        return referralLinkFromUser[_user].refLink;
+    }
+
     function setAccess(
         address _address,
         bool _status

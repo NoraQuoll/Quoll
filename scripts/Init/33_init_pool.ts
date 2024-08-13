@@ -21,7 +21,7 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const campaign = "0x4Cc560ce2D53dCEbD26Ef92EA7E3ed523faA1b27";
+  const campaign = "0x7f676d86c367c1dCd5780381af48a3555367d748";
 
   const VeTHEbootstrap = JSON.parse(
     fs.readFileSync(
@@ -37,7 +37,7 @@ async function main() {
   const txData = contract.methods
     .initPool(
       Math.floor(Date.now() / 1000),
-      1723892400
+      1724662800
     )
     .encodeABI();
   console.log(txData);
