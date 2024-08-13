@@ -41,10 +41,12 @@ async function main() {
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("3000000"),
+    gasLimit: web3.utils.toHex("30000000"),
+    gasPrice: "100000000",
     data: txData,
     to: nft,
     from: user,
+
   };
 
   const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);

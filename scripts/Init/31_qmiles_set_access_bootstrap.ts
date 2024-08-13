@@ -26,9 +26,9 @@ async function main() {
   //   "ReferralBootstrapLens"
   // ]["address"];
 
-  const quoll_token = "0xd36B8A9cEb69C288B393A31Cd7e0e8946F8E900c"
+  const quoll_token = "0xCBD28bDF789422c3e4fF37834ADe0d0e804b8f50"
 
-  const operator = "0xeE68e08e79DCb2458A3423C926e1E992675B9341"
+  const operator = "0x55213A3837125cb9e938585cAEa87cd76b773984"
 
   const QuollToken = JSON.parse(
     fs.readFileSync(

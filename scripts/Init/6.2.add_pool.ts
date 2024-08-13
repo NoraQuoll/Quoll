@@ -33,36 +33,36 @@ const USDT = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9";
 const masterWombat = "0x62a83c6791a3d7950d823bb71a38e47252b6b6f4";
 
 const datas = [
-  // {
-  //   _masterWombatPid: "31",
-  //   _token: "0x2427b7226D0B938C99f8d7deE0B393f74a20A633",
-  //   _rewardPool: "0x7EEac069B71c6419e814A04E93205d8048d01919",
-  // },
-  // {
-  //   _masterWombatPid: "39",
-  //   _token: "0x1388Dec2096B0d4F63c9a72CA9f843e19C75Feba",
-  //   _rewardPool: "0xD4409d280B6EFA1365b18b3d5720E2084fFfEF5e",
-  // },
-  // {
-  //   _masterWombatPid: "40",
-  //   _token: "0x8f617D85dD96429C6D2d9f575e539988C84fa743",
-  //   _rewardPool: "0xf8faD8577F4A18228e679Cbd7B18910143784ABb",
-  // },
+  {
+    _masterWombatPid: "45",
+    _token: "0x131088d5f3AabDbCfACC3D08EBC5fb130BA55662",
+    _rewardPool: "0xCE0A901a04F8b8d3FC2977373b6a6cdEE0bc0289",
+  },
+  {
+    _masterWombatPid: "46",
+    _token: "0x95bCD544b9Bd490824fAd0A2a9A653b1E34E58FE",
+    _rewardPool: "0x996B4c9ce1EA2c798E760f7D512964d0020b0127",
+  },
+  {
+    _masterWombatPid: "47",
+    _token: "0x91Deb91E2159E9303c9c5013aB7356bD6778E663",
+    _rewardPool: "0xd75dE26B0e850cFd70f1F8C701e15cD8214bfc09",
+  },
   // {
   //   _masterWombatPid: "41",
   //   _token: "0xD91aD58305C266aC38288DfBc600a5ef50d3F3aa",
   //   _rewardPool: "0x54Ada2a3c47299191d9a3a7EE95Ddd6676039D9D",
   // },
-  {
-    _masterWombatPid: "42",
-    _token: "0xA9AE4B5d5BDDc61436d50fcEc067D149737A9200",
-    _rewardPool: "0xA9f00bd0D01E5ba2C54E87076bE24A21F9Ef16eC",
-  },
-  {
-    _masterWombatPid: "43",
-    _token: "0x199415b8cEdd4b561A313ffBb4832999b71A3B49",
-    _rewardPool: "0xdb6B5DA83fc1c68F94BFaB82bE242b4AE597e29c",
-  },
+  // {
+  //   _masterWombatPid: "42",
+  //   _token: "0xA9AE4B5d5BDDc61436d50fcEc067D149737A9200",
+  //   _rewardPool: "0xA9f00bd0D01E5ba2C54E87076bE24A21F9Ef16eC",
+  // },
+  // {
+  //   _masterWombatPid: "43",
+  //   _token: "0x199415b8cEdd4b561A313ffBb4832999b71A3B49",
+  //   _rewardPool: "0xdb6B5DA83fc1c68F94BFaB82bE242b4AE597e29c",
+  // },
 ];
 async function main() {
   const booster = "0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54";
@@ -90,7 +90,15 @@ async function main() {
         USDT
       )
       .encodeABI();
-    console.log(txData);
+    // console.log({
+    //   masterWombat: masterWombat,
+    //   _masterWombatPid: datas[i]._masterWombatPid,
+    //   _token: datas[i]._token,
+    //   _rewardPool: datas[i]._rewardPool,
+    //   pancakePath,
+    //   pancakeRouter,
+    //   USDT,
+    // });
 
     //using ETH
     const txObj = {

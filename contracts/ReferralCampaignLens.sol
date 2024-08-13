@@ -337,7 +337,7 @@ contract ReferralCampaignLens is OwnableUpgradeable {
             oldDeposit < minimumDepositToGetRef &&
             keccak256(
                 abi.encodePacked(
-                    Referral(payable(referralAddress)).referral(_user)
+                    Referral(payable(referralAddress)).getLinkRefFromUser(_user)
                 )
             ) ==
             keccak256(abi.encodePacked(""))

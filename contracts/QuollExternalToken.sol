@@ -14,35 +14,37 @@ contract QuollExternalToken is
 {
     address public operator;
 
-    // --- Events ---
-    event OperatorUpdated(address _operator);
+    mapping(address => bool) public operators;
 
-    function initialize(string memory _name, string memory _symbol)
-        public
-        initializer
-    {
+    // --- Events ---
+    event OperatorUpdated(address _operator, bool status);
+
+    function initialize(
+        string memory _name,
+        string memory _symbol
+    ) public initializer {
         __Ownable_init();
 
         __ERC20_init_unchained(_name, _symbol);
 
-        emit OperatorUpdated(msg.sender);
+        // emit OperatorUpdated(msg.sender, true);
     }
 
-    function setOperator(address _operator) external onlyOwner {
-        require(operator == address(0), "already set!");
-        operator = _operator;
+    function setOperator(address _operator, bool status) external onlyOwner {
+        // require(operator == address(0), "already set!");
+        operators[_operator] = status;
 
-        emit OperatorUpdated(_operator);
+        emit OperatorUpdated(_operator, status);
     }
 
     function mint(address _to, uint256 _amount) external override {
-        require(msg.sender == operator, "!authorized");
+        require(operators[msg.sender], "!authorized");
 
         _mint(_to, _amount);
     }
 
     function burn(address _from, uint256 _amount) external override {
-        require(msg.sender == operator, "!authorized");
+        require(operators[msg.sender], "!authorized");
 
         _burn(_from, _amount);
     }

@@ -7,7 +7,7 @@ dotenv.config();
 
 import Web3 from "web3";
 
-const lp_token = "0x604D7B993d44Ff7Bf1c21b061454e5B98934D60c";
+const lp_token = "0xBb5F4d1d1dbA6B5291bE6109430f61687a9854DB";
 
 const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deployments, getNamedAccounts, network } = hre;

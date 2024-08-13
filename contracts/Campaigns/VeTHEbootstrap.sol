@@ -68,12 +68,12 @@ contract VeTHEbootstrap is ManagerUpgradeable {
         uint256 sum;
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            ERC721(veTHE).transferFrom(msg.sender, voterProxy, tokenIds[i]);
-
             uint256 veTheHoldingIn = IVotingEscrow(veTHE).balanceOfNFT(
                 tokenIds[i]
             );
             sum += veTheHoldingIn;
+            ERC721(veTHE).transferFrom(msg.sender, voterProxy, tokenIds[i]);
+
             emit Convert(msg.sender, tokenIds[i], veTheHoldingIn);
         }
 

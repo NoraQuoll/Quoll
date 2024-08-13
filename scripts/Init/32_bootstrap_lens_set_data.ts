@@ -30,11 +30,11 @@ async function main() {
   //   "QMilesPts"
   // ]["address"];
 
-  const campaignLens = "0xeE68e08e79DCb2458A3423C926e1E992675B9341";
+  const campaignLens = "0x55213A3837125cb9e938585cAEa87cd76b773984";
 
-  const referral = "0xE54b7AcA99c5F4996Ffe5946FAD88d536A200011";
+  const referral = "0xf0f00b5f9fc4D33D4B2640Aa328f4780DF8AA9F9";
 
-  const qMilesPts = "0xd36B8A9cEb69C288B393A31Cd7e0e8946F8E900c";
+  const qMilesPts = "0xCBD28bDF789422c3e4fF37834ADe0d0e804b8f50";
 
   const ReferralBootstrapLens = JSON.parse(
     fs.readFileSync(

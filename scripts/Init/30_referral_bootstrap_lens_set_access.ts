@@ -26,9 +26,9 @@ async function main() {
   //   "VeTHEbootstrap"
   // ]["address"];
 
-  const quoll_token = "0xeE68e08e79DCb2458A3423C926e1E992675B9341"
+  const quoll_token = "0x55213A3837125cb9e938585cAEa87cd76b773984"
 
-  const operator = "0x95F2caA1d11122245B0Ad1c638C466e60AA4426E"
+  const operator = "0x7f676d86c367c1dCd5780381af48a3555367d748"
 
   const QuollToken = JSON.parse(
     fs.readFileSync(

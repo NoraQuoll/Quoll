@@ -42,7 +42,7 @@ async function main() {
 
   const contract = new web3.eth.Contract(QuollExternalToken);
 
-  const txData = contract.methods.setOperator(operator).encodeABI();
+  const txData = contract.methods.setOperator(operator, true).encodeABI();
   console.log(txData);
 
   //using ETH

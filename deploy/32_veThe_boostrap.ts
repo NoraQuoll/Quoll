@@ -7,10 +7,10 @@ dotenv.config();
 
 import Web3 from "web3";
 
-const voterProxy = "0x605519B1ef3E9d8490e61136cA95607040E95254";
-const qTHE = "0x342435347F5FEd4F9ACd18185883C1E2F6E26d1A";
-const veTHE = "0xb8Cd7F22722F80CBDc21059Ae91BfA0d8b6ebc9B";
-const bootstrapLens = "0xeE68e08e79DCb2458A3423C926e1E992675B9341";
+const voterProxy = "0xc0cd42017380cf4dc76adb8535cdF76b8f3fE398";
+const qTHE = "0x0427df380aecdb4657b1334ab608da16b7526ab2";
+const veTHE = "0xfBBF371C9B0B994EebFcC977CEf603F7f31c070D";
+const bootstrapLens = "0x55213A3837125cb9e938585cAEa87cd76b773984";
 
 const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deployments, getNamedAccounts, network } = hre;
