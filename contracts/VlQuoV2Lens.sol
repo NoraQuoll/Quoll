@@ -10,19 +10,23 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
 
+import {MerkleProof} from "./lib/MerkleProof.sol";
+
 contract VlQuoV2Lens is OwnableUpgradeable {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
     uint256 public constant CONST_30_DAYS = 86400 * 30;
 
-    struct UserReward {
-        address user;
-        uint256 amountQuo;
-        bool isReward;
-    }
+    // struct UserReward {
+    //     address user;
+    //     uint256 amountQuo;
+    //     bool isReward;
+    // }
 
-    mapping(address => UserReward) public userData;
+    mapping(address => bool) public isUserClaimed;
+
+    bytes32 public rootTree;
 
     address public vlQuoV2;
 
@@ -38,8 +42,8 @@ contract VlQuoV2Lens is OwnableUpgradeable {
     }
 
     function initUserGetReward(
-        address[] calldata users,
-        uint256[] calldata amounts,
+        bytes32 _rootTree,
+        uint256 sum,
         uint256 _startTime,
         address _quo,
         uint256 _penalty,
@@ -50,22 +54,13 @@ contract VlQuoV2Lens is OwnableUpgradeable {
         require(_startTime > block.timestamp, "start time invalid");
         startTime = _startTime;
 
-        require(users.length == amounts.length, "Invalid args");
-
-        uint256 sum;
-
-        for (uint256 i = 0; i < users.length; i++) {
-            if (amounts[i] > 0) {
-                userData[users[i]] = UserReward(users[i], amounts[i], false);
-                sum += amounts[i];
-            }
-        }
+        rootTree = _rootTree;
 
         quo = _quo;
         penalty = _penalty;
         vlQuoV2 = _vlQuoV2;
 
-        IERC20(quo).transferFrom(msg.sender, address(this), sum);
+        // IERC20(quo).transferFrom(msg.sender, address(this), sum);
     }
 
     function claimTokenWom() public onlyOwner {
@@ -83,6 +78,8 @@ contract VlQuoV2Lens is OwnableUpgradeable {
 
     function getUserData(
         address _user,
+        uint256 _amount,
+        bytes32[] calldata merkleProof,
         uint256 _weeks
     ) public returns (uint256) {
         // only vlQUO can call
@@ -103,22 +100,64 @@ contract VlQuoV2Lens is OwnableUpgradeable {
 
         require(_weeks == 26 || _weeks == 52, "invalid lock week");
 
-        require(!userData[_user].isReward, "Already reward");
-        require(userData[_user].amountQuo > 0, "Dont have reward for user");
+        require(!isUserClaimed[_user], "Rewards: Already claimed");
+        require(_amount > 0, "Dont have reward for user");
 
-        userData[_user].isReward = true;
+        // verify data
+        (bool canClaim, ) = _verifyProof(_user, _amount, merkleProof);
+        require(canClaim, "That user could not claim");
+
+        isUserClaimed[_user] = true;
 
         if (_weeks == 26) {
-            uint256 amountToTransfer = userData[_user].amountQuo -
-                (userData[_user].amountQuo * penalty) /
+            uint256 amountToTransfer = _amount -
+                (_amount * penalty) /
                 DENOMINATOR;
 
             IERC20(quo).transfer(vlQuoV2, amountToTransfer);
             return amountToTransfer;
         } else {
-            uint256 amountToTransfer = userData[_user].amountQuo;
+            uint256 amountToTransfer = _amount;
             IERC20(quo).transfer(vlQuoV2, amountToTransfer);
             return amountToTransfer;
+        }
+    }
+
+    /**
+     * @notice Check whether it is possible to claim and how much based on previous distribution
+     * @param user address of the user
+     * @param amount amount to claim
+     * @param merkleProof array with the merkle proof
+     */
+    function _verifyProof(
+        address user,
+        uint256 amount,
+        bytes32[] calldata merkleProof
+    ) internal view returns (bool, uint256) {
+        // Compute the node and verify the merkle proof
+        bytes32 node = keccak256(abi.encodePacked(user, amount));
+        bool canUserClaim = MerkleProof.verify(merkleProof, rootTree, node);
+
+        if ((!canUserClaim) || (isUserClaimed[user])) {
+            return (false, 0);
+        } else {
+            return (true, amount);
+        }
+    }
+
+    function verifyProofExternal(
+        address user,
+        uint256 amount,
+        bytes32[] calldata merkleProof
+    ) public view returns (bool, uint256) {
+        // Compute the node and verify the merkle proof
+        bytes32 node = keccak256(abi.encodePacked(user, amount));
+        bool canUserClaim = MerkleProof.verify(merkleProof, rootTree, node);
+
+        if ((!canUserClaim) || (isUserClaimed[user])) {
+            return (false, 0);
+        } else {
+            return (true, amount);
         }
     }
 }

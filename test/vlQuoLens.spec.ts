@@ -5,6 +5,15 @@ import * as ethersI from "ethers";
 
 import { currentTime, increase, increaseTo } from "./utils/time";
 import { expect } from "chai";
+import {
+  bufferToBytes32,
+  getProofandRoot,
+  hashUserAndAmount,
+} from "../scripts/utils";
+import { MerkleTree } from "merkletreejs";
+
+const SHA256 = require("crypto-js/sha256");
+
 describe("vlQuo Minting", function () {
   async function deployFixture() {
     const [
@@ -119,25 +128,60 @@ describe("vlQuo Minting", function () {
 
     const currentTimeStamp = await currentTime();
 
-    await vlQuoV2Lens.initUserGetReward(
-      [
+    let leaves = [];
+    leaves.push(
+      hashUserAndAmount(
         user1.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user2.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user3.address,
+        ethersI.ethers.utils.parseEther("200").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user4.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user5.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user6.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user7.address,
-      ],
-      [
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("200"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("300"),
-      ],
+        ethersI.ethers.utils.parseEther("300").toString()
+      )
+    );
+
+    const leaf = hashUserAndAmount(
+      user1.address,
+      ethersI.ethers.utils.parseEther("100").toString()
+    );
+
+    const { root, proof } = getProofandRoot(leaves, leaf);
+
+    await vlQuoV2Lens.initUserGetReward(
+      root,
+      ethersI.ethers.utils.parseEther("1000").toString(),
       currentTimeStamp + 100,
       quo.address,
       50,
@@ -173,25 +217,60 @@ describe("vlQuo Minting", function () {
 
     const currentTimeStamp = await currentTime();
 
-    await vlQuoV2Lens.initUserGetReward(
-      [
+    let leaves = [];
+    leaves.push(
+      hashUserAndAmount(
         user1.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user2.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user3.address,
+        ethersI.ethers.utils.parseEther("200").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user4.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user5.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user6.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user7.address,
-      ],
-      [
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("200"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("300"),
-      ],
+        ethersI.ethers.utils.parseEther("300").toString()
+      )
+    );
+
+    const leaf = hashUserAndAmount(
+      user1.address,
+      ethersI.ethers.utils.parseEther("100").toString()
+    );
+
+    const { root, proof } = getProofandRoot(leaves, leaf);
+
+    await vlQuoV2Lens.initUserGetReward(
+      root,
+      ethersI.ethers.utils.parseEther("1000").toString(),
       currentTimeStamp + 100,
       quo.address,
       50,
@@ -228,25 +307,60 @@ describe("vlQuo Minting", function () {
 
     const currentTimeStamp = await currentTime();
 
-    await vlQuoV2Lens.initUserGetReward(
-      [
+    let leaves = [];
+    leaves.push(
+      hashUserAndAmount(
         user1.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user2.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user3.address,
+        ethersI.ethers.utils.parseEther("200").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user4.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user5.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user6.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user7.address,
-      ],
-      [
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("200"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("300"),
-      ],
+        ethersI.ethers.utils.parseEther("300").toString()
+      )
+    );
+
+    const leaf = hashUserAndAmount(
+      user1.address,
+      ethersI.ethers.utils.parseEther("100").toString()
+    );
+
+    const { root, proof } = getProofandRoot(leaves, leaf);
+
+    await vlQuoV2Lens.initUserGetReward(
+      root,
+      ethersI.ethers.utils.parseEther("1000").toString(),
       currentTimeStamp + 100,
       quo.address,
       50,
@@ -254,7 +368,14 @@ describe("vlQuo Minting", function () {
     );
 
     try {
-      await vlQuoV2Lens.connect(owner).getUserData(user1.address, 26);
+      await vlQuoV2Lens
+        .connect(owner)
+        .getUserData(
+          user1.address,
+          ethersI.ethers.utils.parseEther("100").toString(),
+          proof,
+          26
+        );
     } catch (e) {
       expect(e?.toString()).to.contain(
         "only vlQuov2 can call to this function"
@@ -285,25 +406,60 @@ describe("vlQuo Minting", function () {
 
     const currentTimeStamp = await currentTime();
 
-    await vlQuoV2Lens.initUserGetReward(
-      [
+    let leaves = [];
+    leaves.push(
+      hashUserAndAmount(
         user1.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user2.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user3.address,
+        ethersI.ethers.utils.parseEther("200").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user4.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user5.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user6.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user7.address,
-      ],
-      [
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("200"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("300"),
-      ],
+        ethersI.ethers.utils.parseEther("300").toString()
+      )
+    );
+
+    const leaf = hashUserAndAmount(
+      user1.address,
+      ethersI.ethers.utils.parseEther("100").toString()
+    );
+
+    const { root, proof } = getProofandRoot(leaves, leaf);
+
+    await vlQuoV2Lens.initUserGetReward(
+      root,
+      ethersI.ethers.utils.parseEther("1000").toString(),
       currentTimeStamp + 100,
       quo.address,
       50,
@@ -311,7 +467,13 @@ describe("vlQuo Minting", function () {
     );
 
     try {
-      await vlQuoV2.connect(user1).lockCustomForUser(26);
+      await vlQuoV2
+        .connect(user1)
+        .lockCustomForUser(
+          26,
+          ethersI.ethers.utils.parseEther("100").toString(),
+          proof
+        );
     } catch (e) {
       expect(e?.toString()).to.contain("Not yet start");
     }
@@ -340,25 +502,60 @@ describe("vlQuo Minting", function () {
 
     const currentTimeStamp = await currentTime();
 
-    await vlQuoV2Lens.initUserGetReward(
-      [
+    let leaves = [];
+    leaves.push(
+      hashUserAndAmount(
         user1.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user2.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user3.address,
+        ethersI.ethers.utils.parseEther("200").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user4.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user5.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user6.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user7.address,
-      ],
-      [
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("200"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("300"),
-      ],
+        ethersI.ethers.utils.parseEther("300").toString()
+      )
+    );
+
+    const leaf = hashUserAndAmount(
+      user1.address,
+      ethersI.ethers.utils.parseEther("100").toString()
+    );
+
+    const { root, proof } = getProofandRoot(leaves, leaf);
+
+    await vlQuoV2Lens.initUserGetReward(
+      root,
+      ethersI.ethers.utils.parseEther("1000").toString(),
       currentTimeStamp + 100,
       quo.address,
       50,
@@ -368,7 +565,13 @@ describe("vlQuo Minting", function () {
     await increase(200 + 86400 * 30);
 
     try {
-      await vlQuoV2.connect(user1).lockCustomForUser(26);
+      await vlQuoV2
+        .connect(user1)
+        .lockCustomForUser(
+          26,
+          ethersI.ethers.utils.parseEther("100").toString(),
+          proof
+        );
     } catch (e) {
       expect(e?.toString()).to.contain("Only can claim within 30 days");
     }
@@ -397,25 +600,60 @@ describe("vlQuo Minting", function () {
 
     const currentTimeStamp = await currentTime();
 
-    await vlQuoV2Lens.initUserGetReward(
-      [
+    let leaves = [];
+    leaves.push(
+      hashUserAndAmount(
         user1.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user2.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user3.address,
+        ethersI.ethers.utils.parseEther("200").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user4.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user5.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user6.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user7.address,
-      ],
-      [
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("200"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("300"),
-      ],
+        ethersI.ethers.utils.parseEther("300").toString()
+      )
+    );
+
+    const leaf = hashUserAndAmount(
+      user1.address,
+      ethersI.ethers.utils.parseEther("100").toString()
+    );
+
+    const { root, proof } = getProofandRoot(leaves, leaf);
+
+    await vlQuoV2Lens.initUserGetReward(
+      root,
+      ethersI.ethers.utils.parseEther("1000").toString(),
       currentTimeStamp + 100,
       quo.address,
       50,
@@ -425,7 +663,13 @@ describe("vlQuo Minting", function () {
     await increase(200);
 
     try {
-      await vlQuoV2.connect(user1).lockCustomForUser(27);
+      await vlQuoV2
+        .connect(user1)
+        .lockCustomForUser(
+          27,
+          ethersI.ethers.utils.parseEther("100").toString(),
+          proof
+        );
     } catch (e) {
       expect(e?.toString()).to.contain("invalid lock week");
     }
@@ -455,25 +699,60 @@ describe("vlQuo Minting", function () {
 
     const currentTimeStamp = await currentTime();
 
-    await vlQuoV2Lens.initUserGetReward(
-      [
+    let leaves = [];
+    leaves.push(
+      hashUserAndAmount(
         user1.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user2.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user3.address,
+        ethersI.ethers.utils.parseEther("200").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user4.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user5.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user6.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user7.address,
-      ],
-      [
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("200"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("300"),
-      ],
+        ethersI.ethers.utils.parseEther("300").toString()
+      )
+    );
+
+    const leaf = hashUserAndAmount(
+      user8.address,
+      ethersI.ethers.utils.parseEther("100").toString()
+    );
+
+    const { root, proof } = getProofandRoot(leaves, leaf);
+
+    await vlQuoV2Lens.initUserGetReward(
+      root,
+      ethersI.ethers.utils.parseEther("1000").toString(),
       currentTimeStamp + 100,
       quo.address,
       50,
@@ -483,9 +762,15 @@ describe("vlQuo Minting", function () {
     await increase(200);
 
     try {
-      await vlQuoV2.connect(user8).lockCustomForUser(26);
+      await vlQuoV2
+        .connect(user8)
+        .lockCustomForUser(
+          26,
+          ethersI.ethers.utils.parseEther("100").toString(),
+          proof
+        );
     } catch (e) {
-      expect(e?.toString()).to.contain("Dont have reward for user");
+      expect(e?.toString()).to.contain("That user could not claim");
     }
   });
 
@@ -513,25 +798,60 @@ describe("vlQuo Minting", function () {
 
     const currentTimeStamp = await currentTime();
 
-    await vlQuoV2Lens.initUserGetReward(
-      [
+    let leaves = [];
+    leaves.push(
+      hashUserAndAmount(
         user1.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user2.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user3.address,
+        ethersI.ethers.utils.parseEther("200").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user4.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user5.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user6.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user7.address,
-      ],
-      [
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("200"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("300"),
-      ],
+        ethersI.ethers.utils.parseEther("300").toString()
+      )
+    );
+
+    const leaf = hashUserAndAmount(
+      user1.address,
+      ethersI.ethers.utils.parseEther("100").toString()
+    );
+
+    const { root, proof } = getProofandRoot(leaves, leaf);
+
+    await vlQuoV2Lens.initUserGetReward(
+      root,
+      ethersI.ethers.utils.parseEther("1000").toString(),
       currentTimeStamp + 100,
       quo.address,
       50,
@@ -546,7 +866,13 @@ describe("vlQuo Minting", function () {
     const balanceVlquoLensBefore = await quo.balanceOf(vlQuoV2Lens.address);
     const balanceVlquoBefore = await quo.balanceOf(vlQuoV2.address);
 
-    await vlQuoV2.connect(user1).lockCustomForUser(26);
+    await vlQuoV2
+      .connect(user1)
+      .lockCustomForUser(
+        26,
+        ethersI.ethers.utils.parseEther("100").toString(),
+        proof
+      );
 
     const balanceVlquoLensAfter = await quo.balanceOf(vlQuoV2Lens.address);
     const balanceVlquoAfter = await quo.balanceOf(vlQuoV2.address);
@@ -598,25 +924,60 @@ describe("vlQuo Minting", function () {
 
     const currentTimeStamp = await currentTime();
 
-    await vlQuoV2Lens.initUserGetReward(
-      [
+    let leaves = [];
+    leaves.push(
+      hashUserAndAmount(
         user1.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user2.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user3.address,
+        ethersI.ethers.utils.parseEther("200").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user4.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user5.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user6.address,
+        ethersI.ethers.utils.parseEther("100").toString()
+      )
+    );
+    leaves.push(
+      hashUserAndAmount(
         user7.address,
-      ],
-      [
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("200"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("100"),
-        ethersI.ethers.utils.parseEther("300"),
-      ],
+        ethersI.ethers.utils.parseEther("300").toString()
+      )
+    );
+
+    const leaf = hashUserAndAmount(
+      user1.address,
+      ethersI.ethers.utils.parseEther("100").toString()
+    );
+
+    const { root, proof } = getProofandRoot(leaves, leaf);
+
+    await vlQuoV2Lens.initUserGetReward(
+      root,
+      ethersI.ethers.utils.parseEther("1000").toString(),
       currentTimeStamp + 100,
       quo.address,
       50,
@@ -628,7 +989,13 @@ describe("vlQuo Minting", function () {
     const penalty = await vlQuoV2Lens.penalty();
     const DENOMINATOR = await vlQuoV2Lens.DENOMINATOR();
 
-    await vlQuoV2.connect(user1).lockCustomForUser(52);
+    await vlQuoV2
+      .connect(user1)
+      .lockCustomForUser(
+        52,
+        ethersI.ethers.utils.parseEther("100").toString(),
+        proof
+      );
 
     await increase(86400 * 30);
 

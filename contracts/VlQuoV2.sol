@@ -193,10 +193,14 @@ contract VlQuoV2 is
     }
 
     function lockCustomForUser(
-        uint256 _weeks
+        uint256 _weeks,
+        uint256 _amountQuo,
+        bytes32[] calldata merkleProof
     ) external override nonReentrant whenNotPaused {
         uint256 _amount = VlQuoV2Lens(getVlQuoLens()).getUserData(
             msg.sender,
+            _amountQuo,
+            merkleProof,
             _weeks
         );
         require(_amount > 0, "Amount must be nonzero");

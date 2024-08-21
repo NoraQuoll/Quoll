@@ -19,7 +19,11 @@ interface IVlQuoV2 {
 
     function lock(address _user, uint256 _amount, uint256 _weeks) external;
 
-    function lockCustomForUser(uint256 _weeks) external;
+    function lockCustomForUser(
+        uint256 _weeks,
+        uint256 _amountQuo,
+        bytes32[] calldata merkleProof
+    ) external;
 
     function increaseBalance(address _user, uint256 _amount) external;
 

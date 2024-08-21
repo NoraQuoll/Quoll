@@ -415,6 +415,14 @@
         "VeTHEbootstrap": {
             "address": "0x7f676d86c367c1dCd5780381af48a3555367d748",
             "impl": "0xd701673A9741fd52123090Fe021fE0C396de115a"
+        },
+        "VlQuoV2Lens": {
+            "address": "0x9B246d5DD6FdB96457FC9a281E893B6A3DEeC4D7",
+            "impl": "0xB740Db176EaAE30Fd69eEc5623EE2f1651fa84D2"
+        },
+        "VlQuoV2": {
+            "address": "0xD653FDD560Fd8d936fFe5f8Feeb9EF68fd5743e9",
+            "impl": "0x11c37374267c4D9D27f47AEd0976E0a64f9A7EB2"
         }
     },
     "arb": {
@@ -560,6 +568,14 @@
         "DepositToken0xBb5F4d1d1dbA6B5291bE6109430f61687a9854DB": {
             "address": "0x91Deb91E2159E9303c9c5013aB7356bD6778E663",
             "impl": "0xBdC61EcB725cFf83e4259bf39B005EE71E4f2dc0"
+        },
+        "VlQuoV2Lens": {
+            "address": "0xcE8defdd79951409021Bd6fCd7cBa4F59Aa481FC",
+            "impl": "0x95A58AEC9ba44528A742a0DcA1ae23A1d9E1E616"
+        },
+        "VlQuoV2": {
+            "address": "0x1787b212A96eBA9EAa8c55B30D4dB6e5bc6EBD8d",
+            "impl": "0xcA57285cFB1E1ce095F6f210B4695fB1869C451c"
         }
     }
 }

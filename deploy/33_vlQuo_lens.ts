@@ -14,7 +14,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const data = await deploy("VlQuoV2", {
+  const data = await deploy("VlQuoV2Lens", {
     from: deployer,
     args: [],
     log: true,
@@ -23,17 +23,17 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     proxy: {
       proxyContract: "OptimizedTransparentProxy",
       owner: deployer,
-      // execute: {
-      //   methodName: "initialize",
-      //   args: [],
-      // },
+      execute: {
+        methodName: "initialize",
+        args: [],
+      },
     },
   });
 
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
   await saveContract(
     network.name,
-    "VlQuoV2",
+    `VlQuoV2Lens`,
     data.address,
     data.implementation!
   );
@@ -49,6 +49,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-deploy.tags = ["VlQuoV2"];
+deploy.tags = ["VlQuoV2Lens"];
 
 export default deploy;

@@ -19,6 +19,7 @@
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
     "chai": "^4.2.0",
+    "crypto-js": "^4.2.0",
     "dotenv": "10.0.0",
     "eslint": "7.32.0",
     "eslint-config-prettier": "8.10.0",
@@ -32,6 +33,7 @@
     "hardhat": "2.20.1",
     "hardhat-contract-sizer": "^2.10.0",
     "hardhat-gas-reporter": "1.0.10",
+    "merkletreejs": "^0.4.0",
     "prettier": "2.8.8",
     "prettier-plugin-solidity": "1.3.1",
     "solhint": "3.6.2",
@@ -42,7 +44,9 @@
   },
   "dependencies": {
     "hardhat-deploy": "^0.11.37",
-    "hardhat-deploy-ethers": "^0.4.1"
+    "hardhat-deploy-ethers": "^0.4.1",
+    "web3": "^4.11.1",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "deploy-quo:testnet": "yarn hardhat deploy --network testnet --tags QUO",
@@ -69,6 +73,5 @@
     "delete-depositor:arb": "rm -rf ./deployments/arb/DepositToken_Proxy.json && rm -rf ./deployments/arb/DepositToken.json",
     "delete-depositor:bsc": "rm -rf ./deployments/bsc/DepositToken_Proxy.json && rm -rf ./deployments/bsc/DepositToken.json",
     "delete-depositor:testnet": "rm -rf ./deployments/testnet/DepositToken_Proxy.json && rm -rf ./deployments/testnet/DepositToken.json"
-
   }
 }
