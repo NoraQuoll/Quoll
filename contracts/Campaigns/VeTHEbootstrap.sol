@@ -72,7 +72,7 @@ contract VeTHEbootstrap is ManagerUpgradeable {
                 tokenIds[i]
             );
             sum += veTheHoldingIn;
-            ERC721(veTHE).transferFrom(msg.sender, voterProxy, tokenIds[i]);
+            ERC721(veTHE).safeTransferFrom(msg.sender, voterProxy, tokenIds[i]);
 
             emit Convert(msg.sender, tokenIds[i], veTheHoldingIn);
         }
