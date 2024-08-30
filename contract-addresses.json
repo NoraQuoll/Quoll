@@ -382,7 +382,7 @@
         },
         "QMilesPts": {
             "address": "0xCBD28bDF789422c3e4fF37834ADe0d0e804b8f50",
-            "impl": "0x5e83f2f467b4809ED7cad49aC0049ecA48818554"
+            "impl": "0xC8F3Da7530DEf658799bcd082590f81885a2728d"
         },
         "DepositToken0x8Ac2bE4593731A569F9bd6a9A28cCEEdAdE54D50": {
             "address": "0xe57cBDe5A0A958Ce4A09F73083E7275bF2356a99",
@@ -422,7 +422,11 @@
         },
         "VlQuoV2": {
             "address": "0xD653FDD560Fd8d936fFe5f8Feeb9EF68fd5743e9",
-            "impl": "0x11c37374267c4D9D27f47AEd0976E0a64f9A7EB2"
+            "impl": "0x2e8B58fbECF388b41dDb1972D17ABfBb800a3e1B"
+        },
+        "PTSconverter": {
+            "address": "0xF49f0A8AF5d9BB380AF2c2724b9EA3f9e75732c4",
+            "impl": "0x75AbBD8eB6500f47B59E462Eb6CdB0b3cFB76Efd"
         }
     },
     "arb": {

@@ -14,6 +14,7 @@ import "./Interfaces/IVlQuoV2.sol";
 import "./Interfaces/IBribeManager.sol";
 
 import "./VlQuoV2Lens.sol";
+import "./Campaigns/PTSconverter.sol";
 
 contract VlQuoV2 is
     IVlQuoV2,
@@ -77,6 +78,8 @@ contract VlQuoV2 is
     mapping(address => mapping(address => uint256)) private _lockerBalances;
 
     address public vlQuoLens;
+
+    address public ptsConverter;
 
     modifier onlyAllowedLocker() {
         require(allowedLocker[msg.sender], "!auth");
@@ -230,8 +233,49 @@ contract VlQuoV2 is
         emit Locked(msg.sender, _amount, _weeks);
     }
 
+    function lockCustomForConvertingPTS(
+        uint256 _weeks,
+        uint256 _amountPTS
+    ) external nonReentrant whenNotPaused {
+        require(_weeks == 26 || _weeks == 52, "Incorrect lock week");
+
+        uint256 _amount = PTSconverter(ptsConverter).getUserData(
+            msg.sender,
+            _amountPTS
+        );
+        require(_amount > 0, "Amount must be nonzero");
+
+        require(userLocks[msg.sender].length < maxLockLength, "locks too much");
+
+        uint256 vlQuoAmount = _amount.mul(_weeks);
+
+        uint256 unlockTime = _getNextWeek().add(_weeks.mul(WEEK));
+        userLocks[msg.sender].push(
+            LockInfo(_amount, vlQuoAmount, block.timestamp, unlockTime)
+        );
+
+        _increaseBalance(address(0), msg.sender, vlQuoAmount);
+
+        for (uint256 week = _getNextWeek(); week < unlockTime; week += WEEK) {
+            weeklyTotalWeight[week] = weeklyTotalWeight[week].add(vlQuoAmount);
+            weeklyUserWeight[msg.sender][week] = weeklyUserWeight[msg.sender][
+                week
+            ].add(vlQuoAmount);
+        }
+
+        if (lastClaimedWeek[msg.sender] == 0) {
+            lastClaimedWeek[msg.sender] = _getCurWeek();
+        }
+
+        emit Locked(msg.sender, _amount, _weeks);
+    }
+
     function getVlQuoLens() public view returns (address) {
         return vlQuoLens;
+    }
+
+    function setPTSConverter(address newConverter) public onlyOwner {
+        ptsConverter = newConverter;
     }
 
     function setVlQuoLens(address newVlQuoLens) public onlyOwner {

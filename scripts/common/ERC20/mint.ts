@@ -5,6 +5,7 @@ dotenv.config();
 
 import * as fs from "fs";
 import { getContracts } from "../../utils";
+import { getGasPrice } from "web3/lib/commonjs/eth.exports";
 
 const web3 = new Web3(process.env.RPC!);
 
@@ -13,7 +14,7 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const quoll_token = "0x4F62160edB7584Bca1436e8eAD3F58325e6298eD"
+  const quoll_token = "0xCBD28bDF789422c3e4fF37834ADe0d0e804b8f50"
   const Token = JSON.parse(
     fs.readFileSync(
       "./artifacts/contracts/QuollToken.sol/QuollToken.json",
@@ -26,21 +27,17 @@ async function main() {
   const contract = new web3.eth.Contract(Token, quoll_token);
 
   const txData = contract.methods
-    .mint(user, "10000000000000000000000000")
+    .mint("0x0bab13c3c77b0d1c0be7b19f7987e20dd242e70d", "719750345039652193149069")
     .encodeABI();
 
-  const estGas = Math.ceil(
-    (await contract.methods
-      .mint(user, "10000000000000000000000000")
-      .estimateGas({from: user})) * 1.1
-  );
 
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex(estGas),
+    gas: web3.utils.toHex(300000),
     data: txData,
     to: quoll_token,
     from: user,
+    gasPrice: await web3.eth.getGasPrice()
   };
 
   const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);

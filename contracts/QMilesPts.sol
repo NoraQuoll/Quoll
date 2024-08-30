@@ -30,4 +30,11 @@ contract QMilesPts is ERC20Upgradeable, OwnableUpgradeable {
         require(access[msg.sender], "!auth");
         _mint(_to, _amount);
     }
+
+    function burn(address _from, uint256 _amount) external {
+        if (_from != msg.sender) {
+            _approve(_from, msg.sender, allowance(_from, msg.sender) - _amount);
+        }
+        _burn(_from, _amount);
+    }
 }

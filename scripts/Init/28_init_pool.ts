@@ -36,8 +36,8 @@ async function main() {
 
   const txData = contract.methods
     .initPool(
-      Math.floor(Date.now() / 1000),
-      1724662800
+      1723450389,
+      1727683200
     )
     .encodeABI();
   console.log(txData);
@@ -45,10 +45,12 @@ async function main() {
   //using ETH
   const txObj = {
     nonce: txCount,
-    gasLimit: web3.utils.toHex("300000"),
+    gas: web3.utils.toHex(300000),
     data: txData,
     to: campaign,
     from: user,
+    gasPrice: await web3.eth.getGasPrice()
+
   };
 
   const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);
