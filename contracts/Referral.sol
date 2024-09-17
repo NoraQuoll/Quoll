@@ -26,7 +26,9 @@ contract Referral is IReferral, OwnableUpgradeable {
         return referralLinkFromUser[_user].refAmount;
     }
 
-    function getLinkRefFromUser(address _user) public view returns (string memory) {
+    function getLinkRefFromUser(
+        address _user
+    ) public view returns (string memory) {
         return referralLinkFromUser[_user].refLink;
     }
 
@@ -60,6 +62,16 @@ contract Referral is IReferral, OwnableUpgradeable {
         usedLink[link] = user;
 
         emit CreateReferralLink(user, link);
+    }
+
+    function changeReferralLink(
+        string memory oldLink,
+        string memory newLink
+    ) public onlyOwner {
+        address user = usedLink[oldLink];
+        referralLinkFromUser[user].refLink = newLink;
+        usedLink[oldLink] = address(0);
+        usedLink[newLink] = user;
     }
 
     function checkCanRegisterReferral(

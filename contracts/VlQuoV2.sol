@@ -15,6 +15,7 @@ import "./Interfaces/IBribeManager.sol";
 
 import "./VlQuoV2Lens.sol";
 import "./Campaigns/PTSconverter.sol";
+import "./VlQuoRewardPool.sol";
 
 contract VlQuoV2 is
     IVlQuoV2,
@@ -80,6 +81,8 @@ contract VlQuoV2 is
     address public vlQuoLens;
 
     address public ptsConverter;
+
+    address public rewardPool;
 
     modifier onlyAllowedLocker() {
         require(allowedLocker[msg.sender], "!auth");
@@ -272,6 +275,14 @@ contract VlQuoV2 is
 
     function getVlQuoLens() public view returns (address) {
         return vlQuoLens;
+    }
+
+    function setRewardPool(address newRewardPool) public onlyOwner {
+        rewardPool = newRewardPool;
+    }
+
+    function withdrawReward(address token, uint256 amount) public onlyOwner {
+        IERC20(token).transfer(msg.sender, amount);
     }
 
     function setPTSConverter(address newConverter) public onlyOwner {
@@ -471,6 +482,7 @@ contract VlQuoV2 is
             _lockerBalances[_locker][_user] = _lockerBalances[_locker][_user]
                 .add(_amount);
         }
+        VlQuoRewardPool(rewardPool).updateBalVlquoV2(_user, _balances[_user], _balances[_user].add(_amount), _totalSupply);
         _totalSupply = _totalSupply.add(_amount);
         uint256 newBal = _balances[_user].add(_amount);
         _balances[_user] = newBal;
@@ -489,6 +501,7 @@ contract VlQuoV2 is
             _lockerBalances[_locker][_user] = _lockerBalances[_locker][_user]
                 .sub(_amount);
         }
+        VlQuoRewardPool(rewardPool).updateBalVlquoV2(_user, _balances[_user], _balances[_user].sub(_amount), _totalSupply);
         _totalSupply = _totalSupply.sub(_amount);
         uint256 newBal = _balances[_user].sub(_amount);
         _balances[_user] = newBal;

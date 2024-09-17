@@ -190,7 +190,7 @@
         },
         "WombatBooster": {
             "address": "0x47fa2B7F712711C05247F189B9A66DA6C469c7f7",
-            "impl": "0xc4eEbD32dbde6cC440B1fb506DCc3d6Bd8A1BFDD"
+            "impl": "0xb641Cd201df87A72a4AAC8eAB6A68F17D8455577"
         },
         "Reward_Pool-1710936953019": {
             "address": "0x921f5F899955168254f61BE9a98c359c3fa085E3",
@@ -374,7 +374,7 @@
         },
         "Referral": {
             "address": "0xf0f00b5f9fc4D33D4B2640Aa328f4780DF8AA9F9",
-            "impl": "0x4748AA8128E3E160249aD7F7b18FB10C9b3f210F"
+            "impl": "0x7Ec27e64B77C311B45D2Fc67c854F294548DeeB9"
         },
         "ReferralCampaignLens": {
             "address": "0x92B667AC28773De43A3F831BCcDca2eF17a43722",
@@ -422,11 +422,19 @@
         },
         "VlQuoV2": {
             "address": "0xD653FDD560Fd8d936fFe5f8Feeb9EF68fd5743e9",
-            "impl": "0x2e8B58fbECF388b41dDb1972D17ABfBb800a3e1B"
+            "impl": "0x79184898D69cF6748A613b5DeB38c50dD7FD920D"
         },
         "PTSconverter": {
             "address": "0xF49f0A8AF5d9BB380AF2c2724b9EA3f9e75732c4",
             "impl": "0x75AbBD8eB6500f47B59E462Eb6CdB0b3cFB76Efd"
+        },
+        "qTHEReward": {
+            "address": "0xF7aa5CdF9469144AcdFA322b274BCed5Fc2937B5",
+            "impl": "0x2E383409274f28E01ba3416D287dCF729Afa9459"
+        },
+        "VlQuoRewardPool": {
+            "address": "0x956dbA3B34350a6cD662CF9281cbA54f074f48cf",
+            "impl": "0x77FcAB80c6b166836e2396676F011223e0c05233"
         }
     },
     "arb": {

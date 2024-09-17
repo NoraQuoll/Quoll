@@ -615,7 +615,8 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
     require(
       msg.sender == rewardContract ||
         msg.sender == qWomRewardPool ||
-        msg.sender == qWomRewardLockPool,
+        msg.sender == qWomRewardLockPool ||
+        msg.sender == 0xF7aa5CdF9469144AcdFA322b274BCed5Fc2937B5,
       "!auth"
     );
 

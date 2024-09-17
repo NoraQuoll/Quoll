@@ -7,6 +7,8 @@ dotenv.config();
 
 import Web3 from "web3";
 
+const vlQuo = "0xc634c0A24BFF88c015Ff32145CE0F8d578B02F60";
+
 const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deployments, getNamedAccounts, network } = hre;
   const { deploy } = deployments;
@@ -14,7 +16,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const data = await deploy("BaseRewardPoolV1", {
+  const data = await deploy("VlQuoRewardPool", {
     from: deployer,
     args: [],
     log: true,
@@ -23,17 +25,17 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     proxy: {
       proxyContract: "OptimizedTransparentProxy",
       owner: deployer,
-      execute: {
-        methodName: "initialize",
-        args: [deployer],
-      },
+    //   execute: {
+    //     methodName: "initialize",
+    //     args: [vlQuo],
+    //   },
     },
   });
 
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
   await saveContract(
     network.name,
-    "qTHEReward",
+    `VlQuoRewardPool`,
     data.address,
     data.implementation!
   );
@@ -49,6 +51,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-deploy.tags = ["qTHEReward"];
+deploy.tags = ["VlQuoRewardPool"];
 
 export default deploy;

@@ -1,6 +1,8 @@
-// Set Access wombatBooster to contract QUO
-// Contract QUO
-// Accessable to wombatBooster
+// setAccess
+
+// Contract vlQuoV2
+// address: wombatBooster
+// status: true
 
 import Web3 from "web3";
 import { ethers } from "ethers";
@@ -18,30 +20,29 @@ const user_pk = process.env.PK;
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 async function main() {
-  const quoll_token = "0x956dbA3B34350a6cD662CF9281cbA54f074f48cf";
-  
-  const QuollToken = JSON.parse(
-    fs.readFileSync(
-      "./artifacts/contracts/QuollToken.sol/QuollToken.json",
-      "utf-8"
-    )
+  const address = "0xc634c0a24bff88c015ff32145ce0f8d578b02f60";
+  const vlPool = "0x956dbA3B34350a6cD662CF9281cbA54f074f48cf"
+
+  const VlQuoV2 = JSON.parse(
+    fs.readFileSync("./artifacts/contracts/VlQuoV2.sol/VlQuoV2.json", "utf-8")
   ).abi;
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(QuollToken);
+  const contract = new web3.eth.Contract(VlQuoV2);
 
-  const txData = contract.methods.setAccess(user, true).encodeABI();
+  const txData = contract.methods
+    .setRewardPool(vlPool)
+    .encodeABI();
   console.log(txData);
 
   //using ETH
   const txObj = {
     nonce: txCount,
-    gas: web3.utils.toHex(1000000),
+    gasLimit: web3.utils.toHex("100000"),
     data: txData,
-    to: quoll_token,
+    to: address,
     from: user,
-    gasPrice: await web3.eth.getGasPrice(),
   };
 
   const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);
