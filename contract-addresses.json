@@ -435,6 +435,10 @@
         "VlQuoRewardPool": {
             "address": "0x956dbA3B34350a6cD662CF9281cbA54f074f48cf",
             "impl": "0x77FcAB80c6b166836e2396676F011223e0c05233"
+        },
+        "QMilesPool": {
+            "address": "0x3c6767DEE1699c24DFf92A11c4CC526C3D290915",
+            "impl": "0x360fb1eECF3f518B1F4CFA5F786634Fc1FF09822"
         }
     },
     "arb": {
