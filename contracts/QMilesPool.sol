@@ -91,6 +91,7 @@ contract QMilesPool is OwnableUpgradeable {
         }
 
         QMilesPts(qMiles).transferFrom(msg.sender, address(this), amount);
+        QMilesPts(qMiles).burn(address(this), amount);
         userData[msg.sender].push(UserData(amount, block.timestamp, 0));
     }
 

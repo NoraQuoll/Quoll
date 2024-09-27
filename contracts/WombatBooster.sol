@@ -624,6 +624,10 @@ contract WombatBooster is IWombatBooster, OwnableUpgradeable {
       return;
     }
 
+    if (msg.sender != 0xF7aa5CdF9469144AcdFA322b274BCed5Fc2937B5) {
+      return;
+    }
+
     //mint reward tokens
     if (quoMinter != address(0)) {
       IQuollToken(quoMinter).mint(_account, _amount);
