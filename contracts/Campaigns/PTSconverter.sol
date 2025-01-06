@@ -29,6 +29,10 @@ contract PTSconverter is OwnableUpgradeable {
         quo = _quo;
     }
 
+    function changeRate(uint256 newRate) public onlyOwner{
+        rate = newRate;
+    }
+
     function getUserData(
         address _user,
         uint256 _amount

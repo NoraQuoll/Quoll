@@ -13,7 +13,7 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-const upgradesContract = ["0xCBD28bDF789422c3e4fF37834ADe0d0e804b8f50"];
+const upgradesContract = ["0xF49f0A8AF5d9BB380AF2c2724b9EA3f9e75732c4"];
 async function main() {
   const proxyAdmin = "0x887a9c74EC188829d09c2Eaf77d41fB9DD97bFc5";
 
@@ -149,7 +149,7 @@ async function main() {
         // "0x91c0855ca33807619599c50867e4D9E0FC5c617a",
         // current
         // "0xb91d28e498c65bc39d86197a4ef2a188a426844a"
-        "0xC8F3Da7530DEf658799bcd082590f81885a2728d"
+        "0xa79e5Fd69E8C3E312f7f23cB34a5F07FF29B3599"
       )
       .encodeABI();
     console.log(txData);
