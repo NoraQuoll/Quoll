@@ -7,10 +7,7 @@ dotenv.config();
 
 import Web3 from "web3";
 
-const rate = "5000000000000000000";
-const vlQuo = "0xc634c0A24BFF88c015Ff32145CE0F8d578B02F60";
-const qMile = "0xCBD28bDF789422c3e4fF37834ADe0d0e804b8f50";
-const quo = "0x08b450e4a48C04CDF6DB2bD4cf24057f7B9563fF";
+const qMilesPts = "0xCBD28bDF789422c3e4fF37834ADe0d0e804b8f50";
 
 const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deployments, getNamedAccounts, network } = hre;
@@ -19,7 +16,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const data = await deploy("PTSconverter", {
+  const data = await deploy("QMilesPool", {
     from: deployer,
     args: [],
     log: true,
@@ -30,7 +27,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       owner: deployer,
       // execute: {
       //   methodName: "initialize",
-      //   args: [rate, vlQuo, qMile, quo],
+      //   args: [qMilesPts],
       // },
     },
   });
@@ -38,7 +35,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
   await saveContract(
     network.name,
-    `PTSconverter`,
+    `QMilesPool`,
     data.address,
     data.implementation!
   );
@@ -54,6 +51,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-deploy.tags = ["PTSconverter"];
+deploy.tags = ["QMilesPool"];
 
 export default deploy;

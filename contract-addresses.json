@@ -190,7 +190,7 @@
         },
         "WombatBooster": {
             "address": "0x47fa2B7F712711C05247F189B9A66DA6C469c7f7",
-            "impl": "0xb641Cd201df87A72a4AAC8eAB6A68F17D8455577"
+            "impl": "0xD4F36397d72a2646cae2270B730485EDF79521eB"
         },
         "Reward_Pool-1710936953019": {
             "address": "0x921f5F899955168254f61BE9a98c359c3fa085E3",
@@ -426,7 +426,7 @@
         },
         "PTSconverter": {
             "address": "0xF49f0A8AF5d9BB380AF2c2724b9EA3f9e75732c4",
-            "impl": "0x75AbBD8eB6500f47B59E462Eb6CdB0b3cFB76Efd"
+            "impl": "0xa79e5Fd69E8C3E312f7f23cB34a5F07FF29B3599"
         },
         "qTHEReward": {
             "address": "0xF7aa5CdF9469144AcdFA322b274BCed5Fc2937B5",
@@ -435,6 +435,10 @@
         "VlQuoRewardPool": {
             "address": "0x956dbA3B34350a6cD662CF9281cbA54f074f48cf",
             "impl": "0x77FcAB80c6b166836e2396676F011223e0c05233"
+        },
+        "QMilesPool": {
+            "address": "0x3c6767DEE1699c24DFf92A11c4CC526C3D290915",
+            "impl": "0x2f2fD797856054B4800e05142370826F977f1997"
         }
     },
     "arb": {
