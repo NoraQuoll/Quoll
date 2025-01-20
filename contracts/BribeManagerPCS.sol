@@ -77,7 +77,7 @@ contract BribeManagerPCS is IBribeManagerPCS, OwnableUpgradeable {
         address _delegatePool
     ) external onlyOwner {
         require(
-            address(_gaugeVoting) == address(0),
+            address(gaugeVoting) == address(0),
             "params have already been set"
         );
 

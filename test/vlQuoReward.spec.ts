@@ -214,6 +214,5 @@ describe("vlQuo Minting", function () {
     console.log(await reward1.balanceOf(user1.address));
     console.log(await reward1.balanceOf(user2.address));
 
-
   });
 });
