@@ -122,6 +122,8 @@ contract PCSVoterProxy is IPCSVoterProxy, OwnableUpgradeable {
         emit RevenueSharingPoolAdded(_revenueSharingPool);
     }
 
+    function lockCake(uint256 _lockDays) external override onlyDepositor {}
+
     // function vote(
     //     address[] calldata _lpVote,
     //     int256[] calldata _deltas,

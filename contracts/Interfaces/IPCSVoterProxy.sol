@@ -4,6 +4,8 @@ pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
 interface IPCSVoterProxy {
+    function lockCake(uint256 _lockDays) external;
+
     // --- Events ---
     event BoosterUpdated(address _booster);
     event DepositorUpdated(address _depositor);
