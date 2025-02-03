@@ -186,7 +186,7 @@ describe("vlQuo Minting", function () {
     );
 
     const rewardInfo = await vlQuoRewardPool.rewardInfos(reward1.address);
-    console.log(rewardInfo)
+    console.log(rewardInfo);
     await increase(100);
 
     await vlQuoRewardPool.connect(user1).getReward();
@@ -213,6 +213,5 @@ describe("vlQuo Minting", function () {
 
     console.log(await reward1.balanceOf(user1.address));
     console.log(await reward1.balanceOf(user2.address));
-
   });
 });

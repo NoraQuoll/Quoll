@@ -84,9 +84,9 @@ contract PCSBootstrap is ManagerUpgradeable {
         IERC20(cake).safeTransferFrom(msg.sender, address(this), _amount);
         _approveTokenIfNeeded(cake, cakeDepositor, _amount);
         uint256 multiplier = hasSquadNFT(msg.sender) ? 11 : BASE_MULTIPLIER;
-        uint256 finalAmount =  (multiplier * _amount) / BASE_MULTIPLIER;
+        uint256 finalAmount = (multiplier * _amount) / BASE_MULTIPLIER;
         IPCSDepositor(cakeDepositor).deposit(finalAmount, false);
-        
+
         IERC20(stakingToken).safeTransfer(
             msg.sender,
             (multiplier * _amount) / BASE_MULTIPLIER

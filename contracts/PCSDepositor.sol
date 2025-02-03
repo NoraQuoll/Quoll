@@ -129,6 +129,4 @@ contract PCSDepositor is IPCSDepositor, OwnableUpgradeable {
         uint256 cakeBal = IERC20(cake).balanceOf(msg.sender);
         deposit(cakeBal, _stake);
     }
-
-
 }
