@@ -5,7 +5,6 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/math/Math.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 import "../lib/TransferHelper.sol";
 import "../lib/ManagerUpgradeable.sol";
@@ -21,7 +20,6 @@ contract PCSBootstrap is ManagerUpgradeable {
 
     IERC20 public stakingToken; //qCake
     address public cake;
-    address public squad; //nft Pancake Squad
     address public cakeDepositor;
     address public referralLensAddress;
 
@@ -37,7 +35,6 @@ contract PCSBootstrap is ManagerUpgradeable {
     function setParams(
         address _stakingToken,
         address _cake,
-        address _squad,
         address _cakeDepositor,
         address _referalLensAddress
     ) external onlyOwner {
@@ -51,7 +48,6 @@ contract PCSBootstrap is ManagerUpgradeable {
 
         stakingToken = IERC20(_stakingToken);
         cake = _cake;
-        squad = _squad;
         cakeDepositor = _cakeDepositor;
         referralLensAddress = _referalLensAddress;
     }
@@ -93,10 +89,6 @@ contract PCSBootstrap is ManagerUpgradeable {
         );
 
         emit Convert(msg.sender, _amount);
-    }
-
-    function hasSquadNFT(address account) internal view returns (bool) {
-        return IERC721(squad).balanceOf(account) > 0;
     }
 
     function _approveTokenIfNeeded(

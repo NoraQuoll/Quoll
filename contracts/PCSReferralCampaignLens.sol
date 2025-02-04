@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 import "./Referral.sol";
 import "./QMilesPts.sol";
@@ -27,7 +28,7 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
     }
 
     uint256 public constant BASE_REFERRAL = 10000;
-
+    uint256 public constant BASE_REFERRAL_WITH_SQUAD = 11000;
     uint256 public minimumDepositToGetRef;
     uint256 public welcomeOfferMinDeposit;
     uint256 public welcomeOfferForReferredUser;
@@ -42,6 +43,8 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
     mapping(address => string) public tempMapReferral;
     mapping(address => bool) public access;
     mapping(address => uint256) public userUnClaimedPTS;
+
+    address public squad; //nft Pancake Squad
 
     event AmountOfTokenInStatus(
         address user,
@@ -65,6 +68,7 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
         uint256 _welcomeOfferMinDeposit,
         address _referralAddress,
         address _qMileAddress,
+        address _squad,
         uint256[] memory _fromAmountOfRef,
         uint256[] memory _additionBase,
         uint256[] memory _fromAmount,
@@ -75,6 +79,7 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
         welcomeOfferForReferredUser = _welcomeOfferForReferredUser;
         referralAddress = _referralAddress;
         qMileAddress = _qMileAddress;
+        squad = _squad;
 
         require(
             _fromAmountOfRef.length == _additionBase.length,
@@ -121,6 +126,10 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
                 );
             }
         }
+    }
+
+    function hasSquadNFT(address account) internal view returns (bool) {
+        return IERC721(squad).balanceOf(account) > 0;
     }
 
     function _getTokenWillGetForUser(
@@ -332,6 +341,10 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
             .getRefAmountFromUser(_user);
 
         uint256 sum = BASE_REFERRAL;
+
+        if (hasSquadNFT(_user)) {
+            sum = BASE_REFERRAL_WITH_SQUAD;
+        }
 
         for (uint256 i = 0; i < refMultiplier.length; i++) {
             if (
