@@ -152,6 +152,71 @@ describe("PCS Campaign", function () {
     await deployFixture();
   });
 
+  it("should convert with NFT ", async () => {
+    const {
+      owner,
+      user1,
+      user2,
+      user3,
+      user4,
+      user5,
+      user6,
+      user7,
+      treasury,
+      cake,
+      qCake,
+      squad,
+      qMilesPts,
+      referral,
+      referralCampaignLens,
+      bootstrapPCS,
+    } = await deployFixture();
+    await cake.mint(user1.address, "1100000000000000000000");
+    //mint nft
+    await squad.mint(user1.address, 1);
+    await cake
+      .connect(user1)
+      .approve(bootstrapPCS.address, "1100000000000000000000");
+    await bootstrapPCS
+      .connect(user1)
+      .convert("1000000000000000000000", "", "newLink");
+    expect(await qCake.balanceOf(user1.address)).to.eq(
+      "1100000000000000000000"
+    );
+  });
+  it("should convert without NFT", async () => {
+    const {
+      owner,
+      user1,
+      user2,
+      user3,
+      user4,
+      user5,
+      user6,
+      user7,
+      treasury,
+      cake,
+      qCake,
+      squad,
+      qMilesPts,
+      referral,
+      referralCampaignLens,
+      bootstrapPCS,
+    } = await deployFixture();
+    await cake.mint(user1.address, "1100000000000000000000");
+    //mint nft
+    //await squad.mint(user1.address, 1);
+    await cake
+      .connect(user1)
+      .approve(bootstrapPCS.address, "1100000000000000000000");
+    await bootstrapPCS
+      .connect(user1)
+      .convert("1000000000000000000000", "", "newLink");
+    expect(await qCake.balanceOf(user1.address)).to.eq(
+      "1000000000000000000000"
+    );
+  });
+
   //Referral program :
   // Multiplicator base : 1
   // 1 Ref —> x1.1
@@ -208,36 +273,36 @@ describe("PCS Campaign", function () {
       user1.address
     );
 
-    // 1 ref --> 1.1 (11000)
+    // 1 ref --> 1.01 (10100)
     expect(await referralCampaignLens.findRefMultiplier(user1.address)).to.eq(
-      "11000"
+      "10100"
     );
 
-    //10 ref --> 1.1 + 9*0.01 = 1.19
+    //10 ref --> 1.01 + 9*0.01 = 1.1 (11000)
     for (let i = 0; i < 9; i++) {
       const user = ethers.Wallet.createRandom();
       await referral.referralRegister("newLink", user.address);
     }
     expect(await referralCampaignLens.findRefMultiplier(user1.address)).to.eq(
-      "11900"
+      "11000"
     );
 
-    //12 ref --> 1.19  + 0.02*2 = 1.23
+    //12 ref --> 1.1  + 0.02*2 = 1.14 (11400)
     for (let i = 0; i < 2; i++) {
       const user = ethers.Wallet.createRandom();
       await referral.referralRegister("newLink", user.address);
     }
     expect(await referralCampaignLens.findRefMultiplier(user1.address)).to.eq(
-      "12300"
+      "11400"
     );
 
-    //50 ref = 1.1 + 9*0.01 + 0.02 * 40 = 1.99
+    //50 ref = 1.01 + 9*0.01 + 0.02 * 40 = 1.9 (19000)
     for (let i = 0; i < 38; i++) {
       const user = ethers.Wallet.createRandom();
       await referral.referralRegister("newLink", user.address);
     }
     expect(await referralCampaignLens.findRefMultiplier(user1.address)).to.eq(
-      "19900"
+      "19000"
     );
   });
 

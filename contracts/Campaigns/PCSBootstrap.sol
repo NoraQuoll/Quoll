@@ -19,8 +19,6 @@ contract PCSBootstrap is ManagerUpgradeable {
     using SafeERC20 for IERC20;
     using TransferHelper for address;
 
-    uint256 public constant BASE_MULTIPLIER = 10;
-
     IERC20 public stakingToken; //qCake
     address public cake;
     address public squad; //nft Pancake Squad
@@ -83,14 +81,9 @@ contract PCSBootstrap is ManagerUpgradeable {
 
         IERC20(cake).safeTransferFrom(msg.sender, address(this), _amount);
         _approveTokenIfNeeded(cake, cakeDepositor, _amount);
-        uint256 multiplier = hasSquadNFT(msg.sender) ? 11 : BASE_MULTIPLIER;
-        uint256 finalAmount = (multiplier * _amount) / BASE_MULTIPLIER;
-        IPCSDepositor(cakeDepositor).deposit(finalAmount, false);
+        IPCSDepositor(cakeDepositor).deposit(_amount, false);
 
-        IERC20(stakingToken).safeTransfer(
-            msg.sender,
-            (multiplier * _amount) / BASE_MULTIPLIER
-        );
+        IERC20(stakingToken).safeTransfer(msg.sender, _amount);
 
         PCSReferralCampaignLens(referralLensAddress).deposit(
             _linkReferral,
