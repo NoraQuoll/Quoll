@@ -27,8 +27,8 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
         uint256 currentPointCake;
     }
 
-    uint256 public constant BASE_REFERRAL = 10000;
-    uint256 public constant BASE_REFERRAL_WITH_SQUAD = 11000;
+    uint256 public constant BASE_REFERRAL_INTERNAL = 10000;
+    uint256 public constant BASE_REFERRAL_WITH_SQUAD_INTERNAL = 11000;
     uint256 public minimumDepositToGetRef;
     uint256 public welcomeOfferMinDeposit;
     uint256 public welcomeOfferForReferredUser;
@@ -336,15 +336,18 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
         );
     }
 
+    function BASE_REFERRAL(address _user) public view returns (uint256) {
+        if (hasSquadNFT(_user)) {
+            return BASE_REFERRAL_WITH_SQUAD_INTERNAL;
+        }
+        return BASE_REFERRAL_INTERNAL;
+    }
+
     function findRefMultiplier(address _user) public view returns (uint256) {
         uint256 getRefAmount = Referral(payable(referralAddress))
             .getRefAmountFromUser(_user);
 
-        uint256 sum = BASE_REFERRAL;
-
-        if (hasSquadNFT(_user)) {
-            sum = BASE_REFERRAL_WITH_SQUAD;
-        }
+        uint256 sum = BASE_REFERRAL(_user);
 
         for (uint256 i = 0; i < refMultiplier.length; i++) {
             if (
