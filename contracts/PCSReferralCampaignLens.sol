@@ -332,7 +332,7 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
 
         QMilesPts(qMileAddress).mint(
             msg.sender,
-            (claimableAmount * findRefMultiplier(msg.sender))
+            (claimableAmount * findRefMultiplier(msg.sender)) / BASE_REFERRAL_INTERNAL
         );
     }
 
