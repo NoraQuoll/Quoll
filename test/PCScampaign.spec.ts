@@ -92,7 +92,6 @@ describe("PCS Campaign", function () {
     await bootstrapPCS.setParams(
       qCake.address,
       cake.address,
-      squad.address,
       pancakeDepositor.address,
       referralCampaignLens.address
     );
@@ -110,6 +109,7 @@ describe("PCS Campaign", function () {
       "200000000000000000000",
       referral.address,
       qMilesPts.address,
+      squad.address,
       ["1", "11", "51"],
       ["100", "200", "300"],
       [
@@ -152,7 +152,8 @@ describe("PCS Campaign", function () {
     await deployFixture();
   });
 
-  it("should convert with NFT ", async () => {
+
+  it("should convert correctly", async () => {
     const {
       owner,
       user1,
@@ -174,38 +175,6 @@ describe("PCS Campaign", function () {
     await cake.mint(user1.address, "1100000000000000000000");
     //mint nft
     await squad.mint(user1.address, 1);
-    await cake
-      .connect(user1)
-      .approve(bootstrapPCS.address, "1100000000000000000000");
-    await bootstrapPCS
-      .connect(user1)
-      .convert("1000000000000000000000", "", "newLink");
-    expect(await qCake.balanceOf(user1.address)).to.eq(
-      "1100000000000000000000"
-    );
-  });
-  it("should convert without NFT", async () => {
-    const {
-      owner,
-      user1,
-      user2,
-      user3,
-      user4,
-      user5,
-      user6,
-      user7,
-      treasury,
-      cake,
-      qCake,
-      squad,
-      qMilesPts,
-      referral,
-      referralCampaignLens,
-      bootstrapPCS,
-    } = await deployFixture();
-    await cake.mint(user1.address, "1100000000000000000000");
-    //mint nft
-    //await squad.mint(user1.address, 1);
     await cake
       .connect(user1)
       .approve(bootstrapPCS.address, "1100000000000000000000");
@@ -479,7 +448,7 @@ describe("PCS Campaign", function () {
       bootstrapPCS,
     } = await deployFixture();
     await cake.mint(user1.address, "1600000000000000000000");
-
+  
     await cake
       .connect(user1)
       .approve(bootstrapPCS.address, "1600000000000000000000");
@@ -534,4 +503,74 @@ describe("PCS Campaign", function () {
       .convert("6100000000000000000000", "", "newLink");
     console.log(await referralCampaignLens.userUnClaimedPTS(user1.address)); //8799999999999999999996
   });
+
+  it("should NFT holder claim pts", async () => {
+    const {
+      owner,
+      user1,
+      user2,
+      user3,
+      user4,
+      user5,
+      user6,
+      user7,
+      treasury,
+      cake,
+      qCake,
+      squad,
+      qMilesPts,
+      referral,
+      referralCampaignLens,
+      bootstrapPCS,
+    } = await deployFixture();
+    await cake.mint(user1.address, "20000000000000000000000");
+    await squad.mint(user1.address, 1);
+    await cake
+      .connect(user1)
+      .approve(bootstrapPCS.address, "20000000000000000000000");
+
+    // first convert 1000 => qMilePts = 1000
+    await bootstrapPCS
+      .connect(user1)
+      .convert("1000000000000000000000", "", "newLink");
+    expect(await referralCampaignLens.userUnClaimedPTS(user1.address)).to.eq("1000000000000000000000");
+
+    await referralCampaignLens.connect(user1).claimPts();
+    expect(await qMilesPts.balanceOf(user1.address)).to.eq("1100000000000000000000");
+  })
+
+  it("should user wit no NFT claim pts", async () => {
+    const {
+      owner,
+      user1,
+      user2,
+      user3,
+      user4,
+      user5,
+      user6,
+      user7,
+      treasury,
+      cake,
+      qCake,
+      squad,
+      qMilesPts,
+      referral,
+      referralCampaignLens,
+      bootstrapPCS,
+    } = await deployFixture();
+    await cake.mint(user1.address, "20000000000000000000000");
+    //await squad.mint(user1.address, 1);
+    await cake
+      .connect(user1)
+      .approve(bootstrapPCS.address, "20000000000000000000000");
+
+    // first convert 1000 => qMilePts = 1000
+    await bootstrapPCS
+      .connect(user1)
+      .convert("1000000000000000000000", "", "newLink");
+    expect(await referralCampaignLens.userUnClaimedPTS(user1.address)).to.eq("1000000000000000000000");
+
+    await referralCampaignLens.connect(user1).claimPts();
+    expect(await qMilesPts.balanceOf(user1.address)).to.eq("1000000000000000000000");
+  })
 });
