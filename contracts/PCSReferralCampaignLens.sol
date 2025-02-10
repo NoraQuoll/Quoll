@@ -223,23 +223,48 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
                 userDepositedAmount[_user].currentPointCake = i;
                 break;
             } else {
-                // case that start point in current data
+                // case that not in current data
+                // two case
+                // here that start point before current data
+
                 //                                      fromAmount                                  toAmount  currentStake+amount
                 //  |--------pre-status------------------«-------------------current-status--------------«------------------next-status---------------«
                 //  |                                    |                   |                           |                                            |
-                //  |                                    |            «-------addedAmount----------------|----«                                       |
-                //  |                                    |            |                                  |    |                                       |
+                //  |                         «-------addedAmount----------------------------------------|----«                                       |
+                //  |                         |          |                                               |    |                                       |
                 // ||------------------------------------||----------------------------------------------||-------------------------------------------||
-                //
-                ptsWillGet +=
-                    ((pointPerCake[i].toAmount - currentStaked) *
-                        pointPerCake[i].pointPerCake) /
-                    10 ** 18;
-                emit AmountOfTokenInStatus(
-                    _user,
-                    pointPerCake[i].toAmount - currentStaked,
-                    pointPerCake[i].pointPerCake
-                );
+                //                                       «------result-----------------------------------«
+                if (currentStaked < pointPerCake[i].fromAmount) {
+                    ptsWillGet +=
+                        ((pointPerCake[i].toAmount -
+                            pointPerCake[i].fromAmount) *
+                            pointPerCake[i].pointPerCake) /
+                        10 ** 18;
+
+                    emit AmountOfTokenInStatus(
+                        _user,
+                        pointPerCake[i].toAmount - pointPerCake[i].fromAmount,
+                        pointPerCake[i].pointPerCake
+                    );
+                } else {
+                    // case that start point in current data
+                    //                                      fromAmount                                  toAmount  currentStake+amount
+                    //  |--------pre-status------------------«-------------------current-status--------------«------------------next-status---------------«
+                    //  |                                    |                   |                           |                                            |
+                    //  |                                    |            «-------addedAmount----------------|----«                                       |
+                    //  |                                    |            |                                  |    |                                       |
+                    // ||------------------------------------||----------------------------------------------||-------------------------------------------||
+                    //
+                    ptsWillGet +=
+                        ((pointPerCake[i].toAmount - currentStaked) *
+                            pointPerCake[i].pointPerCake) /
+                        10 ** 18;
+                    emit AmountOfTokenInStatus(
+                        _user,
+                        pointPerCake[i].toAmount - currentStaked,
+                        pointPerCake[i].pointPerCake
+                    );
+                }
             }
         }
 
@@ -332,7 +357,8 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
 
         QMilesPts(qMileAddress).mint(
             msg.sender,
-            (claimableAmount * findRefMultiplier(msg.sender)) / BASE_REFERRAL_INTERNAL
+            (claimableAmount * findRefMultiplier(msg.sender)) /
+                BASE_REFERRAL_INTERNAL
         );
     }
 
