@@ -412,7 +412,11 @@ describe("BribeManagerPCS", function () {
 
     await increase(86400 * 2);
 
-    await depositorInstance.connect(user1).deposit(100000, false);
+    await depositorInstance
+      .connect(user1)
+      .deposit("10000000000000000000", false);
+
+    await increase(86400);
 
     // check voter proxy have veCake
     const veCakeBalance = await veCake.balanceOf(voterProxyInstance.address);
@@ -425,5 +429,41 @@ describe("BribeManagerPCS", function () {
       depositorInstance.address
     );
     console.log({ cakeBalanceDepositor });
+
+    // check locks voterproxy
+    const locks = await veCake.locks(voterProxyInstance.address);
+    console.log({ locks });
+
+    const userInfo = await veCake.userInfo(voterProxyInstance.address);
+    console.log({ userInfo });
+
+    const userPointEpoch = await veCake.userPointEpoch(
+      voterProxyInstance.address
+    );
+    console.log({ userPointEpoch });
+
+    const userPointHistory = await veCake.userPointHistory(
+      voterProxyInstance.address,
+      userPointEpoch
+    );
+    console.log({ userPointHistory });
+
+    await increase(86400 * 20);
+
+    await depositorInstance
+      .connect(user1)
+      .deposit("10000000000000000000", false);
+
+    // check voter proxy have veCake
+    const veCakeBalance2 = await veCake.balanceOf(voterProxyInstance.address);
+    console.log({ veCakeBalance2 });
+
+    const cakeBalance2 = await cake.balanceOf(voterProxyInstance.address);
+    console.log({ cakeBalance2 });
+
+    const cakeBalanceDepositor2 = await cake.balanceOf(
+      depositorInstance.address
+    );
+    console.log({ cakeBalanceDepositor2 });
   });
 });
