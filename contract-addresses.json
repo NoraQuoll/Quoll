@@ -414,7 +414,7 @@
         },
         "VeTHEbootstrap": {
             "address": "0x7f676d86c367c1dCd5780381af48a3555367d748",
-            "impl": "0xA12e8Bd0766de52fEfcD3CB1e219AbFAfc680BEd"
+            "impl": "0xaF790EF37620bd7d595C06D75D3cD513bC6F4E9b"
         },
         "VlQuoV2Lens": {
             "address": "0x9B246d5DD6FdB96457FC9a281E893B6A3DEeC4D7",

@@ -12,13 +12,9 @@ import "./Interfaces/IPCSVoterProxy.sol";
 import "./Interfaces/Pancake/IGaugeVoting.sol";
 import "./Interfaces/Pancake/IMasterChef.sol";
 import "./Interfaces/Pancake/IRevenueSharingPool.sol";
+import "./Interfaces/Pancake/IVECake.sol";
+import "./Interfaces/Pancake/IVECakeOwner.sol";
 
-// import "./Interfaces/IWombatVoterProxy.sol";
-// import "./Interfaces/Wombat/IBribe.sol";
-// import "./Interfaces/Wombat/IMasterWombatV2.sol";
-// import "./Interfaces/Wombat/IMasterWombatV3.sol";
-// import "./Interfaces/Wombat/IVeWom.sol";
-// import "./Interfaces/Wombat/IVoter.sol";
 import "./lib/TransferHelper.sol";
 
 contract PCSVoterProxy is IPCSVoterProxy, OwnableUpgradeable {
@@ -122,7 +118,29 @@ contract PCSVoterProxy is IPCSVoterProxy, OwnableUpgradeable {
         emit RevenueSharingPoolAdded(_revenueSharingPool);
     }
 
-    function lockCake(uint256 _lockDays) external override onlyDepositor {}
+    function lockCake(uint256 _lockDays) external override onlyDepositor {
+        uint256 balance = IERC20(cake).balanceOf(address(this));
+
+        if (balance == 0) {
+            return;
+        }
+
+        IERC20(cake).safeApprove(veCake, 0);
+        IERC20(cake).safeApprove(veCake, balance);
+
+        // call to veCake to check is lock is created
+        (IVECake.LockedBalance memory lockedBalance) = IVECake(veCake).locks(address(this));
+        if (lockedBalance.amount == 0) {
+            IVECake(veCake).createLock(balance, _lockDays * 1 days + block.timestamp);
+        }else {
+            IVECake(veCake).depositFor(address(this), balance);
+        }
+    }
+
+    function setWhitelist(bool _status) external onlyOwner {
+        // call to veCakerOwner to seft set voterProxy as whitelist
+        IVECakeOwner(0xe6cdC66A96458FbF11F632B50964153fBDa78548).setWhitelist(_status);
+    }
 
     // function vote(
     //     address[] calldata _lpVote,

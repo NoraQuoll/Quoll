@@ -24,15 +24,15 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
-    // hardhat: {
-    //   forking: {
-    //     url: "https://bsc-dataseed1.binance.org/",
-    //     // blockNumber: 45810378,
-    //   },
-    // },
     hardhat: {
-      chainId: 1337,
+      forking: {
+        url: "https://bsc-dataseed1.binance.org/",
+        // blockNumber: 45810378,
+      },
     },
+    // hardhat: {
+    //   chainId: 1337,
+    // },
     goerli_arbi: {
       url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
       accounts: private_key,
