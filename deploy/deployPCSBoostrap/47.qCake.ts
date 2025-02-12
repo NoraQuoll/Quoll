@@ -33,6 +33,17 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
   await saveContract(network.name, "qCAKE", data.address, data.implementation!);
 
+  // verify proxy contract
+  try {
+    // verify
+    await hre.run("verify:verify", {
+      address: data.address,
+      constructorArguments: [],
+    });
+  } catch (e) {
+    console.log(e);
+  }
+  
   try {
     // verify
     await hre.run("verify:verify", {
