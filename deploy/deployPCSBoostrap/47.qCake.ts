@@ -14,9 +14,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const depositor = "REPLACE-DEPOSITOR-ADDRESS"; 
-
-  const data = await deploy("VirtualBalanceRewardPool", {
+  const data = await deploy("QuollExternalToken", {
     from: deployer,
     args: [],
     log: true,
@@ -27,29 +25,13 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       owner: deployer,
       execute: {
         methodName: "initialize",
-        args: [depositor],
+        args: ["Quoll CAKE", "qCAKE"],
       },
     },
   });
 
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
-  await saveContract(
-    network.name,
-    "QCakeBalanceRewardPool",
-    data.address,
-    data.implementation!
-  );
-
-  // verify proxy contract
-  try {
-    // verify
-    await hre.run("verify:verify", {
-      address: data.address,
-      constructorArguments: [],
-    });
-  } catch (e) {
-    console.log(e);
-  }
+  await saveContract(network.name, "qCAKE", data.address, data.implementation!);
 
   try {
     // verify
@@ -62,6 +44,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-deploy.tags = ["QCakeBalanceRewardPool"];
+deploy.tags = ["qCAKE"];
 
 export default deploy;
