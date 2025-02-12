@@ -33,7 +33,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
   await saveContract(
     network.name,
-    `Referral`,
+    `PCSReferral`,
     data.address,
     data.implementation!
   );
@@ -60,6 +60,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-deploy.tags = ["Referral"];
+deploy.tags = ["PCSReferral"];
 
 export default deploy;
