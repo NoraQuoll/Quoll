@@ -1,6 +1,6 @@
 import { DeployFunction } from "hardhat-deploy/dist/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { saveContract, getContracts, sleep } from "../scripts/utils";
+import { saveContract, getContracts, sleep } from "../../scripts/utils";
 
 import * as dotenv from "dotenv";
 dotenv.config();
