@@ -49,7 +49,7 @@ import "./Interfaces/IPancakePath.sol";
 import "./Interfaces/Pancake/IPancakeRouter.sol";
 import "./lib/TransferHelper.sol";
 
-contract BaseRewardPoolV1 is IBaseRewardPoolV1, OwnableUpgradeable {
+contract PCSBaseRewardPoolV1 is IBaseRewardPoolV1, OwnableUpgradeable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     using TransferHelper for address;

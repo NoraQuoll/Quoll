@@ -1686,5 +1686,33 @@
   "QMilesPool": {
     "address": "0x3c6767DEE1699c24DFf92A11c4CC526C3D290915",
     "impl": "0x2f2fD797856054B4800e05142370826F977f1997"
+  },
+  "BootstrapPCS": {
+    "address": "0x3EdC82340720e89d7e799814Bb1517CACC2Fcc3B",
+    "impl": "0x6443463c00B4dF0Bb6FD5C84C6E24C33B3a6954c"
+  },
+  "PCSDepositor": {
+    "address": "0x0a47D6B3CeB8eaaa570fE8670183060382Cb5975",
+    "impl": "0x0abA8D4677217CA33676aaE36EA62e45ddB39874"
+  },
+  "PCSVoterProxy": {
+    "address": "0x39088C414beca8977cC90247FE887Ea8b2E2dC6f",
+    "impl": "0x08c79B06826604D86AEAed44AC85df9f5E1F2f5E"
+  },
+  "PCSReferralCampaignLens": {
+    "address": "0x2484feB840fCdb505fc0739d86518CAc1F14e7B3",
+    "impl": "0x2cAA974471dE39bb8219761eBF2Cb5f52bA333ec"
+  },
+  "PCSReferral": {
+    "address": "0x06B5c419ec807Acb6CdF2c2Fab91889cBe79302f",
+    "impl": "0x7Ec27e64B77C311B45D2Fc67c854F294548DeeB9"
+  },
+  "qCAKE": {
+    "address": "0x3f4066C900e66532780d2e367755ABbe1CBf0fBE",
+    "impl": "0x507a5Ac0ed61D44fe3c61a1c789a723df21B9F62"
+  },
+  "QCakeBalanceRewardPool": {
+    "address": "0xcCac06A4ee305050f84578F60DCd39935696C36A",
+    "impl": "0x877Ed2994D7D0a2C9E74c80208648264Bb67b438"
   }
 }

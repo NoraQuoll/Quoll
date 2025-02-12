@@ -465,8 +465,8 @@
             "impl": "0x507a5Ac0ed61D44fe3c61a1c789a723df21B9F62"
         },
         "QCakeBalanceRewardPool": {
-            "address": "0x6054501B371Cc8859ed5BcaD982b5952a46a0276",
-            "impl": "0xbdD8e1a1C4833204EDedC41d1bBae0211d6a0446"
+            "address": "0xcCac06A4ee305050f84578F60DCd39935696C36A",
+            "impl": "0x877Ed2994D7D0a2C9E74c80208648264Bb67b438"
         }
     },
     "arb": {
