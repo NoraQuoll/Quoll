@@ -14,9 +14,9 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const depositor = "0x0a47D6B3CeB8eaaa570fE8670183060382Cb5975"; 
+  const operator = "REPLACE-OPERATOR-ADDRESS"; 
 
-  const data = await deploy("VirtualBalanceRewardPool", {
+  const data = await deploy("PCSBaseRewardPoolV1", {
     from: deployer,
     args: [],
     log: true,
@@ -27,7 +27,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       owner: deployer,
       execute: {
         methodName: "initialize",
-        args: [depositor],
+        args: [operator],
       },
     },
   });

@@ -37,6 +37,13 @@ const masterChef = "0x73feaa1eE314F8c655E354234017bE2193C9E24E";
 const veCake = "0x5692DB8177a81A6c6afc8084C2976C9933EC1bAB";
 const booster = "0x1Ac09ecdf1aD811F0C3929FcDCb5520c99b43088";
 
+/*to set up reward pool*/
+const pid = "REPLACE-THIS-ADDRESS";
+const stakingToken =  "REPLACE-THIS-ADDRESS";
+const rewardToken = "REPLACE-THIS-ADDRESS";
+const pancakePath = "REPLACE-THIS-ADDRESS";
+const pancakeRouter = "REPLACE-THIS-ADDRESS";
+const usdtAddress = "REPLACE-THIS-ADDRESS";
 
 /**
  * CONTRACT ABI
@@ -90,6 +97,12 @@ const QuollExternalToken = JSON.parse(
     )
 ).abi;
 
+const PCSBaseRewardPoolV1 = JSON.parse(
+    fs.readFileSync(
+       "./artifacts/contracts/PCSBaseRewardPoolV1.sol/BaseRewardPoolV1.json",
+        "utf-8"
+    )
+).abi;
 
 async function setParamsBoostrap() {
     console.log('setParamsBoostrap: ');
@@ -229,6 +242,68 @@ async function setParamsCampaignLens() {
 
     const result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction!);
     console.log(result);
+}
+
+async function setParamsPCSBaseRewardPoolV1(){
+    console.log('setParamsPCSBaseRewardPool');
+    const txCount = await web3.eth.getTransactionCount(user);
+
+    const contract = new web3.eth.Contract(PCSBaseRewardPoolV1);
+
+    const txData = contract.methods.setParams(
+        booster,
+        pid,
+        stakingToken,
+        rewardToken,
+        pancakePath,
+        pancakeRouter,
+        usdtAddress
+
+    ).encodeABI();
+
+     //using ETH
+     const txObj = {
+        nonce: txCount,
+        gas: web3.utils.toHex(1000000),
+        gasPrice: await web3.eth.getGasPrice(),
+        data: txData,
+        to: rewardPool,
+        from: user,
+    };
+
+    const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);
+
+    const result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction!);
+    console.log(result);
+}
+
+async function addUpgradeDataPCSBaseRewardPoolV1 (){
+    console.log('addUpgradeDataPCSBaseRewardPoolV1');
+    const txCount = await web3.eth.getTransactionCount(user);
+
+    const contract = new web3.eth.Contract(PCSBaseRewardPoolV1);
+
+    const txData = contract.methods.addUpgradeData(
+        pancakePath,
+        pancakeRouter,
+        usdtAddress
+    ).encodeABI();
+
+     //using ETH
+     const txObj = {
+        nonce: txCount,
+        gas: web3.utils.toHex(1000000),
+        gasPrice: await web3.eth.getGasPrice(),
+        data: txData,
+        to: rewardPool,
+        from: user,
+    };
+
+    const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);
+
+    const result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction!);
+    console.log(result);
+
 }
 
 //set access for boostrap to call deposit
@@ -389,7 +464,9 @@ async function main() {
     // allow Depositor to call mint qCake - ok
     //await setOperator();
 
-    
+    /*==================REWARD POOL ================= */
+    //await setParamsPCSBaseRewardPoolV1();
+    //await addUpgradeDataPCSBaseRewardPoolV1()
     /*=============START THE CAMPAIGN - ok===========*/
     //await initPool (1, 1000000000000); 
 }
