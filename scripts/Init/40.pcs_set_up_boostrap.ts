@@ -18,20 +18,20 @@ const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
  */
 
 /*Token contracts*/
-const cake = "0x05545432189eF90BAFCAE7858c84dE9FADc7f772";
-const qCake = "0x7308A30dE50da10367d2a12Ab4408B2681Bd0Ec7";
-const squad = "0xE2cC38f99a0Da2c1E6575dB349C5541aaf118121";
-const qMilesPts = "0xd36B8A9cEb69C288B393A31Cd7e0e8946F8E900c";
+const cake = "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82";
+const qCake = "0x3f4066C900e66532780d2e367755ABbe1CBf0fBE";
+const squad = "0x0a8901b0E25DEb55A87524f0cC164E9644020EBA";
+const qMilesPts = "0xCBD28bDF789422c3e4fF37834ADe0d0e804b8f50";
 
 /*PCS Bootstrap contracts*/
-const campaignLens = "0x373e6aA1055124DE64642A8cda35E598Ec0089E3";
-const bootstrap = "0x1Ac09ecdf1aD811F0C3929FcDCb5520c99b43088";
-const voterProxy = "0x11fa1099e6c16D5e48849818b6d88Ab833A8c1de";
-const depositor = "0x360bd6D54975B0d130139f481cE0D87190b43178";
+const campaignLens = "0x2484feB840fCdb505fc0739d86518CAc1F14e7B3";
+const bootstrap = "0x3EdC82340720e89d7e799814Bb1517CACC2Fcc3B";
+const voterProxy = "0x39088C414beca8977cC90247FE887Ea8b2E2dC6f";
+const depositor = "0x0a47D6B3CeB8eaaa570fE8670183060382Cb5975";
 
 /*Other contracts*/
-const referral = "0xE129e385b7399622C9666C51025C3FdEf85f6c30";
-const rewardPool = "0xBa530ACBe7Af1c820192A31AdFd0858E333Affb0";
+const referral = "0x06B5c419ec807Acb6CdF2c2Fab91889cBe79302f";
+const rewardPool = "0x6054501B371Cc8859ed5BcaD982b5952a46a0276";
 
 const masterChef = "0x73feaa1eE314F8c655E354234017bE2193C9E24E";
 const veCake = "0x5692DB8177a81A6c6afc8084C2976C9933EC1bAB";

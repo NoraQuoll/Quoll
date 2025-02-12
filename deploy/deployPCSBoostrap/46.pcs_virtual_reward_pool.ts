@@ -14,7 +14,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const depositor = "REPLACE-DEPOSITOR-ADDRESS"; 
+  const depositor = "0x0a47D6B3CeB8eaaa570fE8670183060382Cb5975"; 
 
   const data = await deploy("VirtualBalanceRewardPool", {
     from: deployer,

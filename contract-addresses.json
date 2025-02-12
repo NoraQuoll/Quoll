@@ -459,6 +459,14 @@
         "PCSReferral": {
             "address": "0x06B5c419ec807Acb6CdF2c2Fab91889cBe79302f",
             "impl": "0x7Ec27e64B77C311B45D2Fc67c854F294548DeeB9"
+        },
+        "qCAKE": {
+            "address": "0x3f4066C900e66532780d2e367755ABbe1CBf0fBE",
+            "impl": "0x507a5Ac0ed61D44fe3c61a1c789a723df21B9F62"
+        },
+        "QCakeBalanceRewardPool": {
+            "address": "0x6054501B371Cc8859ed5BcaD982b5952a46a0276",
+            "impl": "0xbdD8e1a1C4833204EDedC41d1bBae0211d6a0446"
         }
     },
     "arb": {
