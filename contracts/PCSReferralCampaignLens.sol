@@ -54,6 +54,8 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
     event UserGetWelcomePoint(address user, uint256 amount);
     event AccessSet(address indexed _address, bool _status);
 
+    event UserClaimPts(address user, uint256 amount);
+
     function initialize() public initializer {
         __Ownable_init();
     }
@@ -355,11 +357,12 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
 
         userUnClaimedPTS[msg.sender] = 0;
 
-        QMilesPts(qMileAddress).mint(
-            msg.sender,
-            (claimableAmount * findRefMultiplier(msg.sender)) /
-                BASE_REFERRAL_INTERNAL
-        );
+        uint256 amountMint = (claimableAmount * findRefMultiplier(msg.sender)) /
+            BASE_REFERRAL_INTERNAL;
+
+        QMilesPts(qMileAddress).mint(msg.sender, amountMint);
+
+        emit UserClaimPts(msg.sender, amountMint);
     }
 
     function BASE_REFERRAL(address _user) public view returns (uint256) {
