@@ -1610,5 +1610,109 @@
     "txHash": "0xd989f41c25b628c0c05b5db6c16c6df980b4249ddce2cbdd484c78ea99704440",
     "verification": "https://bscscan.com/address/0x0FFd14D28Af0fc1A64d7d63Bc64C45551078D01E#code",
     "implVerification": "https://bscscan.com/address/0xF6E97145502250077bb0C5AC7826acc7Ac93361D#code"
+  },
+  "Reward_Pool-1718188032017": {
+    "address": "0x3B4e48265aD0806309F29E0776FB6DB5E6AE881c",
+    "impl": "0xa2D55CeC47c8875d0d4E407f7996b6CE83e59319"
+  },
+  "Reward_Pool-1718188090860": {
+    "address": "0x3B4e48265aD0806309F29E0776FB6DB5E6AE881c",
+    "impl": "0xa2D55CeC47c8875d0d4E407f7996b6CE83e59319"
+  },
+  "CampaignRewardPoolV3": {
+    "address": "0x63bDD4feaCBA482ee1eAAb1d2f494f57f907a1bF",
+    "impl": "0xCe278948b932A8b53409702C80d37Fc3073cDa13"
+  },
+  "Referral": {
+    "address": "0xf0f00b5f9fc4D33D4B2640Aa328f4780DF8AA9F9",
+    "impl": "0x7Ec27e64B77C311B45D2Fc67c854F294548DeeB9"
+  },
+  "ReferralCampaignLens": {
+    "address": "0x92B667AC28773De43A3F831BCcDca2eF17a43722",
+    "impl": "0x48356729ceE73147A958a3B38f2CfCFB58B92740"
+  },
+  "QMilesPts": {
+    "address": "0xCBD28bDF789422c3e4fF37834ADe0d0e804b8f50",
+    "impl": "0xC8F3Da7530DEf658799bcd082590f81885a2728d"
+  },
+  "DepositToken0x8Ac2bE4593731A569F9bd6a9A28cCEEdAdE54D50": {
+    "address": "0xe57cBDe5A0A958Ce4A09F73083E7275bF2356a99",
+    "impl": "0xC5488951002E255Bef213976b4367bC238B77755"
+  },
+  "DepositToken0xD6eE97A2621b2f9E6CE1bD36844945822f5cdDfa": {
+    "address": "0xD73990d4b63864cE6C9456b4027cF2b8E097c3EE",
+    "impl": "0xC5488951002E255Bef213976b4367bC238B77755"
+  },
+  "DepositToken0xE88B064b202490bD549C1Df0d4b03dDe784D074B": {
+    "address": "0xb6e0298bE1dB1a87ED5f768D6724ad5dfD24Ef95",
+    "impl": "0xC5488951002E255Bef213976b4367bC238B77755"
+  },
+  "Reward_Pool-1723397488820": {
+    "address": "0x087BEf4508cd453C4e586ab049766F4d2bCdbD91",
+    "impl": "0xAE080b9beC785d13A5D3dB333af1AB486B5208Ac"
+  },
+  "Reward_Pool-1723397551724": {
+    "address": "0x5E5829e2B7896D2Bf51A5B7228F0E7a8eB77c3BE",
+    "impl": "0xAE080b9beC785d13A5D3dB333af1AB486B5208Ac"
+  },
+  "Reward_Pool-1723397594337": {
+    "address": "0x00565c5122A4019Ca94FAD315768A4A8Ee73d9d3",
+    "impl": "0xAE080b9beC785d13A5D3dB333af1AB486B5208Ac"
+  },
+  "ReferralBootstrapLens": {
+    "address": "0x55213A3837125cb9e938585cAEa87cd76b773984",
+    "impl": "0x84a1b94E9040e81f69354B33ca085413Fc601112"
+  },
+  "VeTHEbootstrap": {
+    "address": "0x7f676d86c367c1dCd5780381af48a3555367d748",
+    "impl": "0xaF790EF37620bd7d595C06D75D3cD513bC6F4E9b"
+  },
+  "VlQuoV2Lens": {
+    "address": "0x9B246d5DD6FdB96457FC9a281E893B6A3DEeC4D7",
+    "impl": "0xB740Db176EaAE30Fd69eEc5623EE2f1651fa84D2"
+  },
+  "PTSconverter": {
+    "address": "0xF49f0A8AF5d9BB380AF2c2724b9EA3f9e75732c4",
+    "impl": "0xa79e5Fd69E8C3E312f7f23cB34a5F07FF29B3599"
+  },
+  "qTHEReward": {
+    "address": "0xF7aa5CdF9469144AcdFA322b274BCed5Fc2937B5",
+    "impl": "0x2E383409274f28E01ba3416D287dCF729Afa9459"
+  },
+  "VlQuoRewardPool": {
+    "address": "0x956dbA3B34350a6cD662CF9281cbA54f074f48cf",
+    "impl": "0x77FcAB80c6b166836e2396676F011223e0c05233"
+  },
+  "QMilesPool": {
+    "address": "0x3c6767DEE1699c24DFf92A11c4CC526C3D290915",
+    "impl": "0x2f2fD797856054B4800e05142370826F977f1997"
+  },
+  "BootstrapPCS": {
+    "address": "0x3EdC82340720e89d7e799814Bb1517CACC2Fcc3B",
+    "impl": "0x6443463c00B4dF0Bb6FD5C84C6E24C33B3a6954c"
+  },
+  "PCSDepositor": {
+    "address": "0x0a47D6B3CeB8eaaa570fE8670183060382Cb5975",
+    "impl": "0x0abA8D4677217CA33676aaE36EA62e45ddB39874"
+  },
+  "PCSVoterProxy": {
+    "address": "0x39088C414beca8977cC90247FE887Ea8b2E2dC6f",
+    "impl": "0x08c79B06826604D86AEAed44AC85df9f5E1F2f5E"
+  },
+  "PCSReferralCampaignLens": {
+    "address": "0x2484feB840fCdb505fc0739d86518CAc1F14e7B3",
+    "impl": "0x2cAA974471dE39bb8219761eBF2Cb5f52bA333ec"
+  },
+  "PCSReferral": {
+    "address": "0x06B5c419ec807Acb6CdF2c2Fab91889cBe79302f",
+    "impl": "0x7Ec27e64B77C311B45D2Fc67c854F294548DeeB9"
+  },
+  "qCAKE": {
+    "address": "0x3f4066C900e66532780d2e367755ABbe1CBf0fBE",
+    "impl": "0x507a5Ac0ed61D44fe3c61a1c789a723df21B9F62"
+  },
+  "QCakeBalanceRewardPool": {
+    "address": "0xcCac06A4ee305050f84578F60DCd39935696C36A",
+    "impl": "0x877Ed2994D7D0a2C9E74c80208648264Bb67b438"
   }
 }
