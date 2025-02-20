@@ -67,7 +67,7 @@ contract PCSDepositor is IPCSDepositor, OwnableUpgradeable {
 
         qCakeRewardPoolLock = _qCakeRewardPoolLock;
     }
-
+  
     function setQCakeRewardPool(address _qCakeRewardPool) external onlyOwner {
         qCakeRewardPool = _qCakeRewardPool;
     }

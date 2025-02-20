@@ -5,6 +5,18 @@ pragma experimental ABIEncoderV2;
 
 interface IPCSVoterProxy {
     function lockCake(uint256 _lockDays) external;
+    function vote(
+    address[] memory _pools,
+    uint256[] memory _weights,
+    uint256[] memory _chainIds,
+    address[] memory _rewarders,
+    address _caller
+)
+    external
+    returns (
+        address[][] memory rewardTokens,
+        uint256[][] memory feeAmounts
+    );
 
     // --- Events ---
     event BoosterUpdated(address _booster);

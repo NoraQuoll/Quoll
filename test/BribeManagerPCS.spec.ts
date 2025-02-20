@@ -5,7 +5,9 @@ import * as ethersI from "ethers";
 
 import { currentTime, increase, increaseTo } from "./utils/time";
 
-import { expect } from "chai";
+import { expect, use } from "chai";
+
+import { keccak256, solidityPack } from "ethers/lib/utils";
 
 import {
   BribeManagerPCS__factory,
@@ -16,6 +18,7 @@ import {
   VlQuoV2__factory,
   WombatBooster__factory,
   WomDepositor__factory,
+  IPlatform__factory,
 } from "../typechain-types";
 import {
   IMasterChefV2__factory,
@@ -24,6 +27,11 @@ import {
 } from "../typechain-types/factories/contracts/Interfaces/Pancake";
 
 describe("BribeManagerPCS", function () {
+
+  async function getBlockTimestamp() {
+    const block = await ethers.provider.getBlock("latest");
+    return block.timestamp;
+  }
   async function deployFixture() {
     await network.provider.request({
       method: "hardhat_impersonateAccount",
@@ -104,6 +112,11 @@ describe("BribeManagerPCS", function () {
       "0xcB0Fd804a913ee4cB4e8CCe26dD5CC8012359B79"
     );
 
+    const bountyManager = await ethers.getSigner(
+      "0xA1249C7D6Caa1a2F798D7b1078B1F59220f837d8"
+    );
+
+
     await treasury.sendTransaction({
       to: owner.address,
       value: ethers.utils.parseEther("1"), // Amount of ETH to send
@@ -146,6 +159,11 @@ describe("BribeManagerPCS", function () {
       value: ethers.utils.parseEther("1"), // Amount of ETH to send
     });
 
+    await treasury.sendTransaction({
+      to: bountyManager.address,
+      value: ethers.utils.parseEther("1"), // Amount of ETH to send
+    });
+
     const veCake = IVECake__factory.connect(
       "0x5692DB8177a81A6c6afc8084C2976C9933EC1bAB",
       owner
@@ -156,10 +174,21 @@ describe("BribeManagerPCS", function () {
       owner
     );
 
+    // const gaugeVoting = IGaugeVoting__factory.connect(
+    //   "0xf81953dC234cdEf1D6D0d3ef61b232C6bCbF9aeF",
+    //   owner
+    // );
+
     const gaugeVoting = IGaugeVoting__factory.connect(
-      "0xf81953dC234cdEf1D6D0d3ef61b232C6bCbF9aeF",
+      "0xbCfBf7ED1756FE478B071687cb430C7B3eB682f1",
       owner
     );
+
+    const platform = IPlatform__factory.connect(
+      "0x0fD2d686C02D686c65804ff45E4e570386E3595f",
+      owner
+    );
+
 
     const vlQuoV2 = VlQuoV2__factory.connect(
       "0xc634c0A24BFF88c015Ff32145CE0F8d578B02F60",
@@ -221,7 +250,9 @@ describe("BribeManagerPCS", function () {
       qCakeInstance.address,
       qCakeRewardPool.address
     );
-
+    await voterProxyInstance.setVoter(gaugeVoting.address);
+    await voterProxyInstance.setBribeManager(bribeManagerInstance.address);
+    await voterProxyInstance.setPlatform(platform.address);
     const delegatePool = await ethers.getContractFactory("DelegateVotePCSPool");
     const delegatePoolInstance = await delegatePool.deploy();
     await delegatePoolInstance.initialize();
@@ -307,9 +338,11 @@ describe("BribeManagerPCS", function () {
       user7,
       user1HolderVlquo,
       user2HolderVlquo,
+      bountyManager,
       veCake,
       cake,
       gaugeVoting,
+      platform,
       bribeManagerInstance,
       delegatePoolInstance,
       firstVirtualBalanceRewardPool,
@@ -327,58 +360,240 @@ describe("BribeManagerPCS", function () {
     await deployFixture();
   });
 
-  it("Vote for gauge1, and gauge2", async () => {
-    const {
-      owner,
-      user1,
-      user2,
-      user3,
-      user4,
-      user5,
-      user6,
-      user7,
-      user1HolderVlquo,
-      user2HolderVlquo,
-      veCake,
-      cake,
-      gaugeVoting,
-      bribeManagerInstance,
-      delegatePoolInstance,
-      firstVirtualBalanceRewardPool,
-      secondVirtualBalanceRewardPool,
-      thirdVirtualBalanceRewardPool,
-      firstGauge,
-      secondGauge,
-      thirdGauge,
-    } = await deployFixture();
+  // it("Vote for gauge1, and gauge2", async () => {
+  //   const {
+  //     owner,
+  //     user1,
+  //     user2,
+  //     user3,
+  //     user4,
+  //     user5,
+  //     user6,
+  //     user7,
+  //     user1HolderVlquo,
+  //     user2HolderVlquo,
+  //     veCake,
+  //     cake,
+  //     gaugeVoting,
+  //     bribeManagerInstance,
+  //     delegatePoolInstance,
+  //     firstVirtualBalanceRewardPool,
+  //     secondVirtualBalanceRewardPool,
+  //     thirdVirtualBalanceRewardPool,
+  //     firstGauge,
+  //     secondGauge,
+  //     thirdGauge,
+  //   } = await deployFixture();
 
-    // const getBalance = user1HolderVlquo.
+  //   // const getBalance = user1HolderVlquo.
 
-    await bribeManagerInstance
-      .connect(user1HolderVlquo)
-      .vote(
-        [firstGauge.pairAddress, secondGauge.pairAddress],
-        [firstGauge.chainId, secondGauge.chainId],
-        [100, 100]
-      );
+  //   await bribeManagerInstance
+  //     .connect(user1HolderVlquo)
+  //     .vote(
+  //       [firstGauge.pairAddress, secondGauge.pairAddress],
+  //       [firstGauge.chainId, secondGauge.chainId],
+  //       [100, 100]
+  //     );
 
-    const balanceVirtual = await firstVirtualBalanceRewardPool.balanceOf(
-      user1HolderVlquo.address
-    );
-    console.log({ balanceVirtual });
+  //   const balanceVirtual = await firstVirtualBalanceRewardPool.balanceOf(
+  //     user1HolderVlquo.address
+  //   );
+  //   console.log({ balanceVirtual });
 
-    const balanceVirtual2 = await secondVirtualBalanceRewardPool.balanceOf(
-      user1HolderVlquo.address
-    );
-    console.log({ balanceVirtual2 });
+  //   const balanceVirtual2 = await secondVirtualBalanceRewardPool.balanceOf(
+  //     user1HolderVlquo.address
+  //   );
+  //   console.log({ balanceVirtual2 });
 
-    const balanceVirtual3 = await thirdVirtualBalanceRewardPool.balanceOf(
-      user1HolderVlquo.address
-    );
-    console.log({ balanceVirtual3 });
-  });
+  //   const balanceVirtual3 = await thirdVirtualBalanceRewardPool.balanceOf(
+  //     user1HolderVlquo.address
+  //   );
+  //   console.log({ balanceVirtual3 });
+  // });
 
-  it("deposit cake to depositor", async () => {
+  // it("deposit cake to depositor", async () => {
+  //   const {
+  //     owner,
+  //     user1,
+  //     user2,
+  //     user3,
+  //     user4,
+  //     user5,
+  //     user6,
+  //     user7,
+  //     user1HolderVlquo,
+  //     user2HolderVlquo,
+  //     veCake,
+  //     cake,
+  //     gaugeVoting,
+  //     bribeManagerInstance,
+  //     delegatePoolInstance,
+  //     firstVirtualBalanceRewardPool,
+  //     secondVirtualBalanceRewardPool,
+  //     thirdVirtualBalanceRewardPool,
+  //     firstGauge,
+  //     secondGauge,
+  //     thirdGauge,
+  //     depositorInstance,
+  //     voterProxyInstance,
+  //   } = await deployFixture();
+
+  //   // approve cake for depositor
+  //   await cake
+  //     .connect(user1)
+  //     .approve(depositorInstance.address, ethers.constants.MaxUint256);
+
+  //   await increase(86400 * 2);
+
+  //   await depositorInstance
+  //     .connect(user1)
+  //     .deposit("10000000000000000000", false);
+
+  //   await increase(86400);
+
+  //   // check voter proxy have veCake
+  //   const veCakeBalance = await veCake.balanceOf(voterProxyInstance.address);
+  //   console.log({ veCakeBalance });
+
+  //   const cakeBalance = await cake.balanceOf(voterProxyInstance.address);
+  //   console.log({ cakeBalance });
+
+  //   const cakeBalanceDepositor = await cake.balanceOf(
+  //     depositorInstance.address
+  //   );
+  //   console.log({ cakeBalanceDepositor });
+
+  //   // check locks voterproxy
+  //   const locks = await veCake.locks(voterProxyInstance.address);
+  //   console.log({ locks });
+
+  //   const userInfo = await veCake.userInfo(voterProxyInstance.address);
+  //   console.log({ userInfo });
+
+  //   const userPointEpoch = await veCake.userPointEpoch(
+  //     voterProxyInstance.address
+  //   );
+  //   console.log({ userPointEpoch });
+
+  //   const userPointHistory = await veCake.userPointHistory(
+  //     voterProxyInstance.address,
+  //     userPointEpoch
+  //   );
+  //   console.log({ userPointHistory });
+
+  //   await increase(86400 * 20);
+
+  //   await depositorInstance
+  //     .connect(user1)
+  //     .deposit("10000000000000000000", false);
+
+  //   // check voter proxy have veCake
+  //   const veCakeBalance2 = await veCake.balanceOf(voterProxyInstance.address);
+  //   console.log({ veCakeBalance2 });
+
+  //   const cakeBalance2 = await cake.balanceOf(voterProxyInstance.address);
+  //   console.log({ cakeBalance2 });
+
+  //   const cakeBalanceDepositor2 = await cake.balanceOf(
+  //     depositorInstance.address
+  //   );
+  //   console.log({ cakeBalanceDepositor2 });
+  // });
+
+  // it("should calculate correct weight for pools", async () => {
+  //   const {
+  //     owner,
+  //     user1,
+  //     user2,
+  //     user3,
+  //     user4,
+  //     user5,
+  //     user6,
+  //     user7,
+  //     user1HolderVlquo,
+  //     user2HolderVlquo,
+  //     veCake,
+  //     cake,
+  //     gaugeVoting,
+  //     bribeManagerInstance,
+  //     delegatePoolInstance,
+  //     firstVirtualBalanceRewardPool,
+  //     secondVirtualBalanceRewardPool,
+  //     thirdVirtualBalanceRewardPool,
+  //     firstGauge,
+  //     secondGauge,
+  //     thirdGauge,
+  //     depositorInstance,
+  //     voterProxyInstance,
+  //   } = await deployFixture();
+
+  //   await bribeManagerInstance
+  //   .connect(user1HolderVlquo)
+  //   .vote(
+  //     [firstGauge.pairAddress, secondGauge.pairAddress],
+  //     [firstGauge.chainId, secondGauge.chainId],
+  //     [100, 100]
+  //   );
+
+  //   const tx = await bribeManagerInstance.castVotes(false);
+
+  //   const receipt = await tx.wait(); 
+  //   receipt.events?.forEach((event: any, index: any) => {
+  //   console.log(`Event ${index + 1}:`);
+  //   console.log(`  Name: ${event.event}`);
+  //   console.log(`  Args: ${event.args}`);
+  //   });
+
+  // });
+
+
+  // it("should calculate correct weight for pools - scenario 2", async () => {
+  //   const {
+  //     owner,
+  //     user1,
+  //     user2,
+  //     user3,
+  //     user4,
+  //     user5,
+  //     user6,
+  //     user7,
+  //     user1HolderVlquo,
+  //     user2HolderVlquo,
+  //     veCake,
+  //     cake,
+  //     gaugeVoting,
+  //     bribeManagerInstance,
+  //     delegatePoolInstance,
+  //     firstVirtualBalanceRewardPool,
+  //     secondVirtualBalanceRewardPool,
+  //     thirdVirtualBalanceRewardPool,
+  //     firstGauge,
+  //     secondGauge,
+  //     thirdGauge,
+  //     depositorInstance,
+  //     voterProxyInstance,
+  //   } = await deployFixture();
+
+  //   await bribeManagerInstance
+  //   .connect(user1HolderVlquo)
+  //   .vote(
+  //     [firstGauge.pairAddress, secondGauge.pairAddress, thirdGauge.pairAddress],
+  //     [firstGauge.chainId, secondGauge.chainId, thirdGauge.chainId],
+  //     [100, 100, 100]
+  //   );
+
+  //   const tx = await bribeManagerInstance.castVotes(false);
+
+  //   const receipt = await tx.wait(); 
+  //   receipt.events?.forEach((event: any, index: any) => {
+  //   console.log(`Event ${index + 1}:`);
+  //   console.log(`  Name: ${event.event}`);
+  //   console.log(`  Args: ${event.args}`);
+  //   });
+
+  // })
+
+  it("should cast vote to gaugeVoting", async () => {
     const {
       owner,
       user1,
@@ -465,5 +680,137 @@ describe("BribeManagerPCS", function () {
       depositorInstance.address
     );
     console.log({ cakeBalanceDepositor2 });
+
+
+    await bribeManagerInstance
+      .connect(user1HolderVlquo)
+      .vote(
+        [firstGauge.pairAddress, secondGauge.pairAddress],
+        [firstGauge.chainId, secondGauge.chainId],
+        [100, 100]
+      );
+      console.log("vote with vlQuo done");
+    await bribeManagerInstance.castVotes(false);
+    // await voterProxyInstance.vote(
+    //   [firstGauge.pairAddress, secondGauge.pairAddress], 
+    //   [0, 10000], 
+    //   [firstGauge.chainId, secondGauge.chainId], 
+    //   ["0xf9Adc7F9E10eAA8AfD6A3Ea2b419d9497fa192c3", "0xa0bec9b22a22caD9D9813Ad861E331210FE6C589"], 
+    //   voterProxyInstance.address );
+    // console.log("vote to gauge voting");
+
+    //check voteUserPower:  Total vote power used by user
+    expect(await gaugeVoting.voteUserPower(voterProxyInstance.address)).to.eq("10000");
+    //last time vote for gauge != 0
+    const gaugeHash = keccak256(solidityPack(["address", "uint256"], [ firstGauge.pairAddress, firstGauge.chainId]));
+    expect(await gaugeVoting.lastUserVote(voterProxyInstance.address, gaugeHash )).to.gt(0);
   });
+
+  it("should claim reward from VoteMarket", async () => {
+    const {
+      owner,
+      user1,
+      user2,
+      user3,
+      user4,
+      user5,
+      user6,
+      user7,
+      user1HolderVlquo,
+      user2HolderVlquo,
+      bountyManager,
+      veCake,
+      cake,
+      gaugeVoting,
+      platform,
+      bribeManagerInstance,
+      delegatePoolInstance,
+      firstVirtualBalanceRewardPool,
+      secondVirtualBalanceRewardPool,
+      thirdVirtualBalanceRewardPool,
+      firstGauge,
+      secondGauge,
+      thirdGauge,
+      depositorInstance,
+      voterProxyInstance,
+    } = await deployFixture();
+
+    // approve cake for depositor
+    await cake
+      .connect(user1)
+      .approve(depositorInstance.address, ethers.constants.MaxUint256);
+
+    await increase(86400 * 2);
+
+    await depositorInstance
+      .connect(user1)
+      .deposit("10000000000000000000", false);
+
+    await increase(86400);
+
+    // check voter proxy have veCake
+    const veCakeBalance = await veCake.balanceOf(voterProxyInstance.address);
+    console.log({ veCakeBalance });
+
+    const cakeBalance = await cake.balanceOf(voterProxyInstance.address);
+    console.log({ cakeBalance });
+
+    const cakeBalanceDepositor = await cake.balanceOf(
+      depositorInstance.address
+    );
+    console.log({ cakeBalanceDepositor });
+
+    // check locks voterproxy
+    const locks = await veCake.locks(voterProxyInstance.address);
+    console.log({ locks });
+
+    const userInfo = await veCake.userInfo(voterProxyInstance.address);
+    console.log({ userInfo });
+
+    const userPointEpoch = await veCake.userPointEpoch(
+      voterProxyInstance.address
+    );
+    console.log({ userPointEpoch });
+
+    const userPointHistory = await veCake.userPointHistory(
+      voterProxyInstance.address,
+      userPointEpoch
+    );
+    console.log({ userPointHistory });
+
+    console.log("vote with vlQuo done");
+    await bribeManagerInstance
+      .connect(user1HolderVlquo)
+      .vote(
+        [firstGauge.pairAddress, secondGauge.pairAddress],
+        [firstGauge.chainId, secondGauge.chainId],
+        [100, 100]
+      );
+
+    await bribeManagerInstance.castVotes(false);
+    console.log("vote casted")
+    //check voteUserPower:  Total vote power used by user
+    expect(await gaugeVoting.voteUserPower(voterProxyInstance.address)).to.eq("10000");
+    //last time vote for gauge != 0
+    const gaugeHash = keccak256(solidityPack(["address", "uint256"], [firstGauge.pairAddress, firstGauge.chainId]));
+    expect(await gaugeVoting.lastUserVote(voterProxyInstance.address, gaugeHash)).to.gt(0);
+
+
+    //create bounty on Votemarket
+    const bountyTotalReward =  await cake.balanceOf(user1.address);
+    await cake
+      .connect(user1)
+      .approve(platform.address, ethers.constants.MaxUint256);
+   
+    await platform.connect(user1).createBounty(secondGauge.pairAddress, secondGauge.chainId, user1.address, cake.address, 10, BigInt("1000000000"), BigInt(bountyTotalReward), [], true);
+    console.log('bounty created');
+    const bountyId = BigInt((await platform.nextID())) -1n;
+    console.log({bountyId})
+    //claim reward from Votemarket
+    await increase(86400 * 10);
+    //console.log(await platform.claimable(voterProxyInstance.address, bountyId));
+    console.log('cake balance before claim', await cake.balanceOf(voterProxyInstance.address));
+    await voterProxyInstance.claimBribeReward([bountyId]);
+    console.log('cake balance after claim', await cake.balanceOf(voterProxyInstance.address));
+  })
 });

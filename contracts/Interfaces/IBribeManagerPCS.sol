@@ -51,4 +51,10 @@ interface IBribeManagerPCS {
         bytes32 indexed _gaugeHash,
         uint256 _amount
     );
+
+    event VoteCasted(
+        address[] gauges,
+        uint256[] _weights,
+        uint256[] _chainIds
+    );
 }

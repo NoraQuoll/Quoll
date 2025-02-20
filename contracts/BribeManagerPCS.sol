@@ -398,87 +398,94 @@ contract BribeManagerPCS is IBribeManagerPCS, OwnableUpgradeable {
             userVoteForPools[msg.sender][pool.gaugeHash]
         );
     }
-
+    
     /// @notice cast all pending votes
     /// @notice this function will be gas intensive, hence a fee is given to the caller
-    // function castVotes(
-    //     bool _swapForNative
-    // )
-    //     public
-    //     returns (
-    //         address[][] memory finalRewardTokens,
-    //         uint256[][] memory finalFeeAmounts
-    //     )
-    // {
-    //     require(
-    //         block.timestamp - lastCastTimer > castVotesCooldown,
-    //         "Last cast too recent"
-    //     );
-    //     lastCastTimer = block.timestamp;
-    //     uint256 length = pools.length;
-    //     address[] memory lpVote = new address[](length);
-    //     int256[] memory votes = new int256[](length);
-    //     address[] memory rewarders = new address[](length);
-    //     for (uint256 i; i < length; i++) {
-    //         Pool memory pool = poolInfos[pools[i]];
-    //         lpVote[i] = pool.lpToken;
-    //         rewarders[i] = pool.rewarder;
+    function castVotes (
+        bool _swapForNative
+    ) 
+        public 
+        returns (
+            address[][] memory finalRewardTokens,
+            uint256[][] memory finalFeeAmounts
+        )
+    {
+        require(
+            block.timestamp - lastCastTimer > castVotesCooldown,
+            "Last cast too recent"
+        );
 
-    //         uint256 currentVote = getVeWomVoteForLp(pool.lpToken);
-    //         uint256 targetVote = poolTotalVote[pool.lpToken]
-    //             .mul(totalVotes())
-    //             .div(totalVlQuoInVote);
-    //         if (targetVote >= currentVote) {
-    //             votes[i] = int256(targetVote.sub(currentVote));
-    //         } else {
-    //             votes[i] = int256(targetVote).sub(int256(currentVote));
-    //         }
-    //     }
-    //     (
-    //         address[][] memory rewardTokens,
-    //         uint256[][] memory feeAmounts
-    //     ) = voterProxy.vote(lpVote, votes, rewarders, msg.sender);
+        lastCastTimer = block.timestamp;
+        uint256 length = pools.length;
 
-    //     finalRewardTokens = new address[][](length);
-    //     finalFeeAmounts = new uint256[][](length);
-    //     if (_swapForNative) {
-    //         for (uint256 i = 0; i < length; i++) {
-    //             finalRewardTokens[i] = new address[](1);
-    //             finalRewardTokens[i][0] = AddressLib.PLATFORM_TOKEN_ADDRESS;
-    //             finalFeeAmounts[i] = new uint256[](1);
-    //             finalFeeAmounts[i][0] = finalFeeAmounts[i][0].add(
-    //                 _swapFeesForNative(
-    //                     rewardTokens[i],
-    //                     feeAmounts[i],
-    //                     msg.sender
-    //                 )
-    //             );
-    //         }
-    //     } else {
-    //         for (uint256 i = 0; i < length; i++) {
-    //             _forwardRewards(rewardTokens[i], feeAmounts[i]);
-    //             finalRewardTokens[i] = rewardTokens[i];
-    //             finalFeeAmounts[i] = feeAmounts[i];
-    //         }
-    //     }
+        address[] memory gauges = new address[](length);
+        uint256[] memory weights = new uint256[](length);
+        uint256[] memory chainIds = new uint256[](length);
+        address[] memory rewarders = new address[](length);
+        
+        //compute weihgt for gauges
+        for(uint256 i ; i < length ; i++){
+             bytes32 gaugeHash = keccak256(
+                abi.encodePacked(pools[i].gauge , pools[i].chainId)
+            );
+            Pool memory pool = poolInfos[gaugeHash];
+            gauges[i] = pool.gauge;
+            chainIds[i] = pool.chainId;
+            rewarders[i] = pool.rewarder;
+            
+            //compute weight
+            weights[i]=  poolTotalVote[pool.gaugeHash] * CAP_PRECISION / totalVlQuoInVote;
 
-    //     // cmt this for ARB
-    //     IDelegateVotePool(delegatePool).harvestManually();
-    // }
+        }
+        (
+            address[][] memory rewardTokens,
+            uint256[][] memory feeAmounts
+        ) = voterProxy.vote(gauges, weights, chainIds, rewarders, msg.sender);
+        emit VoteCasted(gauges, weights, chainIds);
+
+        // finalRewardTokens = new address[][](length);
+        // finalFeeAmounts = new uint256[][](length);
+        // if (_swapForNative) {
+        //     for (uint256 i = 0; i < length; i++) {
+        //         finalRewardTokens[i] = new address[](1);
+        //         finalRewardTokens[i][0] = AddressLib.PLATFORM_TOKEN_ADDRESS;
+        //         finalFeeAmounts[i] = new uint256[](1);
+        //         finalFeeAmounts[i][0] = finalFeeAmounts[i][0].add(
+        //             _swapFeesForNative(
+        //                 rewardTokens[i],
+        //                 feeAmounts[i],
+        //                 msg.sender
+        //             )
+        //         );
+        //     }
+        // } else {
+        //     for (uint256 i = 0; i < length; i++) {
+        //         _forwardRewards(rewardTokens[i], feeAmounts[i]);
+        //         finalRewardTokens[i] = rewardTokens[i];
+        //         finalFeeAmounts[i] = feeAmounts[i];
+        //     }
+        // }
+
+        // // cmt this for ARB
+        // IDelegateVotePool(delegatePool).harvestManually();
+
+    } 
+
+
 
     /// @notice Cast a zero vote to harvest the bribes of selected pools
     /// @notice this function has a lesser importance than casting votes, hence no rewards will be given to the caller.
     // function harvestPools(address[] calldata _lps) external {
-    //     uint256 length = _lps.length;
-    //     int256[] memory votes = new int256[](length);
-    //     address[] memory rewarders = new address[](length);
-    //     for (uint256 i; i < length; i++) {
-    //         address lp = _lps[i];
-    //         Pool memory pool = poolInfos[lp];
-    //         rewarders[i] = pool.rewarder;
-    //         votes[i] = 0;
-    //     }
-    //     voterProxy.vote(_lps, votes, rewarders, address(0));
+        // uint256 length = _lps.length;
+        // int256[] memory votes = new int256[](length);
+        // address[] memory rewarders = new address[](length);
+        // for (uint256 i; i < length; i++) {
+        //     address lp = _lps[i];
+        //     Pool memory pool = poolInfos[lp];
+        //     rewarders[i] = pool.rewarder;
+        //     votes[i] = 0;
+        // }
+        // voterProxy.vote(_lps, votes, rewarders, address(0));
     // }
 
     /// @notice Harvests user rewards for each pool

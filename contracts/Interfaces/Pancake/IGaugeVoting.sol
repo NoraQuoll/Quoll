@@ -36,7 +36,17 @@ interface IGaugeVoting {
         bool _skipProxy
     ) external;
 
+    function voteForGaugeWeightsBulk(
+        address[] memory _gauge_addrs,
+        uint256[] memory _user_weights,
+        uint256[] memory _chainIds,
+        bool _skipNative,
+        bool _skipProxy
+    ) external;
+    
     function voteUserPower(address _user) external view returns (uint256);
+
+    function lastUserVote(address _user, bytes32 _gaugeHash) external view returns (uint256);
 
     function voteUserSlopes(
         address _user,
