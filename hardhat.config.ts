@@ -24,15 +24,17 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
-    hardhat: {
-      forking: {
-        url: "https://bsc-dataseed1.binance.org/",
-        // blockNumber: 45810378,
-      },
-    },
     // hardhat: {
-    //   chainId: 1337,
+    //   forking: {
+    //     url: "https://sonic-rpc.publicnode.com:443",
+    //     // url: "https://bsc-dataseed1.binance.org/",
+    //     // blockNumber: 1750000,
+    //   },
+
     // },
+    hardhat: {
+      chainId: 1337,
+    },
     goerli_arbi: {
       url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
       accounts: private_key,
@@ -61,9 +63,41 @@ const config: HardhatUserConfig = {
       url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
       accounts: private_key,
     },
+    blaze: {
+      url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
+      chainId: 57054,
+      accounts: private_key,
+    },
+    sonic: {
+      url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
+      chainId: 146,
+      accounts: private_key
+    },
   },
   etherscan: {
-    apiKey: process.env.ETH_API_KEY,
+    apiKey: {
+      blaze: process.env.ETH_API_KEY!,
+      sonic: process.env.ETH_API_KEY!,
+    },
+    customChains: [
+      {
+        network: "sonic",
+        chainId: 146,
+        urls: {
+          apiURL: "https://api.sonicscan.org/api",
+          browserURL: "https://sonicscan.org"
+        }
+      },
+      {
+        network: "blaze",
+        chainId: 57054,
+        urls: {
+          apiURL: "https://api-testnet.sonicscan.org/api",
+          browserURL: "https://testnet.sonicscan.org"
+        }
+      }
+    ]
+
   },
   contractSizer: {
     alphaSort: true,
@@ -93,6 +127,15 @@ const config: HardhatUserConfig = {
       },
       {
         version: "0.8.0",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+      {
+        version: "0.8.13",
         settings: {
           optimizer: {
             enabled: true,

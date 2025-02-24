@@ -33,6 +33,17 @@ contract SWPxVoterProxy is ISWPxVoterProxy, OwnableUpgradeable {
     address[] public revenueSharingPools;
 
     uint256 lockedTokenId = 0;
+    uint256 nextIncreaseUnlockAt;
+
+    // 7 days, to use as denominator in lock calculation
+    uint256 private constant WEEK = 604800;
+    // 2 years
+    uint256 private constant MAX_LOCK_DURATION = 63_072_000; // 2 years
+    
+    
+    event SWPxLockMinted(uint256 tokenId);
+    event SWPxLocked(uint256 amount);
+    event SWPxLockDurationIncreased(uint256 lockedUntil);
 
     modifier onlyBooster() {
         require(msg.sender == booster, "!auth");
@@ -45,6 +56,32 @@ contract SWPxVoterProxy is ISWPxVoterProxy, OwnableUpgradeable {
 
     function initialize() public initializer {
         __Ownable_init();
+    }
+
+    function setParams(
+        address _masterChef,
+        address _swpx,
+        address _veSWPx,
+        address _booster,
+        address _depositor
+    ) external onlyOwner {
+        require(booster == address(0), "!init");
+
+        // require(_masterChef != address(0), "invalid _masterChef!");
+        require(_swpx != address(0), "invalid _cake!");
+        // require(_veSWPx != address(0), "invalid _veSWPx!");
+        // require(_booster != address(0), "invalid _booster!");
+        require(_depositor != address(0), "invalid _depositor!");
+
+        masterChef = IMasterChefV2(_masterChef);
+        swpx = _swpx;
+        veSWPx = _veSWPx;
+
+        booster = _booster;
+        depositor = _depositor;
+
+        emit BoosterUpdated(_booster);
+        emit DepositorUpdated(_depositor);
     }
 
     function setBribeManager(address _bribeManager) external onlyOwner {
@@ -81,24 +118,61 @@ contract SWPxVoterProxy is ISWPxVoterProxy, OwnableUpgradeable {
         emit RevenueSharingPoolAdded(_revenueSharingPool);
     }
 
-    function lockSWPx(uint256 _lockDays) external override {
+    function lockSWPx(uint256 _lockDays) external override onlyDepositor {
         uint256 balance = IERC20(swpx).balanceOf(address(this));
         if (balance == 0) return;
 
-        IERC20(swpx).safeApprove(veSWPx, 0);
-        IERC20(swpx).safeApprove(veSWPx, balance);
+        IERC20(swpx).approve(veSWPx, 0);
+        IERC20(swpx).approve(veSWPx, balance);
 
-        // check is lock if created
-        if (lockedTokenId == 0){
-            (uint256 newTokenId, ) = IVotingEscrowV1_1(veSWPx)
-            .create_lock(balance, _lockDays * 86400);
+        //check is lock if created
+        if (lockedTokenId == 0) {
+            // // First time deposit: need to create a new lock, this will mint a new NFT and we save the token id
+            (uint256 newTokenId, ) = IVotingEscrowV1_1(veSWPx).create_lock(
+                balance,
+                MAX_LOCK_DURATION
+            );
             lockedTokenId = newTokenId;
+            // Will relock in one week
+            nextIncreaseUnlockAt = ((block.timestamp + WEEK) / WEEK) * WEEK;
+            emit SWPxLockMinted(lockedTokenId);
+            emit SWPxLocked(balance);
+        } else {
+            // Lock expired? (no deposits for 2 years?)
+
+            if (
+                block.timestamp >
+                IVotingEscrowV1_1(veSWPx).locked__end(lockedTokenId)
+            ) {
+                IVotingEscrowV1_1(veSWPx).withdraw(lockedTokenId);
+                balance = IERC20(swpx).balanceOf(address(this));
+                //create a new lock
+                (lockedTokenId, ) = IVotingEscrowV1_1(veSWPx).create_lock(
+                    balance,
+                    MAX_LOCK_DURATION
+                );
+                // will relock in one week
+                nextIncreaseUnlockAt = ((block.timestamp + WEEK) / WEEK) * WEEK;
+                
+                emit SWPxLockMinted(lockedTokenId);
+                emit SWPxLocked(balance);
+
+            }
+            else {
+                // Increase lock amount
+                IVotingEscrowV1_1(veSWPx).increase_amount(lockedTokenId, balance);
+                emit SWPxLocked(balance);
+                // Lock is still active, just increase the lock duration
+                if(block.timestamp > nextIncreaseUnlockAt){
+                    IVotingEscrowV1_1(veSWPx).increase_unlock_time(lockedTokenId, MAX_LOCK_DURATION);
+                    // Thena rounds the lock down to the week
+                    emit SWPxLockDurationIncreased(((block.timestamp + MAX_LOCK_DURATION) / WEEK) * WEEK);
+                    // Once a week, increase the lock
+                    nextIncreaseUnlockAt = ((block.timestamp + WEEK) / WEEK) * WEEK;
+
+                }
+            }
         }
-        else {
-            IVotingEscrowV1_1(veSWPx).deposit_for(lockedTokenId, balance);
-            IVotingEscrowV1_1(veSWPx).increase_unlock_time(lockedTokenId,  _lockDays * 86400 );
-        }
-      
     }
 
     function _getRevenueSharingPoolRewardToken(

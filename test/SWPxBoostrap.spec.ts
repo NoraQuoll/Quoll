@@ -7,11 +7,17 @@ import { currentTime, increase, increaseTo } from "./utils/time";
 
 import { expect } from "chai";
 
-import { MockERC20__factory, MockERC721__factory } from "../typechain-types";
+import { IERC20__factory, MockERC20__factory, MockERC721__factory } from "../typechain-types";
 
 
-describe("PCS Campaign", function () {
+describe("SWPx Campaign", function () {
     async function deployFixture() {
+        // await network.provider.request({
+        //     method: "hardhat_impersonateAccount",
+        //     params: ["0x74cc5C283d4e4983cEf47E5261CE65Abc08469e4"],
+        //   });
+      
+       // const swpxHolder = await ethers.getSigner("0x74cc5C283d4e4983cEf47E5261CE65Abc08469e4");
         const [
             owner,
             user1,
@@ -27,8 +33,8 @@ describe("PCS Campaign", function () {
 
         //deploy cake
         const MockERC20 = await ethers.getContractFactory("SWPx");
+        //const swpx = IERC20__factory.connect("0xa04bc7140c26fc9bb1f36b1a604c7a5a88fb0e70", owner);
         const swpx = await MockERC20.deploy();
-
         //deploy qCAKE
         const QuollExternalToken = await ethers.getContractFactory(
             "QuollExternalToken"
@@ -65,7 +71,7 @@ describe("PCS Campaign", function () {
 
         //deploy SWPxReferralCampaignLens
         const SWPxReferralCampaignLens = await ethers.getContractFactory(
-            "PCSReferralCampaignLens"
+            "SWPxReferralCampaignLens"
         );
         const referralCampaignLens = await SWPxReferralCampaignLens.deploy();
         await referralCampaignLens.initialize();
@@ -100,32 +106,31 @@ describe("PCS Campaign", function () {
             qSWPxRewardPool.address
         );
 
-        // await referralCampaignLens.setParams(
-        //   "1000000000000000000000",
-        //   "500000000000000000000",
-        //   "200000000000000000000",
-        //   referral.address,
-        //   qMilesPts.address,
-        //   squad.address,
-        //   ["1", "11", "51"],
-        //   ["100", "200", "300"],
-        //   [
-        //     "0",
-        //     "1000000000000000000001",
-        //     "5000000000000000000001",
-        //     "10000000000000000000001",
-        //     "50000000000000000000001",
-        //     "100000000000000000000001",
-        //   ],
-        //   [
-        //     "1000000000000000000",
-        //     "1200000000000000000",
-        //     "1500000000000000000",
-        //     "2000000000000000000",
-        //     "2500000000000000000",
-        //     "3000000000000000000",
-        //   ]
-        // );
+        await referralCampaignLens.setParams(
+            "1000000000000000000000",
+            "500000000000000000000",
+            "200000000000000000000",
+            referral.address,
+            qMilesPts.address,
+            ["1", "11", "51"],
+            ["100", "200", "300"],
+            [
+                "0",
+                "1000000000000000000001",
+                "5000000000000000000001",
+                "10000000000000000000001",
+                "50000000000000000000001",
+                "100000000000000000000001",
+            ],
+            [
+                "1000000000000000000",
+                "1200000000000000000",
+                "1500000000000000000",
+                "2000000000000000000",
+                "2500000000000000000",
+                "3000000000000000000",
+            ]
+        );
         return {
             owner,
             user1,
@@ -136,6 +141,7 @@ describe("PCS Campaign", function () {
             user6,
             user7,
             treasury,
+            // swpxHolder,
             voterProxyInstance,
             swpx,
             qSWPx,
@@ -160,6 +166,7 @@ describe("PCS Campaign", function () {
             user6,
             user7,
             treasury,
+            // swpxHolder,
             swpx,
             qSWPx,
             voterProxyInstance,
@@ -169,12 +176,16 @@ describe("PCS Campaign", function () {
             bootstrapSWPx,
         } = await deployFixture();
 
-        const amount =  "1100000000000000000000";
+        // const amount =  "1100000000000000000000";
+        const amount = "1000000000000000000";
         await swpx.mint(user1.address, amount);
         await swpx.connect(user1).approve(bootstrapSWPx.address, amount);
-        increase(86400*10);
+        console.log(await bootstrapSWPx.swpx());
+        // console.log(await swpx.balanceOf(swpxHolder.address));
+        increase(86400 * 10);
         await bootstrapSWPx.connect(user1).convert(amount, "", "newLink");
         expect(await qSWPx.balanceOf(user1.address)).to.eq(amount);
         console.log(await swpx.balanceOf(voterProxyInstance.address))
+        console.log(await referralCampaignLens.userUnClaimedPTS(user1.address));
     })
 });

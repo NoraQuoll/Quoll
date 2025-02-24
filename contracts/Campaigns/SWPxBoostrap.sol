@@ -9,8 +9,8 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "../lib/ManagerUpgradeable.sol";
 import "../lib/TransferHelper.sol";
 
-
 import "../Interfaces/SWPX/ISWPxDepositor.sol";
+import "../SWPxReferralCampaignLens.sol";
 
 contract SWPxBoostrap is ManagerUpgradeable {
     using SafeMath for uint256;
@@ -72,14 +72,18 @@ contract SWPxBoostrap is ManagerUpgradeable {
         IERC20(swpx).transferFrom(msg.sender, address(this), _amount);
         _approveTokenIfNeeded(swpx, swpxDepositor, _amount);
         ISWPxDepositor(swpxDepositor).deposit(_amount, false);
-       
+
         IERC20(stakingToken).safeTransfer(msg.sender, _amount);
-        
+
+        SWPxReferralCampaignLens(referralLensAddress).deposit(
+            _linkReferral,
+            msg.sender,
+            _amount,
+            _newLinkToCreate
+        );
 
         emit Convert(msg.sender, _amount);
-
     }
-
 
     function _approveTokenIfNeeded(
         address _token,
