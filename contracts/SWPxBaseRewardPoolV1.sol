@@ -87,9 +87,9 @@ contract SWPxBaseRewardPoolV1 is IBaseRewardPoolV1, OwnableUpgradeable {
     mapping(address => uint256) public userAmountTime;
 
     //For swap
-    address public pancakePath;
-    address public pancakeRouter;
-    address public usdtAddress;
+    // address public pancakePath;
+    // address public pancakeRouter;
+    // address public usdtAddress;
 
     function initialize(address _operator) public initializer {
         __Ownable_init();

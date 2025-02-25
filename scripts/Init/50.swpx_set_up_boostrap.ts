@@ -19,7 +19,7 @@ const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 /*Token contracts*/
 const swpx = "0xa04bc7140c26fc9bb1f36b1a604c7a5a88fb0e70";
 const qSWPx = "0x448eb327112eEc55a08d8ED8500B89ec71e4ee32";
-const qMilesPts = "0x52e56c4cA847b50fb3AE18a78e41396036A799BB";
+const sqMilesPts = "0x52e56c4cA847b50fb3AE18a78e41396036A799BB";
 
 /*PCS Bootstrap contracts*/
 const campaignLens = "0x62bf17dfBE4E1041687c92b9454F5e9a7aD579C9";
@@ -31,9 +31,10 @@ const depositor = "0x7b42F9679ECf4A947F3Eda2c44BDA4CB1114662E";
 const referral = "0x01e6ef4913F9Dc4530dE8135f9579D3acD932935";
 const rewardPool = "0xabc0f051f0c1E5C901C8833ae11336c21B5AF31d";
 
-const masterChef = "0x0000000000000000000000000000000000000000";
+const masterChef = "0x0000000000000000000000000000000000000000"; //no masterchef yet
 const veSWPx = "0xaa30f0977620d4d46b3bb3cf0794fe645d576ca3";
-const booster = "0x0000000000000000000000000000000000000000";
+const booster = "0x0000000000000000000000000000000000000000"; // //no masterchef yet
+
 
 /*to set up reward pool*/
 const pid = "0";
@@ -77,10 +78,11 @@ const Referral = JSON.parse(
   fs.readFileSync("./artifacts/contracts/Referral.sol/Referral.json", "utf-8")
 ).abi;
 
-const QMilePTS = JSON.parse(
-  fs.readFileSync("./artifacts/contracts/QMilesPts.sol/QMilesPts.json", "utf-8")
+const SQMilePTS = JSON.parse(
+  fs.readFileSync("./artifacts/contracts/SQMilesPTS.sol/SQMilesPts.json", "utf-8")
 ).abi;
 
+//qSWPx
 const QuollExternalToken = JSON.parse(
   fs.readFileSync(
     "./artifacts/contracts/QuollExternalToken.sol/QuollExternalToken.json",
@@ -88,7 +90,7 @@ const QuollExternalToken = JSON.parse(
   )
 ).abi;
 
-const PCSBaseRewardPoolV1 = JSON.parse(
+const SWPxBaseRewardPoolV1 = JSON.parse(
   fs.readFileSync(
     "./artifacts/contracts/PCSBaseRewardPoolV1.sol/PCSBaseRewardPoolV1.json",
     "utf-8"
@@ -185,7 +187,7 @@ async function setParamsCampaignLens() {
       "500000000000000000000",
       "200000000000000000000",
       referral,
-      qMilesPts,
+      sqMilesPts,
       ["1", "11", "51"],
       ["100", "200", "300"],
       [
@@ -224,45 +226,45 @@ async function setParamsCampaignLens() {
   console.log(result);
 }
 
-// async function setParamsPCSBaseRewardPoolV1() {
-//   console.log("setParamsPCSBaseRewardPool");
+async function setParamsSWPxBaseRewardPoolV1() {
+  console.log("setParamsSWPxBaseRewardPool");
+  const txCount = await web3.eth.getTransactionCount(user);
+
+  const contract = new web3.eth.Contract(SWPxBaseRewardPoolV1);
+
+  const txData = contract.methods
+    .setParams(
+      booster,
+      pid,
+      qSWPx,
+      rewardToken,
+      // pancakePath,
+      // pancakeRouter,
+      // usdtAddress
+    )
+    .encodeABI();
+
+  //using ETH
+  const txObj = {
+    nonce: txCount,
+    gas: web3.utils.toHex(1000000),
+    gasPrice: await web3.eth.getGasPrice(),
+    data: txData,
+    to: rewardPool,
+    from: user,
+  };
+
+  const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);
+
+  const result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction!);
+  console.log(result);
+}
+
+// async function addUpgradeDataSWPxBaseRewardPoolV1() {
+//   console.log("addUpgradeDataSWPxBaseRewardPoolV1");
 //   const txCount = await web3.eth.getTransactionCount(user);
 
-//   const contract = new web3.eth.Contract(PCSBaseRewardPoolV1);
-
-//   const txData = contract.methods
-//     .setParams(
-//       booster,
-//       pid,
-//       qCake,
-//       rewardToken,
-//       pancakePath,
-//       pancakeRouter,
-//       usdtAddress
-//     )
-//     .encodeABI();
-
-//   //using ETH
-//   const txObj = {
-//     nonce: txCount,
-//     gas: web3.utils.toHex(1000000),
-//     gasPrice: await web3.eth.getGasPrice(),
-//     data: txData,
-//     to: rewardPool,
-//     from: user,
-//   };
-
-//   const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);
-
-//   const result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction!);
-//   console.log(result);
-// }
-
-// async function addUpgradeDataPCSBaseRewardPoolV1() {
-//   console.log("addUpgradeDataPCSBaseRewardPoolV1");
-//   const txCount = await web3.eth.getTransactionCount(user);
-
-//   const contract = new web3.eth.Contract(PCSBaseRewardPoolV1);
+//   const contract = new web3.eth.Contract(SWPxBaseRewardPoolV1);
 
 //   const txData = contract.methods
 //     .addUpgradeData(pancakePath, pancakeRouter, usdtAddress)
@@ -336,13 +338,13 @@ async function setAccessReferral() {
   console.log(result);
 }
 
-//set access for SWPxRefferalCampaignLens to mint QMIlesPTs
-async function setAccessQMilePTS() {
-  console.log("setAccessQMilePTS ");
+//set access for SWPxRefferalCampaignLens to mint SQMIlesPTs
+async function setAccessSQMilePTS() {
+  console.log("setAccessSQMilePTS ");
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(QMilePTS);
+  const contract = new web3.eth.Contract(SQMilePTS);
 
   const txData = contract.methods.setAccess(campaignLens, true).encodeABI();
 
@@ -352,7 +354,7 @@ async function setAccessQMilePTS() {
     gas: web3.utils.toHex(1000000),
     gasPrice: await web3.eth.getGasPrice(),
     data: txData,
-    to: qMilesPts,
+    to: sqMilesPts,
     from: user,
   };
 
@@ -361,7 +363,7 @@ async function setAccessQMilePTS() {
   const result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction!);
   console.log(result);
 }
-// allow Depositor to call mint qCake
+// allow Depositor to call mint qSWPx
 async function setOperator() {
   console.log("setOperator ");
 
@@ -416,25 +418,26 @@ async function initPool(startCampaign: number, endCampaign: number) {
 
 async function main() {
   /*==============SET PARAMS===============*/
- // await setParamsBoostrap(); // test ok done 
-
-  //await setParamsDepositor(); //test ok done
-  //await setParamsCampaignLens(); //test ok
-  //await setParamsVoterProxy(); //test ok
+ // await setParamsBoostrap(); 
+  //await setParamsDepositor();
+  //await setParamsCampaignLens();
+  //await setParamsVoterProxy(); 
+  
+  
   /*==============SET AUTH===============*/
-  //   set access for boostrap to call deposit - ok
-  //await setAccessSWPxRefferalCampaignLens(); //done
-  //   set access for PCSRefferalCampaignLens to call Referral - ok
-  //await setAccessReferral();
-  //   set access for PCSRefferalCampaignLens to mint QMIlesPTs - ok
-  await setAccessQMilePTS(); //-done
-  //   allow Depositor to call mint qCake - ok
-   await setOperator(); // done
+ 
+  //await setAccessSWPxRefferalCampaignLens();  //   set access for boostrap to call deposit
+  //await setAccessReferral();  //   set access for PCSRefferalCampaignLens to call Referral 
+  //await setAccessSQMilePTS(); ////   set access for SWPxRefferalCampaignLens to mint SQMIlesPTs
+  //  await setOperator(); // allow Depositor to call mint qSWPx
+  
+  
   /*==================REWARD POOL ================= */
-  //await setParamsPCSBaseRewardPoolV1();
-  //await addUpgradeDataPCSBaseRewardPoolV1()
+  //await setParamsSWPxBaseRewardPoolV1();
+
+  
   /*=============START THE CAMPAIGN - ok===========*/
- //await initPool(1, 1000000000000);
+  //await initPool(1, 1000000000000);
 }
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
