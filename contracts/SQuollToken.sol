@@ -22,18 +22,19 @@ contract SQuollToken is IQuollToken, ERC20Upgradeable, OwnableUpgradeable {
     // --- Events ---
     event AccessUpdated(address _operator, bool _access);
 
-    function initialize() public initializer {
+    function initialize(address _multisig) public initializer {
         __Ownable_init();
-
+        transferOwnership(_multisig);
         __ERC20_init_unchained("sQuoll Token", "sQUO");
 
-        access[msg.sender] = true;
+        access[_multisig] = true;
 
         maxSupply = 1e27; // 1e27 = 1e9 * 1e18, 1B
         totalCliffs = 1000;
         reductionPerCliff = maxSupply.div(totalCliffs);
-
-        emit AccessUpdated(msg.sender, true);
+        _mint(_multisig, maxSupply.div(2)); // mint 50% to multisig wallet
+       
+        emit AccessUpdated(_multisig, true);
     }
 
     function setAccess(address _operator, bool _access) external onlyOwner {
