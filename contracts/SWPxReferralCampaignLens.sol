@@ -347,11 +347,10 @@ contract SWPxReferralCampaignLens is OwnableUpgradeable {
         require(claimableAmount > 0, "Need to greater than 0");
 
         userUnClaimedPTS[msg.sender] = 0;
-
-        QMilesPts(qMileAddress).mint(
-            msg.sender,
-            (claimableAmount * findRefMultiplier(msg.sender)) / BASE_REFERRAL
-        );
+        uint256 amountMint = (claimableAmount * findRefMultiplier(msg.sender)) /
+            BASE_REFERRAL;
+        QMilesPts(qMileAddress).mint(msg.sender, amountMint);
+        emit UserClaimPts(msg.sender, amountMint);
     }
 
     function findRefMultiplier(address _user) public view returns (uint256) {
