@@ -18,18 +18,18 @@ const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 /*Token contracts*/
 const swpx = "0xa04bc7140c26fc9bb1f36b1a604c7a5a88fb0e70";
-const qSWPx = "0x448eb327112eEc55a08d8ED8500B89ec71e4ee32";
-const sqMilesPts = "0x52e56c4cA847b50fb3AE18a78e41396036A799BB";
+const qSWPx = "0x350708Fe3396E066fFC981fBd560Dc34905CA98d";
+const sqMilesPts = "0xc0325375D8C4a88f4e03fF293037a4262ded3343";
 
 /*PCS Bootstrap contracts*/
-const campaignLens = "0x62bf17dfBE4E1041687c92b9454F5e9a7aD579C9";
-const bootstrap = "0xd88D9a5Fe5cb9D9839c3205D89dA1BF82c318fC6";
-const voterProxy = "0x6Ecd3eBe8E4A8Fd474E2D4e10a09dC81d40bBb94";
-const depositor = "0x7b42F9679ECf4A947F3Eda2c44BDA4CB1114662E";
+const campaignLens = "0x388D157F0BFdc1d30357AF63a8be10BfF8474f4e";
+const bootstrap = "0xEE5B62b3B948F48719f79b3f65e35c5318267A86";
+const voterProxy = "0xf928eb071248B8f79D435c6D0BfB0AbAA6803c06";
+const depositor = "0x277Cd4b508aFbb75d182870409bBf610AFab5c7b";
 
 /*Other contracts*/
-const referral = "0x01e6ef4913F9Dc4530dE8135f9579D3acD932935";
-const rewardPool = "0xabc0f051f0c1E5C901C8833ae11336c21B5AF31d";
+const referral = "0x7BAd956Ad61CB21960Ff647B8fF4c291b44A6FD2";
+const rewardPool = "0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54";
 
 const masterChef = "0x0000000000000000000000000000000000000000"; //no masterchef yet
 const veSWPx = "0xaa30f0977620d4d46b3bb3cf0794fe645d576ca3";
@@ -38,7 +38,7 @@ const booster = "0x0000000000000000000000000000000000000000"; // //no masterchef
 
 /*to set up reward pool*/
 const pid = "0";
-const rewardToken = "0x08b450e4a48C04CDF6DB2bD4cf24057f7B9563fF";
+const rewardToken = "0xF02b3b6dE7a3f1ED2651e34812eA10C9850cAf19";
 const pancakePath = "0x3e981541d489B8ac5dE9016a0A67f3c2Eb369E66";
 const pancakeRouter = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
 const usdtAddress = "0x55d398326f99059fF775485246999027B3197955";
@@ -92,7 +92,7 @@ const QuollExternalToken = JSON.parse(
 
 const SWPxBaseRewardPoolV1 = JSON.parse(
   fs.readFileSync(
-    "./artifacts/contracts/PCSBaseRewardPoolV1.sol/PCSBaseRewardPoolV1.json",
+    "./artifacts/contracts/SWPxBaseRewardPoolV1.sol/SWPxBaseRewardPoolV1.json",
     "utf-8"
   )
 ).abi;
@@ -418,26 +418,26 @@ async function initPool(startCampaign: number, endCampaign: number) {
 
 async function main() {
   /*==============SET PARAMS===============*/
- // await setParamsBoostrap(); 
-  //await setParamsDepositor();
-  //await setParamsCampaignLens();
-  //await setParamsVoterProxy(); 
+ await setParamsBoostrap(); 
+  await setParamsDepositor();
+  await setParamsCampaignLens();
+  await setParamsVoterProxy(); 
   
   
   /*==============SET AUTH===============*/
  
-  //await setAccessSWPxRefferalCampaignLens();  //   set access for boostrap to call deposit
-  //await setAccessReferral();  //   set access for PCSRefferalCampaignLens to call Referral 
-  //await setAccessSQMilePTS(); ////   set access for SWPxRefferalCampaignLens to mint SQMIlesPTs
-  //  await setOperator(); // allow Depositor to call mint qSWPx
+  await setAccessSWPxRefferalCampaignLens();  //   set access for boostrap to call deposit
+  await setAccessReferral();  //   set access for PCSRefferalCampaignLens to call Referral 
+  await setAccessSQMilePTS(); ////   set access for SWPxRefferalCampaignLens to mint SQMIlesPTs
+   await setOperator(); // allow Depositor to call mint qSWPx
   
   
   /*==================REWARD POOL ================= */
-  //await setParamsSWPxBaseRewardPoolV1();
+  await setParamsSWPxBaseRewardPoolV1();
 
   
   /*=============START THE CAMPAIGN - ok===========*/
-  //await initPool(1, 1000000000000);
+  await initPool(1, 1000000000000);
 }
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.

@@ -14,7 +14,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const multisig = "0xAB7ABCF6D4d1A75F00804dCBF5551794eB6c87B1";
+  const multisig = "0x417144F0d27dA5ED261f9DcFD12C74BbfA324A52";
   const data = await deploy("SQuollToken", {
     from: deployer,
     args: [],

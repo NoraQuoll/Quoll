@@ -14,21 +14,18 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const depositor = "0x277Cd4b508aFbb75d182870409bBf610AFab5c7b"; 
-
-  const data = await deploy("SWPxBaseRewardPoolV1", {
+  const data = await deploy("Referral", {
     from: deployer,
     args: [],
     log: true,
     deterministicDeployment: false,
-    //gasPrice: (await web3.eth.getGasPrice()).toString(),
-    gasLimit: 50_000_000,
+    gasPrice: (await web3.eth.getGasPrice()).toString(),
     proxy: {
       proxyContract: "OptimizedTransparentProxy",
       owner: deployer,
       execute: {
         methodName: "initialize",
-        args: [depositor],
+        args: [],
       },
     },
   });
@@ -36,7 +33,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
   await saveContract(
     network.name,
-    "QSWPxBalanceRewardPool",
+    `SWPReferral`,
     data.address,
     data.implementation!
   );
@@ -63,6 +60,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-deploy.tags = ["QSWPxBalanceRewardPool"];
+deploy.tags = ["SWPReferral"];
 
 export default deploy;
