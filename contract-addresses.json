@@ -640,7 +640,7 @@
         },
         "SWPxReferralCampaignLens": {
             "address": "0x388D157F0BFdc1d30357AF63a8be10BfF8474f4e",
-            "impl": "0x3d5BF602C88C9B473B7dEEEeDdFc9E2681065ef4"
+            "impl": "0x02fb761CcfF103BF4CF54905117DFDa846b084A5"
         },
         "SWPxDepositor": {
             "address": "0x277Cd4b508aFbb75d182870409bBf610AFab5c7b",
