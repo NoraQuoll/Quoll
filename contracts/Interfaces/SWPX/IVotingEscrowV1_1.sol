@@ -41,4 +41,6 @@ interface IVotingEscrowV1_1 {
     // @notice Withdraw all tokens for `_tokenId`
     /// @dev Only possible if the lock has expired
     function withdraw(uint256 _tokenId) external;
+
+    function merge(uint256 _from, uint256 _to) external returns (uint256 votingPower) ;
 }

@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "./Interfaces/SWPX/ISWPxVoterProxy.sol";
 import "./Interfaces/SWPX/IRevenueSharingPool.sol";
 import "./Interfaces/Pancake/IMasterChef.sol";
@@ -13,7 +13,11 @@ import "./Interfaces/SWPX/IVotingEscrowV1_1.sol";
 
 import "./lib/TransferHelper.sol";
 
-contract SWPxVoterProxy is ISWPxVoterProxy, OwnableUpgradeable {
+contract SWPxVoterProxy is
+    ISWPxVoterProxy,
+    IERC721Receiver,
+    OwnableUpgradeable
+{
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
 
@@ -39,11 +43,11 @@ contract SWPxVoterProxy is ISWPxVoterProxy, OwnableUpgradeable {
     uint256 private constant WEEK = 604800;
     // 2 years
     uint256 private constant MAX_LOCK_DURATION = 63_072_000; // 2 years
-    
-    
+
     event SWPxLockMinted(uint256 tokenId);
     event SWPxLocked(uint256 amount);
     event SWPxLockDurationIncreased(uint256 lockedUntil);
+    event veSWPxReceived(address operator, address from, uint256 tokenId, bytes data);
 
     modifier onlyBooster() {
         require(msg.sender == booster, "!auth");
@@ -153,23 +157,30 @@ contract SWPxVoterProxy is ISWPxVoterProxy, OwnableUpgradeable {
                 );
                 // will relock in one week
                 nextIncreaseUnlockAt = ((block.timestamp + WEEK) / WEEK) * WEEK;
-                
+
                 emit SWPxLockMinted(lockedTokenId);
                 emit SWPxLocked(balance);
-
-            }
-            else {
+            } else {
                 // Increase lock amount
-                IVotingEscrowV1_1(veSWPx).increase_amount(lockedTokenId, balance);
+                IVotingEscrowV1_1(veSWPx).increase_amount(
+                    lockedTokenId,
+                    balance
+                );
                 emit SWPxLocked(balance);
                 // Lock is still active, just increase the lock duration
-                if(block.timestamp > nextIncreaseUnlockAt){
-                    IVotingEscrowV1_1(veSWPx).increase_unlock_time(lockedTokenId, MAX_LOCK_DURATION);
-                    // Thena rounds the lock down to the week
-                    emit SWPxLockDurationIncreased(((block.timestamp + MAX_LOCK_DURATION) / WEEK) * WEEK);
+                if (block.timestamp > nextIncreaseUnlockAt) {
+                    IVotingEscrowV1_1(veSWPx).increase_unlock_time(
+                        lockedTokenId,
+                        MAX_LOCK_DURATION
+                    );
+                    // SWPx rounds the lock down to the week
+                    emit SWPxLockDurationIncreased(
+                        ((block.timestamp + MAX_LOCK_DURATION) / WEEK) * WEEK
+                    );
                     // Once a week, increase the lock
-                    nextIncreaseUnlockAt = ((block.timestamp + WEEK) / WEEK) * WEEK;
-
+                    nextIncreaseUnlockAt =
+                        ((block.timestamp + WEEK) / WEEK) *
+                        WEEK;
                 }
             }
         }
@@ -197,4 +208,23 @@ contract SWPxVoterProxy is ISWPxVoterProxy, OwnableUpgradeable {
     }
 
     receive() external payable {}
+
+    function onERC721Received(
+        address operator,
+        address from,
+        uint256 tokenId,
+        bytes calldata data
+    ) external override returns (bytes4) {
+        require(msg.sender == veSWPx, "Only accept veSWPx NFTs");
+        emit veSWPxReceived(operator, from, tokenId, data);
+
+        if (lockedTokenId == 0) {
+            lockedTokenId = tokenId;
+            emit SWPxLockMinted(lockedTokenId);
+        }
+        else {
+            IVotingEscrowV1_1(veSWPx).merge(tokenId, lockedTokenId );
+        }
+        return this.onERC721Received.selector;
+    }
 }
