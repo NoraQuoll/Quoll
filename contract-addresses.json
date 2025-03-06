@@ -636,7 +636,7 @@
         },
         "SWPxVoterProxy": {
             "address": "0xf928eb071248B8f79D435c6D0BfB0AbAA6803c06",
-            "impl": "0x2912cb4BADB2988eB79F6BDa55E9Bd47f6e2E167"
+            "impl": "0x64261F9DA8faeF645f59D0c998F4172e800a272b"
         },
         "SWPxReferralCampaignLens": {
             "address": "0x388D157F0BFdc1d30357AF63a8be10BfF8474f4e",
@@ -665,6 +665,14 @@
         "SWPReferral": {
             "address": "0x7BAd956Ad61CB21960Ff647B8fF4c291b44A6FD2",
             "impl": "0x87856b52516CD6C386C41D56965e142E509Aa461"
+        },
+        "VeSWPxBootstrap": {
+            "address": "0xEe45E5B0042600b15ba6141aaa85C9d24e20aE0A",
+            "impl": "0x6a94FfB4c70421De3ED01AA9D5590f38cD2cd9AC"
+        },
+        "VeSWPxReferralBootstrapLens": {
+            "address": "0xe360d7d719974DFD20fceDAF3386a289c568C2D4",
+            "impl": "0x86A0F5cF49d0202deEbec51f520aa6E63b73a22B"
         }
     }
 }

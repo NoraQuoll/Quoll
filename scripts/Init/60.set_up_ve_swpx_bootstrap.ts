@@ -12,73 +12,76 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-// /**
-// * MAINNET
-//  * CONTRACT ADDRESS - REPLACE THESE ADDRESSES
-//  */
-
-// /*Token contracts*/
-// const swpx = "0xa04bc7140c26fc9bb1f36b1a604c7a5a88fb0e70";
-// const qSWPx = "0x448eb327112eEc55a08d8ED8500B89ec71e4ee32";
-// const sqMilesPts = "0xc0325375D8C4a88f4e03fF293037a4262ded3343";
-
-// /*PCS Bootstrap contracts*/
-// const campaignLens = "0x62bf17dfBE4E1041687c92b9454F5e9a7aD579C9";
-// const bootstrap = "0x0B474368f3c9D546c1887d6CF14687e495c92440";
-// const voterProxy = "0x6Ecd3eBe8E4A8Fd474E2D4e10a09dC81d40bBb94";
-// const depositor = "0x277Cd4b508aFbb75d182870409bBf610AFab5c7b";
-
-// /*Other contracts*/
-// const referral = "0x7BAd956Ad61CB21960Ff647B8fF4c291b44A6FD2";
-// const rewardPool = "0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54";
-
-// const masterChef = "0x0000000000000000000000000000000000000000"; //no masterchef yet
-// const veSWPx = "0xaa30f0977620d4d46b3bb3cf0794fe645d576ca3";
-// const booster = "0x0000000000000000000000000000000000000000"; // //no masterchef yet
-
-
-// /*to set up reward pool*/
-// const pid = "0";
-// const rewardToken = "0xF02b3b6dE7a3f1ED2651e34812eA10C9850cAf19";
-// const pancakePath = "0x3e981541d489B8ac5dE9016a0A67f3c2Eb369E66";
-// const pancakeRouter = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
-// const usdtAddress = "0x55d398326f99059fF775485246999027B3197955";
-
-
 /**
- * TESTNET
+* MAINNET
  * CONTRACT ADDRESS - REPLACE THESE ADDRESSES
  */
 
 /*Token contracts*/
-const swpx = "0x1bE1008A72433fd70718411211e49394Cd05Fc23";
-const qSWPx = "0xE95384994aC95EDbf9DC1d755F8911709DDb1763";
-const sqMilesPts = "0x3064973973495B319180E173E7133104DB2fA588";
+const swpx = "0xa04bc7140c26fc9bb1f36b1a604c7a5a88fb0e70";
+const qSWPx = "0x350708Fe3396E066fFC981fBd560Dc34905CA98d";
+const sqMilesPts = "0xc0325375D8C4a88f4e03fF293037a4262ded3343";
 
 /*PCS Bootstrap contracts*/
-const campaignLens = "0xC8aC40E38a5CBe503B8e8d63C88DABEcCcccAc28";
+const campaignLens = "0x62bf17dfBE4E1041687c92b9454F5e9a7aD579C9";
 
-const veSWPxBootstrapLens = "0x78e5866E0790CF5f6379723355232E0679b3e109";
-const bootstrap = "0xbae85db6F51A300f799b86E7d1a3E244B6f8225C";
-const veSWPxBootstrap = "0x2347337880f5a428deC100Be1e1efB5b5C024F32";
-const voterProxy = "0xEbB82F097fEE2c641d6dC71F8b7C330CA108dF8C";
-const depositor = "0xF1B13460Fadbac9C41c49EF481A90150eEac8486";
+const veSWPxBootstrapLens = "0xe360d7d719974DFD20fceDAF3386a289c568C2D4";
+const bootstrap = "0x0B474368f3c9D546c1887d6CF14687e495c92440";
+const veSWPxBootstrap = "0xEe45E5B0042600b15ba6141aaa85C9d24e20aE0A";
+const voterProxy = "0xf928eb071248B8f79D435c6D0BfB0AbAA6803c06";
+const depositor = "0x277Cd4b508aFbb75d182870409bBf610AFab5c7b";
 
 /*Other contracts*/
-const referral = "0x69214E26a85e36A859474CbAf84f8a3998B8012b";
-const rewardPool = "0xabc0f051f0c1E5C901C8833ae11336c21B5AF31d";
+const referral = "0x7BAd956Ad61CB21960Ff647B8fF4c291b44A6FD2";
+const rewardPool = "0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54";
 
 const masterChef = "0x0000000000000000000000000000000000000000"; //no masterchef yet
-const veSWPx = "0x727B9feC11B1216dc2dDDFb93037D6F0342854d5";
+const veSWPx = "0xaa30f0977620d4d46b3bb3cf0794fe645d576ca3";
 const booster = "0x0000000000000000000000000000000000000000"; // //no masterchef yet
 
 
 /*to set up reward pool*/
 const pid = "0";
-const rewardToken = "0x27DA92438996FbC6Bc3bEbA3d92610b2Ff3dC37a"; //quo
+const rewardToken = "0xF02b3b6dE7a3f1ED2651e34812eA10C9850cAf19";
 const pancakePath = "0x3e981541d489B8ac5dE9016a0A67f3c2Eb369E66";
 const pancakeRouter = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
 const usdtAddress = "0x55d398326f99059fF775485246999027B3197955";
+
+
+// /**
+//  * TESTNET
+//  * CONTRACT ADDRESS - REPLACE THESE ADDRESSES
+//  */
+
+// /*Token contracts*/
+// const swpx = "0x1bE1008A72433fd70718411211e49394Cd05Fc23";
+// const qSWPx = "0xE95384994aC95EDbf9DC1d755F8911709DDb1763";
+// const sqMilesPts = "0x3064973973495B319180E173E7133104DB2fA588";
+
+// /*PCS Bootstrap contracts*/
+// const campaignLens = "0xC8aC40E38a5CBe503B8e8d63C88DABEcCcccAc28";
+
+// const veSWPxBootstrapLens = "0x78e5866E0790CF5f6379723355232E0679b3e109";
+// const bootstrap = "0xbae85db6F51A300f799b86E7d1a3E244B6f8225C";
+// const veSWPxBootstrap = "0x2347337880f5a428deC100Be1e1efB5b5C024F32";
+// const voterProxy = "0xEbB82F097fEE2c641d6dC71F8b7C330CA108dF8C";
+// const depositor = "0xF1B13460Fadbac9C41c49EF481A90150eEac8486";
+
+// /*Other contracts*/
+// const referral = "0x69214E26a85e36A859474CbAf84f8a3998B8012b";
+// const rewardPool = "0xabc0f051f0c1E5C901C8833ae11336c21B5AF31d";
+
+// const masterChef = "0x0000000000000000000000000000000000000000"; //no masterchef yet
+// const veSWPx = "0x727B9feC11B1216dc2dDDFb93037D6F0342854d5";
+// const booster = "0x0000000000000000000000000000000000000000"; // //no masterchef yet
+
+
+// /*to set up reward pool*/
+// const pid = "0";
+// const rewardToken = "0x27DA92438996FbC6Bc3bEbA3d92610b2Ff3dC37a"; //quo
+// const pancakePath = "0x3e981541d489B8ac5dE9016a0A67f3c2Eb369E66";
+// const pancakeRouter = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
+// const usdtAddress = "0x55d398326f99059fF775485246999027B3197955";
 
 /**
  * CONTRACT ABI
@@ -432,19 +435,19 @@ async function initPool(startCampaign: number, endCampaign: number) {
 async function main() {
   /*==============SET PARAMS===============*/
 
-  //await setVeSWPxParamsBoostrap();
-  //setParamsVeSWPxReferralBootstrapLens();
+  await setVeSWPxParamsBoostrap();
+  await setParamsVeSWPxReferralBootstrapLens();
   
   
   /*==============SET AUTH===============*/
-  //setAccessReferral () ; //set access for VeSWPxReferralBootstrapLens call referral
-  //setAccessSQMilePTS();; //set access for SWPxRefferalCampaignLens to mint SQMIlesPTs
-   await setAccessSWPxRefferalBootstrapLens();  //   set access for VeSWPxBoostrap to call deposit
-  // await setOperator(); // allow VeSWPxBootstrap to call mint qSWPx
+  await setAccessReferral () ; //set access for VeSWPxReferralBootstrapLens call referral
+  await setAccessSQMilePTS();; //set access for SWPxRefferalCampaignLens to mint SQMIlesPTs
+  await setAccessSWPxRefferalBootstrapLens();  //   set access for VeSWPxBoostrap to call deposit
+  await setOperator(); // allow VeSWPxBootstrap to call mint qSWPx
   
   
   /*=============START THE CAMPAIGN - ok===========*/
- //await initPool(1, 1000000000000);
+ await initPool(1, 1000000000000);
 
 
 }
