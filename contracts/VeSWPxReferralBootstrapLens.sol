@@ -1,0 +1,394 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.6.12;
+pragma experimental ABIEncoderV2;
+
+import "hardhat/console.sol";
+
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+
+import "./Referral.sol";
+import "./QMilesPts.sol";
+
+contract VeSWPxReferralBootstrapLens is OwnableUpgradeable {
+    struct RefMulti {
+        uint256 fromAmountOfRef;
+        uint256 toAmountOfRef;
+        uint256 additionBase;
+    }
+
+    struct PointPerVeTheStruct {
+        uint256 fromAmount;
+        uint256 toAmount;
+        uint256 pointPerVeSWPx;
+    }
+
+    struct UserDataStruct {
+        uint256 depositAmount;
+        uint256 currentPointSWPx;
+    }
+
+    uint256 public constant BASE_REFERRAL = 10000;
+    uint256 public minimumDepositToGetRef;
+    uint256 public welcomeOfferMinDeposit;
+    uint256 public welcomeOfferForReferredUser;
+
+    address public referralAddress;
+    address public sqMileAddress;
+
+    mapping(address => UserDataStruct) public userDepositedAmount;
+
+    RefMulti[] public refMuliplier;
+    PointPerVeTheStruct[] public pointPerVeSWPx;
+
+    mapping(address => string) public tempMapReferral;
+
+    mapping(address => bool) public access;
+
+    mapping(address => uint256) public userUnClaimedPTS;
+
+    event AmountOfTokenInStatus(
+        address user,
+        uint256 amount,
+        uint256 multiplier
+    );
+
+    event UserGetWelcomePoint(address user, uint256 amount);
+    event AccessSet(address indexed _address, bool _status);
+
+    function initialize() public initializer {
+        __Ownable_init();
+    }
+
+    function getRefMultiplier() public view returns (RefMulti[] memory) {
+        return refMuliplier;
+    }
+
+    function setParams(
+        uint256 _minimumDepositToGetRef,
+        uint256 _welcomeOfferForReferredUser,
+        uint256 _welcomeOfferMinDeposit,
+        // uint256 _minimumDepositToGetOffer,
+        address _referralAddress,
+        address _sqMileAddress,
+        uint256[] memory _fromAmountOfRef,
+        uint256[] memory _additionBase,
+        uint256[] memory _fromAmount,
+        uint256[] memory _pointPerVeSWPx
+    ) external onlyOwner {
+        minimumDepositToGetRef = _minimumDepositToGetRef;
+        welcomeOfferMinDeposit = _welcomeOfferMinDeposit;
+        // minimumDepositToGetOffer = _minimumDepositToGetOffer;
+        welcomeOfferForReferredUser = _welcomeOfferForReferredUser;
+        referralAddress = _referralAddress;
+        sqMileAddress = _sqMileAddress;
+
+        require(
+            _fromAmountOfRef.length == _additionBase.length,
+            "invalid length of refmulti struct"
+        );
+        require(
+            _fromAmount.length == _pointPerVeSWPx.length,
+            "invalid point per the"
+        );
+
+        for (uint256 i = 0; i < _fromAmountOfRef.length; i++) {
+            if (i != _fromAmountOfRef.length - 1) {
+                refMuliplier.push(
+                    RefMulti(
+                        _fromAmountOfRef[i],
+                        _fromAmountOfRef[i + 1] - 1,
+                        _additionBase[i]
+                    )
+                );
+            } else {
+                refMuliplier.push(
+                    RefMulti(_fromAmountOfRef[i], uint256(-1), _additionBase[i])
+                );
+            }
+        }
+
+        for (uint256 i = 0; i < _fromAmount.length; i++) {
+            if (i != _fromAmount.length - 1) {
+                pointPerVeSWPx.push(
+                    PointPerVeTheStruct(
+                        _fromAmount[i],
+                        _fromAmount[i + 1] - 1,
+                        _pointPerVeSWPx[i]
+                    )
+                );
+            } else {
+                pointPerVeSWPx.push(
+                    PointPerVeTheStruct(
+                        _fromAmount[i],
+                        uint256(-1),
+                        _pointPerVeSWPx[i]
+                    )
+                );
+            }
+        }
+    }
+
+    function _getTokenWillGetForUser(
+        string memory _linkReferral,
+        address _user,
+        uint256 _stakeAmount
+    ) internal returns (uint256 _welcomeOffer, uint256 theWillGet) {
+        require(_stakeAmount > 0, "invalid stakeAmount");
+        // get current staked amount
+        uint256 currentStaked = userDepositedAmount[_user].depositAmount;
+
+        // Frist case: get welcome, 2 conditions
+        // 1. deposit amount > 200
+        // 2. users have a refferral link
+        (bool statusWelcome, ) = Referral(payable(referralAddress))
+            .checkCanRegisterReferral(_linkReferral, _user);
+        if (
+            currentStaked < welcomeOfferMinDeposit &&
+            currentStaked + _stakeAmount >= welcomeOfferMinDeposit &&
+            keccak256(abi.encodePacked(_linkReferral)) !=
+            keccak256(abi.encodePacked("")) &&
+            statusWelcome
+        ) {
+            _welcomeOffer = welcomeOfferForReferredUser;
+            emit UserGetWelcomePoint(_user, _welcomeOffer);
+
+            // call to referral to register Ref for user to came to limit
+            Referral(payable(referralAddress)).referralRegister(
+                _linkReferral,
+                _user
+            );
+        } else {
+            _welcomeOffer = 0;
+        }
+
+        for (
+            uint256 i = userDepositedAmount[_user].currentPointSWPx;
+            i < pointPerVeSWPx.length;
+            i++
+        ) {
+            // calculate the token SWPx stake with their status
+            // First case that in the current data
+            if (currentStaked + _stakeAmount <= pointPerVeSWPx[i].toAmount) {
+                // two case
+                // here that start point before current data
+                if (currentStaked < pointPerVeSWPx[i].fromAmount) {
+                    //                                      fromAmount       currentStake+amount           toAmount
+                    //  |--------pre-status------------------«-------------------current-status--------------«------------------next-status---------------«
+                    //  |                                    |                   |                           |                                            |
+                    //  |                         «-------addedAmount------------«                           |                                            |
+                    //  |                         |          |                   |                           |                                            |
+                    // ||------------------------------------||----------------------------------------------||-------------------------------------------||
+                    //                                       «------result-------«
+
+                    theWillGet +=
+                        ((currentStaked +
+                            _stakeAmount -
+                            pointPerVeSWPx[i].fromAmount) *
+                            pointPerVeSWPx[i].pointPerVeSWPx) /
+                        10 ** 18;
+
+                    if (theWillGet < 0) break;
+
+                    emit AmountOfTokenInStatus(
+                        _user,
+                        currentStaked +
+                            _stakeAmount -
+                            pointPerVeSWPx[i].fromAmount,
+                        pointPerVeSWPx[i].pointPerVeSWPx
+                    );
+                } else {
+                    // case that start point in current data
+                    //                                      fromAmount                  currentStake+amount  toAmount
+                    //  |--------pre-status------------------«-------------------current-status--------------«------------------next-status---------------«
+                    //  |                                    |                   |               |           |                                            |
+                    //  |                                         «-------addedAmount------------«           |                                            |
+                    //  |                                    |    |                              |           |                                            |
+                    // ||------------------------------------||----------------------------------------------||-------------------------------------------||
+                    //                                            «------result-------------------«
+                    theWillGet +=
+                        ((_stakeAmount) * pointPerVeSWPx[i].pointPerVeSWPx) /
+                        10 ** 18;
+
+                    emit AmountOfTokenInStatus(
+                        _user,
+                        _stakeAmount,
+                        pointPerVeSWPx[i].pointPerVeSWPx
+                    );
+                }
+
+                // update index of current status
+                userDepositedAmount[_user].currentPointSWPx = i;
+                break;
+            } else {
+                // case that not in current data
+                // two case
+                // here that start point before current data
+
+                //                                      fromAmount                                  toAmount  currentStake+amount
+                //  |--------pre-status------------------«-------------------current-status--------------«------------------next-status---------------«
+                //  |                                    |                   |                           |                                            |
+                //  |                         «-------addedAmount----------------------------------------|----«                                       |
+                //  |                         |          |                                               |    |                                       |
+                // ||------------------------------------||----------------------------------------------||-------------------------------------------||
+                //                                       «------result-----------------------------------«
+                if (currentStaked < pointPerVeSWPx[i].fromAmount) {
+                    theWillGet +=
+                        ((pointPerVeSWPx[i].toAmount -
+                            pointPerVeSWPx[i].fromAmount) *
+                            pointPerVeSWPx[i].pointPerVeSWPx) /
+                        10 ** 18;
+
+                    emit AmountOfTokenInStatus(
+                        _user,
+                        pointPerVeSWPx[i].toAmount - pointPerVeSWPx[i].fromAmount,
+                        pointPerVeSWPx[i].pointPerVeSWPx
+                    );
+                } else {
+                    // case that start point in current data
+                    //                                      fromAmount                                  toAmount  currentStake+amount
+                    //  |--------pre-status------------------«-------------------current-status--------------«------------------next-status---------------«
+                    //  |                                    |                   |                           |                                            |
+                    //  |                                    |            «-------addedAmount----------------|----«                                       |
+                    //  |                                    |            |                                  |    |                                       |
+                    // ||------------------------------------||----------------------------------------------||-------------------------------------------||
+                    //                                                    «------result----------------------«
+                    theWillGet +=
+                        ((pointPerVeSWPx[i].toAmount - currentStaked) *
+                            pointPerVeSWPx[i].pointPerVeSWPx) /
+                        10 ** 18;
+
+                    emit AmountOfTokenInStatus(
+                        _user,
+                        pointPerVeSWPx[i].toAmount - currentStaked,
+                        pointPerVeSWPx[i].pointPerVeSWPx
+                    );
+                }
+            }
+        }
+
+        userDepositedAmount[_user].depositAmount += _stakeAmount;
+    }
+
+    function setAccess(address _address, bool _status) external onlyOwner {
+        require(_address != address(0), "invalid _address!");
+
+        access[_address] = _status;
+        emit AccessSet(_address, _status);
+    }
+
+    function _registerTempRefLink(
+        string memory linkReferral,
+        address _user
+    ) private {
+        // check can register for this address
+        (bool canRegisRef, string memory errorString) = Referral(
+            payable(referralAddress)
+        ).checkCanRegisterReferral(linkReferral, _user);
+
+        // for the case user already have a referral link dont need to save temp ref
+        if (
+            keccak256(abi.encodePacked("User already have referral")) !=
+            keccak256(abi.encodePacked(errorString))
+        ) {
+            require(canRegisRef, errorString);
+            tempMapReferral[_user] = linkReferral;
+        }
+    }
+
+    function deposit(
+        string memory _linkReferral,
+        address _user,
+        uint256 _stakeAmount,
+        string memory _newLinkToCreate
+    ) public {
+        require(access[msg.sender], "!auth");
+
+        // if user have not stake yet and the link is valid
+        if (
+            userDepositedAmount[_user].depositAmount == 0 &&
+            keccak256(abi.encodePacked(_linkReferral)) !=
+            keccak256(abi.encodePacked(""))
+        ) {
+            // registry a link for user
+            _registerTempRefLink(_linkReferral, _user);
+        }
+
+        uint256 oldDeposit = userDepositedAmount[_user].depositAmount;
+
+        (uint256 _welcomeOffer, uint256 theWillGet) = _getTokenWillGetForUser(
+            tempMapReferral[_user],
+            _user,
+            _stakeAmount
+        );
+
+        // uint256 mintPtsAmount = _welcomeOffer +
+        //     (theWillGet * findRefMultiplier(_user)) /
+        //     BASE_REFERRAL;
+
+        userUnClaimedPTS[_user] += theWillGet;
+
+        if (_welcomeOffer > 0) {
+            QMilesPts(sqMileAddress).mint(_user, _welcomeOffer);
+        }
+
+        // check that user have link or not
+
+        if (
+            _stakeAmount + oldDeposit >= minimumDepositToGetRef &&
+            oldDeposit < minimumDepositToGetRef &&
+            keccak256(
+                abi.encodePacked(
+                    Referral(payable(referralAddress)).getLinkRefFromUser(_user)
+                )
+            ) ==
+            keccak256(abi.encodePacked(""))
+        ) {
+            Referral(payable(referralAddress)).createReferralLink(
+                _user,
+                _newLinkToCreate
+            );
+        }
+    }
+
+    function claimPts() external {
+        uint256 claimableAmount = userUnClaimedPTS[msg.sender];
+
+        require(claimableAmount > 0, "Need to greater than 0");
+
+        userUnClaimedPTS[msg.sender] = 0;
+
+        QMilesPts(sqMileAddress).mint(
+            msg.sender,
+            (claimableAmount * findRefMultiplier(msg.sender)) / BASE_REFERRAL
+        );
+    }
+
+    function findRefMultiplier(address _user) public view returns (uint256) {
+        uint256 getRefAmount = Referral(payable(referralAddress))
+            .getRefAmountFromUser(_user);
+
+        uint256 sum = BASE_REFERRAL;
+
+        for (uint256 i = 0; i < refMuliplier.length; i++) {
+            if (
+                refMuliplier[i].fromAmountOfRef <= getRefAmount &&
+                getRefAmount <= refMuliplier[i].toAmountOfRef
+            ) {
+                return
+                    sum +=
+                        (getRefAmount - refMuliplier[i].fromAmountOfRef + 1) *
+                        refMuliplier[i].additionBase;
+            } else if (refMuliplier[i].fromAmountOfRef > getRefAmount) {
+                break;
+            } else {
+                sum +=
+                    (refMuliplier[i].toAmountOfRef -
+                        refMuliplier[i].fromAmountOfRef +
+                        1) *
+                    refMuliplier[i].additionBase;
+            }
+        }
+
+        return sum;
+    }
+}

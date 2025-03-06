@@ -53,10 +53,12 @@ const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 /*Token contracts*/
 const swpx = "0x1bE1008A72433fd70718411211e49394Cd05Fc23";
 const qSWPx = "0xE95384994aC95EDbf9DC1d755F8911709DDb1763";
-const sqMilesPts = "0xc0325375D8C4a8f4e03fF293037a4262ded3343";
+const sqMilesPts = "0x3064973973495B319180E173E7133104DB2fA588";
 
 /*PCS Bootstrap contracts*/
 const campaignLens = "0xC8aC40E38a5CBe503B8e8d63C88DABEcCcccAc28";
+
+const veSWPxBootstrapLens = "0x78e5866E0790CF5f6379723355232E0679b3e109";
 const bootstrap = "0xbae85db6F51A300f799b86E7d1a3E244B6f8225C";
 const veSWPxBootstrap = "0x2347337880f5a428deC100Be1e1efB5b5C024F32";
 const voterProxy = "0xEbB82F097fEE2c641d6dC71F8b7C330CA108dF8C";
@@ -108,6 +110,16 @@ const VeSWPxBootstrap = JSON.parse(
     "utf-8"
   )
 ).abi;
+
+
+const VeSWPxReferralBootstrapLens = JSON.parse(
+  fs.readFileSync(
+    "./artifacts/contracts/VeSWPxReferralBootstrapLens.sol/VeSWPxReferralBootstrapLens.json",
+    "utf-8"
+  )
+).abi;
+
+
 
 const SWPxDepositor = JSON.parse(
   fs.readFileSync(
@@ -166,6 +178,56 @@ async function setVeSWPxParamsBoostrap() {
 }
 
 
+async function setParamsVeSWPxReferralBootstrapLens(){
+  console.log('setParamsVeSWPxReferralBootstrapLens');
+    const txCount = await web3.eth.getTransactionCount(user);
+
+  const contract = new web3.eth.Contract(VeSWPxReferralBootstrapLens);
+
+  const txData = contract.methods
+    .setParams(
+      "1000000000000000000000",
+      "500000000000000000000",
+      "200000000000000000000",
+      referral,
+      sqMilesPts,
+      ["1", "11", "51"],
+      ["100", "200", "300"],
+      [
+        "0",
+        "1000000000000000000001",
+        "5000000000000000000001",
+        "10000000000000000000001",
+        "50000000000000000000001",
+        "100000000000000000000001",
+      ],
+      [
+        "1000000000000000000",
+        "1250000000000000000",
+        "1500000000000000000",
+        "3000000000000000000",
+        "4000000000000000000",
+        "5000000000000000000",
+      ]
+    )
+    .encodeABI();
+
+  //using ETH
+  const txObj = {
+    nonce: txCount,
+    gas: web3.utils.toHex(1000000),
+    gasPrice: await web3.eth.getGasPrice(),
+    data: txData,
+    to: veSWPxBootstrapLens,
+    from: user,
+  };
+
+  const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);
+
+  const result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction!);
+  console.log(result);
+
+}
 
 // async function setParamsVoterProxy() {
 //   console.log("setParamsVoterProxy");
@@ -318,6 +380,7 @@ async function main() {
   /*==============SET PARAMS===============*/
 
   //await setVeSWPxParamsBoostrap();
+  setParamsVeSWPxReferralBootstrapLens();
   
   
   /*==============SET AUTH===============*/
