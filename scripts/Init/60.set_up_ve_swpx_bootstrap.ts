@@ -310,6 +310,59 @@ async function setOperator() {
   console.log(result);
 }
 
+// set access for VeSWPxBootstrapCampaignLens to call Referral
+async function setAccessReferral() {
+  console.log("setAccessReferral ");
+
+  const txCount = await web3.eth.getTransactionCount(user);
+
+  const contract = new web3.eth.Contract(Referral);
+
+  const txData = contract.methods.setAccess(veSWPxBootstrapLens, true).encodeABI();
+
+  //using ETH
+  const txObj = {
+    nonce: txCount,
+    gas: web3.utils.toHex(1000000),
+    gasPrice: await web3.eth.getGasPrice(),
+    data: txData,
+    to: referral,
+    from: user,
+  };
+  const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);
+
+  const result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction!);
+  console.log(result);
+}
+
+
+//set access for VeSWPxRefferalBootstrapLens to mint SQMIlesPTs
+async function setAccessSQMilePTS() {
+  console.log("setAccessSQMilePTS ");
+
+  const txCount = await web3.eth.getTransactionCount(user);
+
+  const contract = new web3.eth.Contract(SQMilePTS);
+
+  const txData = contract.methods.setAccess(veSWPxBootstrapLens, true).encodeABI();
+
+  //using ETH
+  const txObj = {
+    nonce: txCount,
+    gas: web3.utils.toHex(1000000),
+    gasPrice: await web3.eth.getGasPrice(),
+    data: txData,
+    to: sqMilesPts,
+    from: user,
+  };
+
+  const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);
+
+  const result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction!);
+  console.log(result);
+}
+
+
 async function initPool(startCampaign: number, endCampaign: number) {
   console.log("init Pool ");
 
@@ -380,11 +433,12 @@ async function main() {
   /*==============SET PARAMS===============*/
 
   //await setVeSWPxParamsBoostrap();
-  setParamsVeSWPxReferralBootstrapLens();
+  //setParamsVeSWPxReferralBootstrapLens();
   
   
   /*==============SET AUTH===============*/
- 
+  //setAccessReferral () ; //set access for VeSWPxReferralBootstrapLens call referral
+  //setAccessSQMilePTS();; //set access for SWPxRefferalCampaignLens to mint SQMIlesPTs
   // await setAccessSWPxRefferalCampaignLens();  //   set access for VeSWPxBoostrap to call deposit
   // await setOperator(); // allow VeSWPxBootstrap to call mint qSWPx
   
