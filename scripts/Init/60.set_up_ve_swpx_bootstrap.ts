@@ -158,7 +158,7 @@ async function setVeSWPxParamsBoostrap() {
   const contract = new web3.eth.Contract(VeSWPxBootstrap);
 
   const txData = contract.methods
-    .setParams(voterProxy, qSWPx, veSWPx, campaignLens)
+    .setParams(voterProxy, qSWPx, veSWPx, veSWPxBootstrapLens)
     .encodeABI();
 
   //using ETH
@@ -258,12 +258,12 @@ async function setParamsVeSWPxReferralBootstrapLens(){
 
 
 //set access for veSWPxboostrap to call deposit
-async function setAccessSWPxRefferalCampaignLens() {
-  console.log("setAccessSWPxRefferalCampaignLens ");
+async function setAccessSWPxRefferalBootstrapLens() {
+  console.log("setAccessSWPxRefferalBootstrapLens ");
 
   const txCount = await web3.eth.getTransactionCount(user);
 
-  const contract = new web3.eth.Contract(ReferralCampaignLens);
+  const contract = new web3.eth.Contract(VeSWPxReferralBootstrapLens);
 
   const txData = contract.methods.setAccess(veSWPxBootstrap, true).encodeABI();
 
@@ -273,7 +273,7 @@ async function setAccessSWPxRefferalCampaignLens() {
     gas: web3.utils.toHex(1000000),
     gasPrice: await web3.eth.getGasPrice(),
     data: txData,
-    to: campaignLens,
+    to: veSWPxBootstrapLens,
     from: user,
   };
 
@@ -439,7 +439,7 @@ async function main() {
   /*==============SET AUTH===============*/
   //setAccessReferral () ; //set access for VeSWPxReferralBootstrapLens call referral
   //setAccessSQMilePTS();; //set access for SWPxRefferalCampaignLens to mint SQMIlesPTs
-  // await setAccessSWPxRefferalCampaignLens();  //   set access for VeSWPxBoostrap to call deposit
+   await setAccessSWPxRefferalBootstrapLens();  //   set access for VeSWPxBoostrap to call deposit
   // await setOperator(); // allow VeSWPxBootstrap to call mint qSWPx
   
   
