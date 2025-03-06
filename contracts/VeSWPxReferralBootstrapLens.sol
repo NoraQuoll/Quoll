@@ -54,6 +54,8 @@ contract VeSWPxReferralBootstrapLens is OwnableUpgradeable {
 
     event UserGetWelcomePoint(address user, uint256 amount);
     event AccessSet(address indexed _address, bool _status);
+    event UserClaimPts(address user, uint256 amount);
+
 
     function initialize() public initializer {
         __Ownable_init();
@@ -357,10 +359,14 @@ contract VeSWPxReferralBootstrapLens is OwnableUpgradeable {
 
         userUnClaimedPTS[msg.sender] = 0;
 
+        uint256 amountMint = (claimableAmount * findRefMultiplier(msg.sender)) / BASE_REFERRAL;
         QMilesPts(sqMileAddress).mint(
             msg.sender,
-            (claimableAmount * findRefMultiplier(msg.sender)) / BASE_REFERRAL
+            amountMint
         );
+          
+        emit UserClaimPts(msg.sender, amountMint);
+        
     }
 
     function findRefMultiplier(address _user) public view returns (uint256) {
