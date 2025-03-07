@@ -47,7 +47,12 @@ contract SWPxVoterProxy is
     event SWPxLockMinted(uint256 tokenId);
     event SWPxLocked(uint256 amount);
     event SWPxLockDurationIncreased(uint256 lockedUntil);
-    event veSWPxReceived(address operator, address from, uint256 tokenId, bytes data);
+    event veSWPxReceived(
+        address operator,
+        address from,
+        uint256 tokenId,
+        bytes data
+    );
 
     modifier onlyBooster() {
         require(msg.sender == booster, "!auth");
@@ -168,7 +173,10 @@ contract SWPxVoterProxy is
                 );
                 emit SWPxLocked(balance);
                 // Lock is still active, just increase the lock duration
-                if (block.timestamp > nextIncreaseUnlockAt) {
+                if (
+                    ((block.timestamp + MAX_LOCK_DURATION) / WEEK) * WEEK >
+                    IVotingEscrowV1_1(veSWPx).locked__end(lockedTokenId)
+                ) {
                     IVotingEscrowV1_1(veSWPx).increase_unlock_time(
                         lockedTokenId,
                         MAX_LOCK_DURATION
@@ -221,9 +229,8 @@ contract SWPxVoterProxy is
         if (lockedTokenId == 0) {
             lockedTokenId = tokenId;
             emit SWPxLockMinted(lockedTokenId);
-        }
-        else {
-            IVotingEscrowV1_1(veSWPx).merge(tokenId, lockedTokenId );
+        } else {
+            IVotingEscrowV1_1(veSWPx).merge(tokenId, lockedTokenId);
         }
         return this.onERC721Received.selector;
     }
