@@ -59,12 +59,12 @@ contract SWPxDepositor is ISWPxDepositor, OwnableUpgradeable {
 
         //increase amount 
         uint256 swpxBalanceVoterProxy = IERC20(swpx).balanceOf(voterProxy);
-        if (swpxBalance == 0){
+        if (swpxBalanceVoterProxy == 0){
             return;
         }
 
         ISWPxVoterProxy(voterProxy).lockSWPx(maxLockDays);
-
+        lastLockTime = block.timestamp;
         
     }
 

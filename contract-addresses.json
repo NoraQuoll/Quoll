@@ -644,7 +644,7 @@
         },
         "SWPxDepositor": {
             "address": "0x277Cd4b508aFbb75d182870409bBf610AFab5c7b",
-            "impl": "0x728E745E9b84f1e2A3CF72C5Caf1FB53f3Fff945"
+            "impl": "0x8405CC7285b2E59639FF4a95629BC39E42C62107"
         },
         "QSWPxBalanceRewardPool": {
             "address": "0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54",
