@@ -14,6 +14,7 @@ import "./Interfaces/Pancake/IMasterChef.sol";
 import "./Interfaces/Pancake/IRevenueSharingPool.sol";
 import "./Interfaces/Pancake/IVECake.sol";
 import "./Interfaces/Pancake/IVECakeOwner.sol";
+import "./Interfaces/Pancake/IPlatform.sol";
 
 import "./lib/TransferHelper.sol";
 
@@ -28,6 +29,7 @@ contract PCSVoterProxy is IPCSVoterProxy, OwnableUpgradeable {
 
     address public booster;
     address public depositor;
+    address public platform; //VoteMarket 
 
     IGaugeVoting public gaugeVoting;
     address public bribeManager;
@@ -90,6 +92,13 @@ contract PCSVoterProxy is IPCSVoterProxy, OwnableUpgradeable {
         bribeManager = _bribeManager;
     }
 
+    // to claim bribe reward
+    function setPlatform(address _platform) external onlyOwner {
+        require(_platform != address(0), "invald _bribeManager!");
+        platform = _platform;
+
+    }
+
     function setBribeCallerFee(uint256 _bribeCallerFee) external onlyOwner {
         require(_bribeCallerFee <= 100, "invalid _bribeCallerFee!");
         bribeCallerFee = _bribeCallerFee;
@@ -142,6 +151,38 @@ contract PCSVoterProxy is IPCSVoterProxy, OwnableUpgradeable {
         IVECakeOwner(0xe6cdC66A96458FbF11F632B50964153fBDa78548).setWhitelist(_status);
     }
 
+     function vote(
+        address[] memory _pools,
+        uint256[] memory _weights,
+        uint256[] memory _chainIds,
+        address[] memory _rewarders,
+        address _caller
+    )
+        external
+        override
+        returns (address[][] memory rewardTokens, uint256[][] memory feeAmounts)
+    {
+        //require(msg.sender == bribeManager, "!auth");
+        require(
+            _pools.length == _weights.length &&
+                _pools.length == _chainIds.length,
+            "length mismacth"
+        );
+
+        gaugeVoting.voteForGaugeWeightsBulk(
+            _pools,
+            _weights,
+            _chainIds,
+            false,
+            false
+        );
+    }
+
+    function claimBribeReward(uint256[] memory bounties) external {
+        require(platform != address(0), "platform has not been set yet");
+        IPlatform(platform).claimAllFor(address(this),bounties);
+    }
+    
     // function vote(
     //     address[] calldata _lpVote,
     //     int256[] calldata _deltas,

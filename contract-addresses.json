@@ -454,7 +454,7 @@
         },
         "PCSReferralCampaignLens": {
             "address": "0x2484feB840fCdb505fc0739d86518CAc1F14e7B3",
-            "impl": "0x2cAA974471dE39bb8219761eBF2Cb5f52bA333ec"
+            "impl": "0xD9aD7B32B03782070663c3D12b6Aad6320112E22"
         },
         "PCSReferral": {
             "address": "0x06B5c419ec807Acb6CdF2c2Fab91889cBe79302f",
@@ -620,6 +620,59 @@
         "VlQuoV2": {
             "address": "0x1787b212A96eBA9EAa8c55B30D4dB6e5bc6EBD8d",
             "impl": "0xcA57285cFB1E1ce095F6f210B4695fB1869C451c"
+        }
+    },
+    "sonic": {
+        "DefaultProxyAdmin": {
+            "address": "0x3Bb551605ee030C19E6E57DcA54a18e3CEEE0177"
+        },
+        "qSWPx": {
+            "address": "0x350708Fe3396E066fFC981fBd560Dc34905CA98d",
+            "impl": "0x16821E45d208D8369c135f546759Fd9849e76433"
+        },
+        "SWPxBoostrap": {
+            "address": "0xEE5B62b3B948F48719f79b3f65e35c5318267A86",
+            "impl": "0x4F878DCa03d9970Bb2a9B770Df7f7E49226510bC"
+        },
+        "SWPxVoterProxy": {
+            "address": "0xf928eb071248B8f79D435c6D0BfB0AbAA6803c06",
+            "impl": "0xd3D28eF12863462aAe33A331D4C4964933D1e5D1"
+        },
+        "SWPxReferralCampaignLens": {
+            "address": "0x388D157F0BFdc1d30357AF63a8be10BfF8474f4e",
+            "impl": "0x02fb761CcfF103BF4CF54905117DFDa846b084A5"
+        },
+        "SWPxDepositor": {
+            "address": "0x277Cd4b508aFbb75d182870409bBf610AFab5c7b",
+            "impl": "0x8405CC7285b2E59639FF4a95629BC39E42C62107"
+        },
+        "QSWPxBalanceRewardPool": {
+            "address": "0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54",
+            "impl": "0x7b6bb9Ccd8B0fAa968054D8e2adc7274830A6969"
+        },
+        "SQMilesPts": {
+            "address": "0xc0325375D8C4a88f4e03fF293037a4262ded3343",
+            "impl": "0x6E82Cf85119eBe90bb68135a1e0685e3a0d415F7"
+        },
+        "sQUO": {
+            "address": "0xF02b3b6dE7a3f1ED2651e34812eA10C9850cAf19",
+            "impl": "0xd198212607b5493B97BC908462cEF1Cf509296F0"
+        },
+        "Multicall3": {
+            "address": "0xeacb160a910A6a1189c9Ec03D5dFea946926754e",
+            "impl": ""
+        },
+        "SWPReferral": {
+            "address": "0x7BAd956Ad61CB21960Ff647B8fF4c291b44A6FD2",
+            "impl": "0x87856b52516CD6C386C41D56965e142E509Aa461"
+        },
+        "VeSWPxBootstrap": {
+            "address": "0xEe45E5B0042600b15ba6141aaa85C9d24e20aE0A",
+            "impl": "0x6a94FfB4c70421De3ED01AA9D5590f38cD2cd9AC"
+        },
+        "VeSWPxReferralBootstrapLens": {
+            "address": "0xe360d7d719974DFD20fceDAF3386a289c568C2D4",
+            "impl": "0x72039C82875D9592a61Aa0F121633098Ecb3fE21"
         }
     }
 }

@@ -3,99 +3,99 @@ pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
 import "hardhat/console.sol";
+
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 import "./Referral.sol";
 import "./QMilesPts.sol";
 
-contract PCSReferralCampaignLens is OwnableUpgradeable {
+contract VeSWPxReferralBootstrapLens is OwnableUpgradeable {
     struct RefMulti {
         uint256 fromAmountOfRef;
         uint256 toAmountOfRef;
         uint256 additionBase;
     }
 
-    struct PointPerCakeStruct {
+    struct PointPerVeTheStruct {
         uint256 fromAmount;
         uint256 toAmount;
-        uint256 pointPerCake;
+        uint256 pointPerVeSWPx;
     }
 
     struct UserDataStruct {
         uint256 depositAmount;
-        uint256 currentPointCake;
+        uint256 currentPointSWPx;
     }
 
-    uint256 public constant BASE_REFERRAL_INTERNAL = 10000;
-    uint256 public constant BASE_REFERRAL_WITH_SQUAD_INTERNAL = 11000;
+    uint256 public constant BASE_REFERRAL = 10000;
     uint256 public minimumDepositToGetRef;
     uint256 public welcomeOfferMinDeposit;
     uint256 public welcomeOfferForReferredUser;
 
     address public referralAddress;
-    address public qMileAddress;
+    address public sqMileAddress;
 
     mapping(address => UserDataStruct) public userDepositedAmount;
-    RefMulti[] public refMultiplier;
-    PointPerCakeStruct[] public pointPerCake;
+
+    RefMulti[] public refMuliplier;
+    PointPerVeTheStruct[] public pointPerVeSWPx;
 
     mapping(address => string) public tempMapReferral;
-    mapping(address => bool) public access;
-    mapping(address => uint256) public userUnClaimedPTS;
 
-    address public squad; //nft Pancake Squad
+    mapping(address => bool) public access;
+
+    mapping(address => uint256) public userUnClaimedPTS;
 
     event AmountOfTokenInStatus(
         address user,
         uint256 amount,
         uint256 multiplier
     );
+
     event UserGetWelcomePoint(address user, uint256 amount);
     event AccessSet(address indexed _address, bool _status);
-
     event UserClaimPts(address user, uint256 amount);
+
 
     function initialize() public initializer {
         __Ownable_init();
     }
 
     function getRefMultiplier() public view returns (RefMulti[] memory) {
-        return refMultiplier;
+        return refMuliplier;
     }
 
     function setParams(
         uint256 _minimumDepositToGetRef,
         uint256 _welcomeOfferForReferredUser,
         uint256 _welcomeOfferMinDeposit,
+        // uint256 _minimumDepositToGetOffer,
         address _referralAddress,
-        address _qMileAddress,
-        address _squad,
+        address _sqMileAddress,
         uint256[] memory _fromAmountOfRef,
         uint256[] memory _additionBase,
         uint256[] memory _fromAmount,
-        uint256[] memory _pointPerCake
+        uint256[] memory _pointPerVeSWPx
     ) external onlyOwner {
         minimumDepositToGetRef = _minimumDepositToGetRef;
         welcomeOfferMinDeposit = _welcomeOfferMinDeposit;
+        // minimumDepositToGetOffer = _minimumDepositToGetOffer;
         welcomeOfferForReferredUser = _welcomeOfferForReferredUser;
         referralAddress = _referralAddress;
-        qMileAddress = _qMileAddress;
-        squad = _squad;
+        sqMileAddress = _sqMileAddress;
 
         require(
             _fromAmountOfRef.length == _additionBase.length,
             "invalid length of refmulti struct"
         );
-
         require(
-            _fromAmount.length == _pointPerCake.length,
-            "invalid point per cake"
+            _fromAmount.length == _pointPerVeSWPx.length,
+            "invalid point per the"
         );
 
         for (uint256 i = 0; i < _fromAmountOfRef.length; i++) {
             if (i != _fromAmountOfRef.length - 1) {
-                refMultiplier.push(
+                refMuliplier.push(
                     RefMulti(
                         _fromAmountOfRef[i],
                         _fromAmountOfRef[i + 1] - 1,
@@ -103,7 +103,7 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
                     )
                 );
             } else {
-                refMultiplier.push(
+                refMuliplier.push(
                     RefMulti(_fromAmountOfRef[i], uint256(-1), _additionBase[i])
                 );
             }
@@ -111,37 +111,32 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
 
         for (uint256 i = 0; i < _fromAmount.length; i++) {
             if (i != _fromAmount.length - 1) {
-                pointPerCake.push(
-                    PointPerCakeStruct(
+                pointPerVeSWPx.push(
+                    PointPerVeTheStruct(
                         _fromAmount[i],
                         _fromAmount[i + 1] - 1,
-                        _pointPerCake[i]
+                        _pointPerVeSWPx[i]
                     )
                 );
             } else {
-                pointPerCake.push(
-                    PointPerCakeStruct(
+                pointPerVeSWPx.push(
+                    PointPerVeTheStruct(
                         _fromAmount[i],
                         uint256(-1),
-                        _pointPerCake[i]
+                        _pointPerVeSWPx[i]
                     )
                 );
             }
         }
     }
 
-    function hasSquadNFT(address account) internal view returns (bool) {
-        return IERC721(squad).balanceOf(account) > 0;
-    }
-
     function _getTokenWillGetForUser(
         string memory _linkReferral,
         address _user,
         uint256 _stakeAmount
-    ) internal returns (uint256 _welcomeOffer, uint256 ptsWillGet) {
+    ) internal returns (uint256 _welcomeOffer, uint256 theWillGet) {
         require(_stakeAmount > 0, "invalid stakeAmount");
-
-        //get current staked amount
+        // get current staked amount
         uint256 currentStaked = userDepositedAmount[_user].depositAmount;
 
         // Frist case: get welcome, 2 conditions
@@ -149,7 +144,6 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
         // 2. users have a refferral link
         (bool statusWelcome, ) = Referral(payable(referralAddress))
             .checkCanRegisterReferral(_linkReferral, _user);
-
         if (
             currentStaked < welcomeOfferMinDeposit &&
             currentStaked + _stakeAmount >= welcomeOfferMinDeposit &&
@@ -170,16 +164,16 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
         }
 
         for (
-            uint256 i = userDepositedAmount[_user].currentPointCake;
-            i < pointPerCake.length;
+            uint256 i = userDepositedAmount[_user].currentPointSWPx;
+            i < pointPerVeSWPx.length;
             i++
         ) {
-            // calculate the token Cake stake with their status
+            // calculate the token SWPx stake with their status
             // First case that in the current data
-            if (currentStaked + _stakeAmount <= pointPerCake[i].toAmount) {
-                //two case
+            if (currentStaked + _stakeAmount <= pointPerVeSWPx[i].toAmount) {
+                // two case
                 // here that start point before current data
-                if (currentStaked < pointPerCake[i].fromAmount) {
+                if (currentStaked < pointPerVeSWPx[i].fromAmount) {
                     //                                      fromAmount       currentStake+amount           toAmount
                     //  |--------pre-status------------------«-------------------current-status--------------«------------------next-status---------------«
                     //  |                                    |                   |                           |                                            |
@@ -187,20 +181,22 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
                     //  |                         |          |                   |                           |                                            |
                     // ||------------------------------------||----------------------------------------------||-------------------------------------------||
                     //                                       «------result-------«
-                    ptsWillGet +=
+
+                    theWillGet +=
                         ((currentStaked +
                             _stakeAmount -
-                            pointPerCake[i].fromAmount) *
-                            pointPerCake[i].pointPerCake) /
+                            pointPerVeSWPx[i].fromAmount) *
+                            pointPerVeSWPx[i].pointPerVeSWPx) /
                         10 ** 18;
 
-                    if (ptsWillGet < 0) break;
+                    if (theWillGet < 0) break;
+
                     emit AmountOfTokenInStatus(
                         _user,
                         currentStaked +
                             _stakeAmount -
-                            pointPerCake[i].fromAmount,
-                        pointPerCake[i].pointPerCake
+                            pointPerVeSWPx[i].fromAmount,
+                        pointPerVeSWPx[i].pointPerVeSWPx
                     );
                 } else {
                     // case that start point in current data
@@ -211,18 +207,19 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
                     //  |                                    |    |                              |           |                                            |
                     // ||------------------------------------||----------------------------------------------||-------------------------------------------||
                     //                                            «------result-------------------«
-
-                    ptsWillGet +=
-                        ((_stakeAmount) * pointPerCake[i].pointPerCake) /
+                    theWillGet +=
+                        ((_stakeAmount) * pointPerVeSWPx[i].pointPerVeSWPx) /
                         10 ** 18;
+
                     emit AmountOfTokenInStatus(
                         _user,
                         _stakeAmount,
-                        pointPerCake[i].pointPerCake
+                        pointPerVeSWPx[i].pointPerVeSWPx
                     );
                 }
+
                 // update index of current status
-                userDepositedAmount[_user].currentPointCake = i;
+                userDepositedAmount[_user].currentPointSWPx = i;
                 break;
             } else {
                 // case that not in current data
@@ -236,17 +233,17 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
                 //  |                         |          |                                               |    |                                       |
                 // ||------------------------------------||----------------------------------------------||-------------------------------------------||
                 //                                       «------result-----------------------------------«
-                if (currentStaked < pointPerCake[i].fromAmount) {
-                    ptsWillGet +=
-                        ((pointPerCake[i].toAmount -
-                            pointPerCake[i].fromAmount) *
-                            pointPerCake[i].pointPerCake) /
+                if (currentStaked < pointPerVeSWPx[i].fromAmount) {
+                    theWillGet +=
+                        ((pointPerVeSWPx[i].toAmount -
+                            pointPerVeSWPx[i].fromAmount) *
+                            pointPerVeSWPx[i].pointPerVeSWPx) /
                         10 ** 18;
 
                     emit AmountOfTokenInStatus(
                         _user,
-                        pointPerCake[i].toAmount - pointPerCake[i].fromAmount,
-                        pointPerCake[i].pointPerCake
+                        pointPerVeSWPx[i].toAmount - pointPerVeSWPx[i].fromAmount,
+                        pointPerVeSWPx[i].pointPerVeSWPx
                     );
                 } else {
                     // case that start point in current data
@@ -256,15 +253,16 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
                     //  |                                    |            «-------addedAmount----------------|----«                                       |
                     //  |                                    |            |                                  |    |                                       |
                     // ||------------------------------------||----------------------------------------------||-------------------------------------------||
-                    //
-                    ptsWillGet +=
-                        ((pointPerCake[i].toAmount - currentStaked) *
-                            pointPerCake[i].pointPerCake) /
+                    //                                                    «------result----------------------«
+                    theWillGet +=
+                        ((pointPerVeSWPx[i].toAmount - currentStaked) *
+                            pointPerVeSWPx[i].pointPerVeSWPx) /
                         10 ** 18;
+
                     emit AmountOfTokenInStatus(
                         _user,
-                        pointPerCake[i].toAmount - currentStaked,
-                        pointPerCake[i].pointPerCake
+                        pointPerVeSWPx[i].toAmount - currentStaked,
+                        pointPerVeSWPx[i].pointPerVeSWPx
                     );
                 }
             }
@@ -284,18 +282,17 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
         string memory linkReferral,
         address _user
     ) private {
-        //check can register for this address
-        (bool canRegister, string memory errorString) = Referral(
+        // check can register for this address
+        (bool canRegisRef, string memory errorString) = Referral(
             payable(referralAddress)
         ).checkCanRegisterReferral(linkReferral, _user);
 
         // for the case user already have a referral link dont need to save temp ref
-
         if (
             keccak256(abi.encodePacked("User already have referral")) !=
-            keccak256(abi.encode(errorString))
+            keccak256(abi.encodePacked(errorString))
         ) {
-            require(canRegister, errorString);
+            require(canRegisRef, errorString);
             tempMapReferral[_user] = linkReferral;
         }
     }
@@ -308,7 +305,7 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
     ) public {
         require(access[msg.sender], "!auth");
 
-        //if user have not stake yet and the link is valid
+        // if user have not stake yet and the link is valid
         if (
             userDepositedAmount[_user].depositAmount == 0 &&
             keccak256(abi.encodePacked(_linkReferral)) !=
@@ -320,16 +317,20 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
 
         uint256 oldDeposit = userDepositedAmount[_user].depositAmount;
 
-        (uint256 _welcomeOffer, uint256 ptsWillGet) = _getTokenWillGetForUser(
+        (uint256 _welcomeOffer, uint256 theWillGet) = _getTokenWillGetForUser(
             tempMapReferral[_user],
             _user,
             _stakeAmount
         );
 
-        userUnClaimedPTS[_user] += ptsWillGet;
+        // uint256 mintPtsAmount = _welcomeOffer +
+        //     (theWillGet * findRefMultiplier(_user)) /
+        //     BASE_REFERRAL;
+
+        userUnClaimedPTS[_user] += theWillGet;
 
         if (_welcomeOffer > 0) {
-            QMilesPts(qMileAddress).mint(_user, _welcomeOffer);
+            QMilesPts(sqMileAddress).mint(_user, _welcomeOffer);
         }
 
         // check that user have link or not
@@ -353,50 +354,47 @@ contract PCSReferralCampaignLens is OwnableUpgradeable {
 
     function claimPts() external {
         uint256 claimableAmount = userUnClaimedPTS[msg.sender];
-        require(claimableAmount > 0, " Need to greater than 0");
+
+        require(claimableAmount > 0, "Need to greater than 0");
 
         userUnClaimedPTS[msg.sender] = 0;
 
-        uint256 amountMint = (claimableAmount * findRefMultiplier(msg.sender)) /
-            BASE_REFERRAL_INTERNAL;
-
-        QMilesPts(qMileAddress).mint(msg.sender, amountMint);
-
+        uint256 amountMint = (claimableAmount * findRefMultiplier(msg.sender)) / BASE_REFERRAL;
+        QMilesPts(sqMileAddress).mint(
+            msg.sender,
+            amountMint
+        );
+          
         emit UserClaimPts(msg.sender, amountMint);
-    }
-
-    function BASE_REFERRAL(address _user) public view returns (uint256) {
-        if (hasSquadNFT(_user)) {
-            return BASE_REFERRAL_WITH_SQUAD_INTERNAL;
-        }
-        return BASE_REFERRAL_INTERNAL;
+        
     }
 
     function findRefMultiplier(address _user) public view returns (uint256) {
         uint256 getRefAmount = Referral(payable(referralAddress))
             .getRefAmountFromUser(_user);
 
-        uint256 sum = BASE_REFERRAL(_user);
+        uint256 sum = BASE_REFERRAL;
 
-        for (uint256 i = 0; i < refMultiplier.length; i++) {
+        for (uint256 i = 0; i < refMuliplier.length; i++) {
             if (
-                refMultiplier[i].fromAmountOfRef <= getRefAmount &&
-                getRefAmount <= refMultiplier[i].toAmountOfRef
+                refMuliplier[i].fromAmountOfRef <= getRefAmount &&
+                getRefAmount <= refMuliplier[i].toAmountOfRef
             ) {
                 return
                     sum +=
-                        (getRefAmount - refMultiplier[i].fromAmountOfRef + 1) *
-                        refMultiplier[i].additionBase;
-            } else if (refMultiplier[i].fromAmountOfRef > getRefAmount) {
+                        (getRefAmount - refMuliplier[i].fromAmountOfRef + 1) *
+                        refMuliplier[i].additionBase;
+            } else if (refMuliplier[i].fromAmountOfRef > getRefAmount) {
                 break;
             } else {
                 sum +=
-                    (refMultiplier[i].toAmountOfRef -
-                        refMultiplier[i].fromAmountOfRef +
+                    (refMuliplier[i].toAmountOfRef -
+                        refMuliplier[i].fromAmountOfRef +
                         1) *
-                    refMultiplier[i].additionBase;
+                    refMuliplier[i].additionBase;
             }
         }
+
         return sum;
     }
 }

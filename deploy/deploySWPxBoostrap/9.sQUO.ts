@@ -1,6 +1,6 @@
 import { DeployFunction } from "hardhat-deploy/dist/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { saveContract, getContracts, sleep } from "../scripts/utils";
+import { saveContract, getContracts, sleep } from "../../scripts/utils";
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -14,29 +14,26 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const data = await deploy("QMilesPts", {
+  const multisig = "0x417144F0d27dA5ED261f9DcFD12C74BbfA324A52";
+  const data = await deploy("SQuollToken", {
     from: deployer,
     args: [],
     log: true,
     deterministicDeployment: false,
     gasPrice: (await web3.eth.getGasPrice()).toString(),
+    // gasLimit: 50_000_000_000,
     proxy: {
       proxyContract: "OptimizedTransparentProxy",
       owner: deployer,
-      // execute: {
-      //   methodName: "initialize",
-      //   args: [],
-      // },
+      execute: {
+        methodName: "initialize",
+        args: [multisig],
+      },
     },
   });
 
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
-  await saveContract(
-    network.name,
-    `QMilesPts`,
-    data.address,
-    data.implementation!
-  );
+  await saveContract(network.name, "sQUO", data.address, data.implementation!);
 
   try {
     // verify
@@ -49,6 +46,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-deploy.tags = ["QMilesPts"];
+deploy.tags = ["sQUO"];
 
 export default deploy;
