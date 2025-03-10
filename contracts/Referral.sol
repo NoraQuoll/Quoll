@@ -125,6 +125,13 @@ contract Referral is IReferral, OwnableUpgradeable {
         emit ReferralRegister(_user, linkReferral, usedLink[linkReferral]);
     }
 
+    function changeReferralAmountByOwner(
+        address _user,
+        uint256 _amount
+    ) public onlyOwner {
+        referralLinkFromUser[_user].refAmount = _amount;
+    }
+
     function referralRegister(
         string memory _linkReferral,
         address _user
