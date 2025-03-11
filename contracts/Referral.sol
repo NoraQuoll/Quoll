@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.12;
+pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
@@ -62,6 +63,15 @@ contract Referral is IReferral, OwnableUpgradeable {
         usedLink[link] = user;
 
         emit CreateReferralLink(user, link);
+    }
+
+    function createReferralLinkByOwner(
+        address[] memory users,
+        string[] memory links
+    ) public onlyOwner {
+        for (uint256 i = 0; i < users.length; i++) {
+            createReferralLink(users[i], links[i]);
+        }
     }
 
     function changeReferralLink(

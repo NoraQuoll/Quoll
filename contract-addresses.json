@@ -664,7 +664,7 @@
         },
         "SWPReferral": {
             "address": "0x7BAd956Ad61CB21960Ff647B8fF4c291b44A6FD2",
-            "impl": "0x99727b9D86ca39bEC6cf8B183E419f09dD66D692"
+            "impl": "0xc5b162F09Acdd5ca2136ba5EA5c445f3495BC14e"
         },
         "VeSWPxBootstrap": {
             "address": "0xEe45E5B0042600b15ba6141aaa85C9d24e20aE0A",
