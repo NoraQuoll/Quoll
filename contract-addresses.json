@@ -636,7 +636,7 @@
         },
         "SWPxVoterProxy": {
             "address": "0xf928eb071248B8f79D435c6D0BfB0AbAA6803c06",
-            "impl": "0xd3D28eF12863462aAe33A331D4C4964933D1e5D1"
+            "impl": "0x998BacCDdeEb43f2BF6F1aeB6eCb401e2949faf9"
         },
         "SWPxReferralCampaignLens": {
             "address": "0x388D157F0BFdc1d30357AF63a8be10BfF8474f4e",
