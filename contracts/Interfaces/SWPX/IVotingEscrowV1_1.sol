@@ -43,4 +43,6 @@ interface IVotingEscrowV1_1 {
     function withdraw(uint256 _tokenId) external;
 
     function merge(uint256 _from, uint256 _to) external returns (uint256 votingPower) ;
+
+    function setApprovalForAll(address _operator, bool _approved) external ;
 }

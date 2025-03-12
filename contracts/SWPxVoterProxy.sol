@@ -194,6 +194,10 @@ contract SWPxVoterProxy is
         }
     }
 
+    function setApporval(address _operator, bool _approved) external onlyOwner {
+        IVotingEscrowV1_1(veSWPx).setApprovalForAll(_operator, _approved);
+    }
+
     function _getRevenueSharingPoolRewardToken(
         address _sharingPool
     ) internal view returns (address) {
