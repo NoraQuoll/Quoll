@@ -14,11 +14,12 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
 
     uint256 public constant PRECISION = 1e4;
 
-    IERC20 public token;
-    IERC20 public purchaseToken;
+    IERC20 public token; //SQUO
+    IERC20 public purchaseToken; //USDT
 
-    /// in public sale mode, whitelist is disable
-    bool public isPublicSale;
+    // For pre-seed and private sale it's a whitelist
+    // For public sale it's for everyone 
+    bool public isWhitelist;
 
     uint256 public startTime;
     // initial lock duration in second
@@ -27,12 +28,13 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
     // linear release duration in second
     uint256 public releaseDuration;
     uint256 public tokenPrice; //10000 = 0.01 USDT
+    uint256 public minBuyAmount;
     uint256 public supply;
     uint256 public sold;
 
-    address[] buyers;
+   address purchaseRecipient;
 
-    mapping(address => uint256) public userBoughts;
+    mapping(address => uint256) public limitAmounts;
     mapping(address => uint256) public totalAmounts;
     mapping(address => uint256) public claimedAmounts;
     mapping(address => bool) public whitelist;
@@ -49,9 +51,10 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
         uint256 _lockPercent,
         uint256 _releaseDuration,
         address _purchaseToken,
-        uint256 _tokenPrice,
-        bool _isPublicSale,
-        uint256 _supply
+        uint256 _tokenPrice, 
+        uint256 _minBuyAmount,
+        address _purchaseRecipient
+
     ) public initializer {
         __Ownable_init();
 
@@ -60,6 +63,7 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
         require(_releaseDuration > 0, "invalid _releaseDuration!");
         require(_tokenPrice > 0, "invalid _tokenPrice");
         require(_purchaseToken != address(0), "invalid _purchaseToken");
+        require(_purchaseRecipient != address(0), "!invalid _purchaseRecipient");
 
         token = IERC20(_token);
         startTime = _startTime;
@@ -67,24 +71,16 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
         lockPercent = _lockPercent;
         releaseDuration = _releaseDuration;
         purchaseToken = IERC20(_purchaseToken);
-        isPublicSale = _isPublicSale;
         tokenPrice = _tokenPrice;
-        supply = _supply;
+        purchaseRecipient = _purchaseRecipient;
+        minBuyAmount = _minBuyAmount;
+        isWhitelist = true;
         sold = 0;
     }
 
-    function addWhitelist(address[] calldata _users) external onlyManager {
-        for (uint i = 0; i < _users.length; i++) {
-            whitelist[_users[i]] = true;
-        }
-    }
 
-    function removeWhiteList(address[] calldata _users) external onlyManager {
-        for (uint i = 0; i < _users.length; i++) {
-            delete whitelist[_users[i]];
-        }
-    }
-
+    // Whitelists will have a precise allocation per user
+    // By default, the contract is in whitelist mode
     function fund(
         address[] calldata _recipients,
         uint256[] calldata _amounts
@@ -93,6 +89,7 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
             _recipients.length == _amounts.length && _recipients.length > 0,
             "invalid _recipients or _amounts"
         );
+        require(isWhitelist, "for whitelist only!");
         uint256 totalAmount = 0;
         for (uint256 i = 0; i < _recipients.length; i++) {
             address recipient = _recipients[i];
@@ -100,32 +97,26 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
             require(recipient != address(0), "invalid recipient!");
             require(amount != 0, "invalid amount!");
             require(totalAmounts[recipient] == 0, "recipient already funded!");
-            totalAmounts[recipient] = amount;
+            limitAmounts[recipient] = amount;
             totalAmount = totalAmount.add(amount);
-
+            whitelist[recipient] = true;
+            supply = supply.add(amount);
             emit Funded(recipient, amount);
         }
 
         token.safeTransferFrom(msg.sender, address(this), totalAmount);
     }
 
-    function fundAllBuyers() external onlyManager {
-        uint256 totalAmount = 0;
-        for (uint256 i = 0; i < buyers.length; i++) {
-            address recipient = buyers[i];
-            uint256 amount = userBoughts[recipient];
-            require(recipient != address(0), "invalid recipient!");
-            require(amount != 0, "invalid amount!");
-            require(totalAmounts[recipient] == 0, "recipient already funded!");
-            totalAmounts[recipient] = amount;
-            totalAmount = totalAmount.add(amount);
+    //For public sale it's for everyone 
+    //Fund once only
+    function fundPublic(uint256 _supply) external onlyManager() {
+        require(supply == 0, "already funded!");
+        token.safeTransferFrom(msg.sender, address(this), _supply);
+        supply = _supply;
+        isWhitelist = false;
+    } 
 
-            emit Funded(recipient, amount);
-        }
-        token.safeTransferFrom(msg.sender, address(this), totalAmount);
-    }
-
-     function changeVestingAddr(
+    function changeVestingAddr(
         address oldAddr,
         address newAddr
     ) public onlyManager {
@@ -145,8 +136,10 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
         emit TransferToAnotherAddress(oldAddr, newAddr);
     }
 
-
+    /// @notice to withdraw remaining token funded but not sold out
     function withdraw() external onlyManager {
+        uint256 endTime = startTime.add(lockDuration).add(releaseDuration);
+        require(block.timestamp >= endTime, "can not withdraw this time");
         uint256 balance = IERC20(purchaseToken).balanceOf(address(this));
         IERC20(purchaseToken).transfer(msg.sender, balance);
     }
@@ -183,12 +176,16 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
             );
     }
 
+    function setRecipient(address _recipient) external onlyManager {
+        require(_recipient != address(0), "!invalid _recipient");
+        purchaseRecipient = _recipient;
+    }
+
     function claim() external {
         uint256 claimableAmount = getClaimableAmount(msg.sender);
         if (claimableAmount == 0) {
             return;
         }
-
         claimedAmounts[msg.sender] = claimedAmounts[msg.sender].add(
             claimableAmount
         );
@@ -198,22 +195,23 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
     }
 
     function buy(uint256 _usdAmount) external {
-        if (!isPublicSale) require(whitelist[msg.sender], "whitelisted only!");
+        uint256 tokenAmount = _usdAmount.mul(10 ** 18).div(tokenPrice);
+        if (isWhitelist) {
+            require(whitelist[msg.sender], "not funded yet!");
+            require(tokenAmount <= limitAmounts[msg.sender], "buy exceeds limit!");
+        }
         require(block.timestamp < startTime, "can not buy this time!");
-        require(userBoughts[msg.sender] == 0, "buy once only!");
-
+        require(_usdAmount >= minBuyAmount, "insufficient purchase amount!");
+        sold = sold.add(tokenAmount);
+        require(sold <= supply, "buy exceeds supply!");
+       
         IERC20(purchaseToken).transferFrom(
             msg.sender,
-            address(this),
+            purchaseRecipient,
             _usdAmount
         );
 
-        uint256 tokenAmount = _usdAmount.mul(10 ** 18).div(tokenPrice);
-        sold = sold.add(tokenAmount);
-        require(sold <= supply, "buy exceeds supply");
-        buyers.push(msg.sender);
-        userBoughts[msg.sender] = tokenAmount;
-
-        emit UserBought(msg.sender, userBoughts[msg.sender]);
+        totalAmounts[msg.sender] = totalAmounts[msg.sender].add(tokenAmount);
+        emit UserBought(msg.sender, tokenAmount);
     }
 }
