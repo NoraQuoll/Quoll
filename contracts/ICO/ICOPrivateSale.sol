@@ -15,7 +15,6 @@ contract ICOPrivateSale is ManagerUpgradeable {
     IERC20 public usdt; //USDT
 
     uint256 public tokenPrice; //10000 = 0.01 USDT
-    uint256 public minBuyAmount;
 
     uint256 public supply;
     uint256 public sold;
@@ -33,7 +32,6 @@ contract ICOPrivateSale is ManagerUpgradeable {
       function initialize(
         address _usdt,
         uint256 _tokenPrice,
-        uint256 _minBuyAmount,
         uint256 _supply,
         uint256 _startTime,
         uint256 _endTime,
@@ -42,13 +40,11 @@ contract ICOPrivateSale is ManagerUpgradeable {
         __Ownable_init();
         require(_usdt != address(0), "invalid _usdt!");
         require(_tokenPrice > 0, "invalid _tokenPrice");
-        require(_minBuyAmount > 0, "invalid _minBuyAmount");
         require(_endTime > block.timestamp, "invalid _endTime");
         require(_recipient != address(0), "invalid _recipient");
 
         usdt = IERC20(_usdt);
         tokenPrice = _tokenPrice;
-        minBuyAmount = _minBuyAmount;
         startTime = _startTime;
         endTime = _endTime;
         supply = _supply;
