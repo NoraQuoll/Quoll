@@ -26,7 +26,7 @@ contract ICOPrivateSale is ManagerUpgradeable {
 
     address recipient; //receive payment
 
-    mapping(address => uint256) public limitAmounts;
+    mapping(address => bool) public whitelist;
     mapping(address => uint256) public totalAmounts;
     event UserBought(address indexed _user, uint256 _amount);
 
@@ -55,10 +55,15 @@ contract ICOPrivateSale is ManagerUpgradeable {
         recipient = _recipient;
     }
 
-    function allocate(address[] calldata _users, uint256[] calldata _limitAmounts) external onlyManager {
+     function addWhitelist(address[] calldata _users) external onlyManager {
         for (uint i = 0; i < _users.length; i++) {
-            require(limitAmounts[_users[i]]==0, " already allocated");
-            limitAmounts[_users[i]] = _limitAmounts[i];
+            whitelist[_users[i]] = true;
+        }
+    }
+
+    function removeWhiteList(address[] calldata _users) external onlyManager {
+        for (uint i = 0; i < _users.length; i++) {
+            delete whitelist[_users[i]];
         }
     }
 
@@ -72,8 +77,8 @@ contract ICOPrivateSale is ManagerUpgradeable {
 
     function buy(uint256 _usdAmount) external {
         uint256 tokenAmount = _usdAmount.mul(10 ** 18).div(tokenPrice);
-
-        require(tokenAmount <= limitAmounts[msg.sender], "exceeds allocated amount");
+        
+        require(whitelist[msg.sender], "not in whitelist");
         require(block.timestamp > startTime && block.timestamp < endTime, "can not buy this time!");
 
         sold = sold.add(tokenAmount);
