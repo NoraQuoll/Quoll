@@ -17,6 +17,7 @@ contract ICOPrivateSale is ManagerUpgradeable {
     uint256 public tokenPrice; //10000 = 0.01 USDT
     uint256 public minBuyAmount;
 
+    uint256 public supply;
     uint256 public sold;
 
     //user can buy in this period
@@ -33,6 +34,7 @@ contract ICOPrivateSale is ManagerUpgradeable {
         address _usdt,
         uint256 _tokenPrice,
         uint256 _minBuyAmount,
+        uint256 _supply,
         uint256 _startTime,
         uint256 _endTime,
         address _recipient
@@ -49,6 +51,7 @@ contract ICOPrivateSale is ManagerUpgradeable {
         minBuyAmount = _minBuyAmount;
         startTime = _startTime;
         endTime = _endTime;
+        supply = _supply;
         recipient = _recipient;
     }
 
@@ -74,6 +77,7 @@ contract ICOPrivateSale is ManagerUpgradeable {
         require(block.timestamp > startTime && block.timestamp < endTime, "can not buy this time!");
 
         sold = sold.add(tokenAmount);
+        require(sold <= supply, "buy exceeds supply!");
         require(recipient != address(0), "!invalid _recipient");
         usdt.transferFrom(msg.sender, recipient, _usdAmount);
         totalAmounts[msg.sender] = totalAmounts[msg.sender].add(tokenAmount);
