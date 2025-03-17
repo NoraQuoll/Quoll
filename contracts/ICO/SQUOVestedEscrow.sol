@@ -18,8 +18,9 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
     IERC20 public purchaseToken; //USDT
 
     // For pre-seed and private sale it's a whitelist
-    // For public sale it's for everyone 
+    // For public sale it's for everyone
     bool public isWhitelist;
+    bool public isAllocate;
 
     uint256 public startTime;
     // initial lock duration in second
@@ -32,7 +33,7 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
     uint256 public supply;
     uint256 public sold;
 
-   address purchaseRecipient;
+    address purchaseRecipient;
 
     mapping(address => uint256) public limitAmounts;
     mapping(address => uint256) public totalAmounts;
@@ -51,10 +52,11 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
         uint256 _lockPercent,
         uint256 _releaseDuration,
         address _purchaseToken,
-        uint256 _tokenPrice, 
+        uint256 _tokenPrice,
         uint256 _minBuyAmount,
-        address _purchaseRecipient
-
+        address _purchaseRecipient,
+        bool _isWhitelist,
+        bool _isAllocate
     ) public initializer {
         __Ownable_init();
 
@@ -63,7 +65,10 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
         require(_releaseDuration > 0, "invalid _releaseDuration!");
         require(_tokenPrice > 0, "invalid _tokenPrice");
         require(_purchaseToken != address(0), "invalid _purchaseToken");
-        require(_purchaseRecipient != address(0), "!invalid _purchaseRecipient");
+        require(
+            _purchaseRecipient != address(0),
+            "!invalid _purchaseRecipient"
+        );
 
         token = IERC20(_token);
         startTime = _startTime;
@@ -74,13 +79,31 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
         tokenPrice = _tokenPrice;
         purchaseRecipient = _purchaseRecipient;
         minBuyAmount = _minBuyAmount;
-        isWhitelist = true;
+        isWhitelist = _isWhitelist;
+        isAllocate = _isAllocate;
         sold = 0;
     }
 
+    function addWhitelist(address[] calldata _users) external onlyManager {
+        for (uint i = 0; i < _users.length; i++) {
+            whitelist[_users[i]] = true;
+        }
+    }
 
+    function removeWhiteList(address[] calldata _users) external onlyManager {
+        for (uint i = 0; i < _users.length; i++) {
+            delete whitelist[_users[i]];
+        }
+    }
+
+    //to change the address receive payment
+    function setRecipient(address _recipient) external onlyManager {
+        require(_recipient != address(0), "!invalid _recipient");
+        purchaseRecipient = _recipient;
+    }
+
+    //For private sale only
     // Whitelists will have a precise allocation per user
-    // By default, the contract is in whitelist mode
     function fund(
         address[] calldata _recipients,
         uint256[] calldata _amounts
@@ -89,7 +112,7 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
             _recipients.length == _amounts.length && _recipients.length > 0,
             "invalid _recipients or _amounts"
         );
-        require(isWhitelist, "for whitelist only!");
+        require(isAllocate, "fund all instead!");
         uint256 totalAmount = 0;
         for (uint256 i = 0; i < _recipients.length; i++) {
             address recipient = _recipients[i];
@@ -107,14 +130,13 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
         token.safeTransferFrom(msg.sender, address(this), totalAmount);
     }
 
-    //For public sale it's for everyone 
-    //Fund once only
-    function fundPublic(uint256 _supply) external onlyManager() {
-        require(supply == 0, "already funded!");
+    //For pre-seed it's for whitelisted user
+    //For public sale it's for everyone
+    function fundAll(uint256 _supply) external onlyManager {
+        require(!isAllocate, "allocate each user!");
         token.safeTransferFrom(msg.sender, address(this), _supply);
-        supply = _supply;
-        isWhitelist = false;
-    } 
+        supply = supply.add(_supply);
+    }
 
     function changeVestingAddr(
         address oldAddr,
@@ -176,11 +198,6 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
             );
     }
 
-    function setRecipient(address _recipient) external onlyManager {
-        require(_recipient != address(0), "!invalid _recipient");
-        purchaseRecipient = _recipient;
-    }
-
     function claim() external {
         uint256 claimableAmount = getClaimableAmount(msg.sender);
         if (claimableAmount == 0) {
@@ -197,14 +214,19 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
     function buy(uint256 _usdAmount) external {
         uint256 tokenAmount = _usdAmount.mul(10 ** 18).div(tokenPrice);
         if (isWhitelist) {
-            require(whitelist[msg.sender], "not funded yet!");
-            require(tokenAmount <= limitAmounts[msg.sender], "buy exceeds limit!");
+            require(whitelist[msg.sender], "not in whitelist");
+        }
+        if (isAllocate) {
+            require(
+                tokenAmount <= limitAmounts[msg.sender],
+                "buy exceeds limit!"
+            );
         }
         require(block.timestamp < startTime, "can not buy this time!");
         require(_usdAmount >= minBuyAmount, "insufficient purchase amount!");
         sold = sold.add(tokenAmount);
         require(sold <= supply, "buy exceeds supply!");
-       
+
         IERC20(purchaseToken).transferFrom(
             msg.sender,
             purchaseRecipient,
