@@ -15,7 +15,6 @@ contract ICOPublicSale is ManagerUpgradeable {
     IERC20 public usdt; //USDT
 
     uint256 public tokenPrice; //10000 = 0.01 USDT
-    uint256 public minBuyAmount;
 
     uint256 public supply;
     uint256 public sold;
@@ -33,7 +32,6 @@ contract ICOPublicSale is ManagerUpgradeable {
     function initialize(
         address _usdt,
         uint256 _tokenPrice,
-        uint256 _minBuyAmount,
         uint256 _supply,
         uint256 _startTime,
         uint256 _endTime,
@@ -42,14 +40,13 @@ contract ICOPublicSale is ManagerUpgradeable {
         __Ownable_init();
         require(_usdt != address(0), "invalid _usdt!");
         require(_tokenPrice > 0, "invalid _tokenPrice");
-        require(_minBuyAmount > 0, "invalid _minBuyAmount");
         require(_supply > 0, "invalid _supply");
-        require(_endTime > block.timestamp, "invalid _endTime");
+        require(_startTime > 0, "invalid _startTime");
+        require(_endTime > _startTime, "invalid _endTime");
         require(_recipient != address(0), "invalid _recipient");
 
         usdt = IERC20(_usdt);
         tokenPrice = _tokenPrice;
-        minBuyAmount = _minBuyAmount;
         startTime = _startTime;
         supply = _supply;
         endTime = _endTime;
@@ -67,7 +64,6 @@ contract ICOPublicSale is ManagerUpgradeable {
         uint256 tokenAmount = _usdAmount.mul(10 ** 18).div(tokenPrice);
 
         require(block.timestamp > startTime && block.timestamp < endTime, "can not buy this time!");
-        require(_usdAmount >= minBuyAmount, "insufficient purchase amount!");
         sold = sold.add(tokenAmount);
         require(sold <= supply, "buy exceeds supply!");
         require(recipient != address(0), "!invalid _recipient");

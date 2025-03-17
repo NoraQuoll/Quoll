@@ -40,7 +40,8 @@ contract ICOPrivateSale is ManagerUpgradeable {
         __Ownable_init();
         require(_usdt != address(0), "invalid _usdt!");
         require(_tokenPrice > 0, "invalid _tokenPrice");
-        require(_endTime > block.timestamp, "invalid _endTime");
+        require(_startTime > 0, "invalid _startTime");
+        require(_endTime > _startTime, "invalid _endTime");
         require(_recipient != address(0), "invalid _recipient");
 
         usdt = IERC20(_usdt);

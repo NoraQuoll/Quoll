@@ -44,7 +44,8 @@ contract ICOPreseedSale is ManagerUpgradeable {
         require(_tokenPrice > 0, "invalid _tokenPrice");
         require(_minBuyAmount > 0, "invalid _minBuyAmount");
         require(_supply > 0, "invalid _supply");
-        require(_endTime > block.timestamp, "invalid _endTime");
+        require(_startTime > 0, "invalid _startTime");
+        require(_endTime > _startTime, "invalid _endTime");
         require(_recipient != address(0), "invalid _recipient");
 
         usdt = IERC20(_usdt);
@@ -72,6 +73,14 @@ contract ICOPreseedSale is ManagerUpgradeable {
     function setRecipient(address _recipient) external onlyManager {
         require(_recipient != address(0), "!invalid _recipient");
         recipient = _recipient;
+    }
+
+    function setPeriod(uint256 _startTime, uint256 _endTime) external onlyManager{
+        
+        require(_startTime > 0, "invalid _startTime");
+        require(_endTime > _startTime, "invalid _endTime");
+        startTime = _startTime;
+        endTime = _endTime;
     }
 
 

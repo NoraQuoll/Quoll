@@ -1,7 +1,7 @@
 import { DeployFunction } from "hardhat-deploy/dist/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { saveContract, getContracts, sleep } from "../../scripts/utils";
-
+import { parseEther } from "ethers/lib/utils";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -15,17 +15,15 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const web3 = new Web3(process.env.RPC!);
 
   //REPLACE THESES PARAMS
-  const token = "0x27DA92438996FbC6Bc3bEbA3d92610b2Ff3dC37a"; //squo
-  const startTime =    Math.floor(Date.now() / 1000) + 86400; //one day after deploy
-  const lockDuration = 86400 * 30 * 3; // 3 month cliff
-  const lockPercent = 2000; //20%
-  const releaseDuration =  86400 * 30 * 12; //12 months linear vesting
+  const startTime =    1;
+  const endTime = 1000000000000
   const price =  0.01 * 10 ** 6;
   const minBuy = 5000 * 10**6; //5k$
-  const usdt = "0xEAEf71E1c2f02b9cBB90E7dCCa6Dd7d99B0a2858";
-  const recipient = "0xC822DcaD6f4e7CD8B6e80CAd1AFA3F97ae8579CD";
+  const usdt = "0x6047828dc181963ba44974801ff68e538da5eaf9";
+  const recipient = "0xA4d81496E03f2449D2002632652d9b277f141345";
+  const supply = parseEther("20000000");
 
-  const data = await deploy("SQUOVestedEscrow", {
+  const data = await deploy("ICOPreseedSale", {
     from: deployer,
     args: [],
     log: true,
@@ -36,7 +34,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
       owner: deployer,
       execute: {
         methodName: "initialize",
-        args: [token, startTime, lockDuration, lockPercent,releaseDuration, usdt, price, minBuy, recipient, true, false],
+        args: [usdt, price, minBuy, supply, startTime, endTime, recipient],
       },
     },
   });
@@ -44,7 +42,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await saveContract(network.name, "DefaultProxyAdmin", data.args![1]);
   await saveContract(
     network.name,
-    `PreseedSQUOVestedEscrow`,
+    `ICOPreseedSale`,
     data.address,
     data.implementation!
   );
@@ -73,6 +71,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 };
 
-deploy.tags = ["PreseedSQUOVestedEscrow"];
+deploy.tags = ["ICOPreseedSale"];
 
 export default deploy;
