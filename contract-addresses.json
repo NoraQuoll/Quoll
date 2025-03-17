@@ -673,6 +673,18 @@
         "VeSWPxReferralBootstrapLens": {
             "address": "0xe360d7d719974DFD20fceDAF3386a289c568C2D4",
             "impl": "0x72039C82875D9592a61Aa0F121633098Ecb3fE21"
+        },
+        "ICOPreseedSale": {
+            "address": "0xF9C4205CA72c9e944569E50f2c3989a228538a28",
+            "impl": "0x6ad9045AeDBA28dfc550bf40eF58EF30199B1676"
+        },
+        "ICOPrivateSale": {
+            "address": "0x51148dCf0ceDC9d7A6b3fb0FcF134a57600aC677",
+            "impl": "0x5c90b76184b6628F8966E7f43A629325426B8D83"
+        },
+        "ICOPublicSale": {
+            "address": "0x1761d1CBfb597CCBF88EB57dbC49002c1cb92EFD",
+            "impl": "0xD060421075293e9b9572c626a446d99f9986D75C"
         }
     }
 }

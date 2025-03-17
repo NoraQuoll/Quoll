@@ -13,16 +13,17 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-const contractAddress = "0x88264D50AB1F633277dE60A981Bc532440bf7577";
+const contractAddress = "0xF9C4205CA72c9e944569E50f2c3989a228538a28";
 const whitelist = [
-    "0x3e8734ec146c981e3ed1f6b582d447dde701d90c",
-    "0x3E8eDbB38a52b0299Ef8fdf585bd45Bee4886f61",
-    "0xde8e0c378b50118b30512386dee6b0475d96173a"
-] 
+  "0xf0b1E4C87A1aD06a30D32225d79A899A89E1339B",
+  "0x3e8734ec146c981e3ed1f6b582d447dde701d90c",
+  "0x3E8eDbB38a52b0299Ef8fdf585bd45Bee4886f61",
+  "0xde8e0c378b50118b30512386dee6b0475d96173a",
+];
 async function main() {
   const ICOPreseedSale = JSON.parse(
     fs.readFileSync(
-    "./artifacts/contracts/ICO/ICOPreseed.sol/ICOPreseedSale.json",
+      "./artifacts/contracts/ICO/ICOPreseed.sol/ICOPreseedSale.json",
       "utf-8"
     )
   ).abi;
