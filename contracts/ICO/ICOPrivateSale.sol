@@ -18,7 +18,10 @@ contract ICOPrivateSale is ManagerUpgradeable {
     uint256 public minBuyAmount;
 
     uint256 public sold;
-    uint256 public endTime; //user can not buy after this time
+
+    //user can buy in this period
+    uint256 public startTime; 
+    uint256 public endTime;
 
     address recipient; //receive payment
 
@@ -26,10 +29,11 @@ contract ICOPrivateSale is ManagerUpgradeable {
     mapping(address => uint256) public totalAmounts;
     event UserBought(address indexed _user, uint256 _amount);
 
-    function initialize(
+      function initialize(
         address _usdt,
         uint256 _tokenPrice,
         uint256 _minBuyAmount,
+        uint256 _startTime,
         uint256 _endTime,
         address _recipient
     ) public initializer {
@@ -43,6 +47,7 @@ contract ICOPrivateSale is ManagerUpgradeable {
         usdt = IERC20(_usdt);
         tokenPrice = _tokenPrice;
         minBuyAmount = _minBuyAmount;
+        startTime = _startTime;
         endTime = _endTime;
         recipient = _recipient;
     }
@@ -66,10 +71,10 @@ contract ICOPrivateSale is ManagerUpgradeable {
         uint256 tokenAmount = _usdAmount.mul(10 ** 18).div(tokenPrice);
 
         require(tokenAmount <= limitAmounts[msg.sender], "exceeds allocated amount");
+        require(block.timestamp > startTime && block.timestamp < endTime, "can not buy this time!");
 
-        require(block.timestamp < endTime, "can not buy this time!");
-        require(_usdAmount >= minBuyAmount, "insufficient purchase amount!");
         sold = sold.add(tokenAmount);
+        require(recipient != address(0), "!invalid _recipient");
         usdt.transferFrom(msg.sender, recipient, _usdAmount);
         totalAmounts[msg.sender] = totalAmounts[msg.sender].add(tokenAmount);
         emit UserBought(msg.sender, tokenAmount);

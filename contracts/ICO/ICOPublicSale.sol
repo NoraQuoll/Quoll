@@ -19,7 +19,10 @@ contract ICOPublicSale is ManagerUpgradeable {
 
     uint256 public supply;
     uint256 public sold;
-    uint256 public endTime; //user can not buy after this time
+
+    //user can buy in this period
+    uint256 public startTime; 
+    uint256 public endTime;
 
     address recipient; //receive payment
 
@@ -32,6 +35,7 @@ contract ICOPublicSale is ManagerUpgradeable {
         uint256 _tokenPrice,
         uint256 _minBuyAmount,
         uint256 _supply,
+        uint256 _startTime,
         uint256 _endTime,
         address _recipient
     ) public initializer {
@@ -46,6 +50,7 @@ contract ICOPublicSale is ManagerUpgradeable {
         usdt = IERC20(_usdt);
         tokenPrice = _tokenPrice;
         minBuyAmount = _minBuyAmount;
+        startTime = _startTime;
         supply = _supply;
         endTime = _endTime;
         recipient = _recipient;
@@ -61,11 +66,11 @@ contract ICOPublicSale is ManagerUpgradeable {
     function buy(uint256 _usdAmount) external {
         uint256 tokenAmount = _usdAmount.mul(10 ** 18).div(tokenPrice);
 
-        require(block.timestamp < endTime, "can not buy this time!");
+        require(block.timestamp > startTime && block.timestamp < endTime, "can not buy this time!");
         require(_usdAmount >= minBuyAmount, "insufficient purchase amount!");
         sold = sold.add(tokenAmount);
         require(sold <= supply, "buy exceeds supply!");
-
+        require(recipient != address(0), "!invalid _recipient");
         usdt.transferFrom(msg.sender, recipient, _usdAmount);
 
         totalAmounts[msg.sender] = totalAmounts[msg.sender].add(tokenAmount);

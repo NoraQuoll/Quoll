@@ -19,8 +19,11 @@ contract ICOPreseedSale is ManagerUpgradeable {
 
     uint256 public supply;
     uint256 public sold;
-    uint256 public endTime; //user can not buy after this time
 
+    //user can buy in this period
+    uint256 public startTime; 
+    uint256 public endTime;
+    
     address recipient; //receive payment
 
     mapping(address => bool) public whitelist;
@@ -32,6 +35,7 @@ contract ICOPreseedSale is ManagerUpgradeable {
         uint256 _tokenPrice,
         uint256 _minBuyAmount,
         uint256 _supply,
+        uint256 _startTime,
         uint256 _endTime,
         address _recipient
     ) public initializer {
@@ -47,6 +51,7 @@ contract ICOPreseedSale is ManagerUpgradeable {
         tokenPrice = _tokenPrice;
         minBuyAmount = _minBuyAmount;
         supply = _supply;
+        startTime = _startTime;
         endTime = _endTime;
         recipient = _recipient;
     }
@@ -74,11 +79,15 @@ contract ICOPreseedSale is ManagerUpgradeable {
         uint256 tokenAmount = _usdAmount.mul(10 ** 18).div(tokenPrice);
 
         require(whitelist[msg.sender], "not in whitelist");
-        require(block.timestamp < endTime, "can not buy this time!");
-        require(_usdAmount >= minBuyAmount, "insufficient purchase amount!");
+        require(block.timestamp > startTime && block.timestamp < endTime, "can not buy this time!");
+        
+        if(totalAmounts[msg.sender] ==0){ //first time buy
+            require(_usdAmount >= minBuyAmount, "insufficient purchase amount!");
+        }
+
         sold = sold.add(tokenAmount);
         require(sold <= supply, "buy exceeds supply!");
-
+        require(recipient != address(0), "!invalid _recipient");
         usdt.transferFrom(msg.sender, recipient, _usdAmount);
 
         totalAmounts[msg.sender] = totalAmounts[msg.sender].add(tokenAmount);
