@@ -14,7 +14,7 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
 
     uint256 public constant PRECISION = 1e4;
 
-    IERC20 public token;
+    IERC20 public squo;
 
     uint256 public startTime;
     // initial lock duration in second
@@ -32,7 +32,7 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
     event TransferToAnotherAddress(address oldAddr, address newAddr);
 
     function initialize(
-        address _token,
+        address _squo,
         uint256 _startTime,
         uint256 _lockDuration,
         uint256 _lockPercent,
@@ -40,11 +40,11 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
     ) public initializer {
         __Ownable_init();
 
-        require(_token != address(0), "invalid _token!");
+        require(_squo != address(0), "invalid _squo!");
         require(_lockPercent <= PRECISION, "invalid _lockPercent!");
         require(_releaseDuration > 0, "invalid _releaseDuration!");
 
-        token = IERC20(_token);
+        squo = IERC20(_squo);
         startTime = _startTime;
         lockDuration = _lockDuration;
         lockPercent = _lockPercent;
@@ -92,7 +92,7 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
             emit Funded(recipient, amount);
         }
 
-        token.safeTransferFrom(msg.sender, address(this), totalAmount);
+        squo.safeTransferFrom(msg.sender, address(this), totalAmount);
     }
 
     function getClaimableAmount(address _user) public view returns (uint256) {
@@ -136,7 +136,7 @@ contract SQUOVestedEscrow is ManagerUpgradeable {
         claimedAmounts[msg.sender] = claimedAmounts[msg.sender].add(
             claimableAmount
         );
-        token.safeTransfer(msg.sender, claimableAmount);
+        squo.safeTransfer(msg.sender, claimableAmount);
 
         emit Claimed(msg.sender, claimableAmount);
     }
