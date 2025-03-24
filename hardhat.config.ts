@@ -26,9 +26,8 @@ const config: HardhatUserConfig = {
   networks: {
     // hardhat: {
     //   forking: {
-    //     url: "https://sonic-rpc.publicnode.com:443",
-    //     // url: "https://bsc-dataseed1.binance.org/",
-    //     // blockNumber: 1750000,
+    //     url: "https://bsc-dataseed1.binance.org/",
+    //     // blockNumber: 45810378,
     //   },
 
     // },
@@ -154,6 +153,15 @@ const config: HardhatUserConfig = {
       },
       {
         version: "0.8.10",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+      {
+        version: "0.8.20",
         settings: {
           optimizer: {
             enabled: true,
