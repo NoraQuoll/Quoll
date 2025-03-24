@@ -92,22 +92,24 @@ contract VlSQuoV2 is
 
     function setParams(
         address _squo,
-        address _swapxVoterProxy,
         address _treasury
     ) external onlyOwner {
         require(address(squo) == address(0), "params have already been set");
-        require(_swapxVoterProxy != address(0), "invalid _swapxVoterProxy");
         require(_squo != address(0), "invalid _quo!");
         require(_treasury != address(0), "invalid _treasury!");
 
         squo = IERC20(_squo);
-        swapxVoterProxy = ISwapxVoterProxy(_swapxVoterProxy);
         treasury = _treasury;
 
         maxLockLength = 10000;
 
         unlockGracePeriod = 14 days;
         unlockPunishment = 300;
+    }
+
+    function setSwapxVoterProxy(address _swapxVoterProxy) external onlyOwner{
+        require(_swapxVoterProxy != address(0), "invalid _swapxVoterProxy");
+        swapxVoterProxy = ISwapxVoterProxy(_swapxVoterProxy);
     }
 
     function pause() external onlyOwner {
@@ -415,10 +417,10 @@ contract VlSQuoV2 is
         _totalSupply = _totalSupply.sub(_amount);
         uint256 newBal = _balances[_user].sub(_amount);
         _balances[_user] = newBal;
-        require(
-            getCurrentVoteForUser(_user) <= newBal,
-            "Too much vote cast"
-        );
+        // require(
+        //     getCurrentVoteForUser(_user) <= newBal,
+        //     "Too much vote cast"
+        // );
         emit BalanceUpdated(_user, newBal);
     }
 

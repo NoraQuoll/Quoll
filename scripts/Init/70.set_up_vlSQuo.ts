@@ -18,11 +18,11 @@ const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 /*Token contracts*/
 const squo = "0x27DA92438996FbC6Bc3bEbA3d92610b2Ff3dC37a";
-const vlSQuoV2 = "0x5b7Ccea98DcA6320e5ceb02c678789C1BBD257d4";
+const vlSQuoV2 = "0x25365C41e02554c6FA1D3c280173DBdeAEd8bFe9";
 const vlSQuoRewardPool = "0x89cDC2cC4b5c386dC0E0F58B0cC1bf38305F6fde";
 
 //Other contract
-const swapxVoterProxy = "0xb0dB2a7Bc69D168C0b940e8AcF6F2AD7E1F566DC";
+// const swapxVoterProxy = "0xb0dB2a7Bc69D168C0b940e8AcF6F2AD7E1F566DC";
 const treasury = "0xC822DcaD6f4e7CD8B6e80CAd1AFA3F97ae8579CD";
 
 
@@ -51,7 +51,7 @@ async function setParamsVlSQuoV2() {
     const contract = new web3.eth.Contract(VlSQuoV2);
 
     const txData = contract.methods
-        .setParams(squo, swapxVoterProxy, treasury)
+        .setParams(squo, treasury)
         .encodeABI();
 
     //using ETH
