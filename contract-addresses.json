@@ -685,6 +685,14 @@
         "ICOPublicSale": {
             "address": "0x1761d1CBfb597CCBF88EB57dbC49002c1cb92EFD",
             "impl": "0xD060421075293e9b9572c626a446d99f9986D75C"
+        },
+        "VlSQuoV2": {
+            "address": "0x761b6C73831685d2b38b9CaC3eE6E0f18E539C02",
+            "impl": "0xFeE4aa5a857772427F5178dD973Dc701f550a809"
+        },
+        "VlSQuoRewardPool": {
+            "address": "0x34a03F63Ef4144BEb8A726e16868f692Ea71C8e7",
+            "impl": "0x03ac59ffa25227747d299B200179201738D4F18e"
         }
     }
 }

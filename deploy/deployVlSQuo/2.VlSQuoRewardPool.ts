@@ -8,7 +8,7 @@ dotenv.config();
 import Web3 from "web3";
 
 //REPLACE THESE PARAMS
-const vlSQquo = "0x5b7Ccea98DcA6320e5ceb02c678789C1BBD257d";
+const vlSQquo = "0x761b6C73831685d2b38b9CaC3eE6E0f18E539C02";
 
 const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deployments, getNamedAccounts, network } = hre;

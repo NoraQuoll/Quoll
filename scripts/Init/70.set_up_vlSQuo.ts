@@ -17,13 +17,13 @@ const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
  */
 
 /*Token contracts*/
-const squo = "0x27DA92438996FbC6Bc3bEbA3d92610b2Ff3dC37a";
-const vlSQuoV2 = "0x25365C41e02554c6FA1D3c280173DBdeAEd8bFe9";
-const vlSQuoRewardPool = "0x89cDC2cC4b5c386dC0E0F58B0cC1bf38305F6fde";
+const squo = "0xF02b3b6dE7a3f1ED2651e34812eA10C9850cAf19";
+const vlSQuoV2 = "0x761b6C73831685d2b38b9CaC3eE6E0f18E539C02";
+const vlSQuoRewardPool = "0x34a03F63Ef4144BEb8A726e16868f692Ea71C8e7";
 
 //Other contract
 // const swapxVoterProxy = "0xb0dB2a7Bc69D168C0b940e8AcF6F2AD7E1F566DC";
-const treasury = "0xC822DcaD6f4e7CD8B6e80CAd1AFA3F97ae8579CD";
+const treasury = "0xA4d81496E03f2449D2002632652d9b277f141345";
 
 
 /**
