@@ -135,6 +135,14 @@ contract SWPxBaseRewardPoolV1 is IBaseRewardPoolV1, OwnableUpgradeable {
         emit RewardTokenAdded(_rewardToken);
     }
 
+    function removeRewardToken(uint _index) external {
+        require(msg.sender == owner() || msg.sender == operator, "!auth");
+        require(_index < rewardTokens.length, "_invalid index");
+        isRewardToken[rewardTokens[_index]] = false;
+        rewardTokens[_index] = rewardTokens[rewardTokens.length -1];
+        rewardTokens.pop();
+    }
+
     function totalSupply() public view override returns (uint256) {
         return _totalSupply;
     }
