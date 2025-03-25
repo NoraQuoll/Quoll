@@ -686,5 +686,37 @@
             "address": "0x1761d1CBfb597CCBF88EB57dbC49002c1cb92EFD",
             "impl": "0xD060421075293e9b9572c626a446d99f9986D75C"
         }
+    },
+    "blaze": {
+        "MockERC20": {
+            "address": "0xEAEf71E1c2f02b9cBB90E7dCCa6Dd7d99B0a2858",
+            "impl": ""
+        },
+        "DefaultProxyAdmin": {
+            "address": "0xeB13Bb97e0cBE5562a0b01812cB9D35E35Bf9b9c"
+        },
+        "ICOPrivateSale": {
+            "address": "0xcA9AaDeCdf33d9EBAc4aC94B24D102498a1CD6a7",
+            "impl": "0x8ebbA815B207d6944C02D55CBA861c3fd3E33a9d"
+        },
+        "ICOPreseedSale": {
+            "address": "0x88264D50AB1F633277dE60A981Bc532440bf7577",
+            "impl": "0x49e274fCe8d0980CAC16a1C1735Cac66b4a7e05F"
+        },
+        "ICOPublicSale": {
+            "address": "0x1a634B36cCEac32Ba539bd059D1A070226582374",
+            "impl": "0x98f8dD4E37E7E7db4823A535045E0F2b56242707"
+        },
+        "MockSwapXVoterProxy": {
+            "address": "0xb0dB2a7Bc69D168C0b940e8AcF6F2AD7E1F566DC"
+        },
+        "VlSQuoV2": {
+            "address": "0x25365C41e02554c6FA1D3c280173DBdeAEd8bFe9",
+            "impl": "0xBEa7986293F312c12d1dEb8F74961520F3f0CF14"
+        },
+        "VlSQuoRewardPool": {
+            "address": "0x89cDC2cC4b5c386dC0E0F58B0cC1bf38305F6fde",
+            "impl": "0xE1811660077e669e9491ac8E03249525221EFACd"
+        }
     }
 }
