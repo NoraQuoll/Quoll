@@ -77,6 +77,7 @@ const config: HardhatUserConfig = {
     apiKey: {
       blaze: process.env.ETH_API_KEY!,
       sonic: process.env.ETH_API_KEY!,
+      arbitrumOne: process.env.ETH_API_KEY!,
     },
     customChains: [
       {

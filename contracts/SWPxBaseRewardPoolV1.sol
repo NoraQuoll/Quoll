@@ -117,14 +117,14 @@ contract SWPxBaseRewardPoolV1 is IBaseRewardPoolV1, OwnableUpgradeable {
         pid = _pid;
         stakingToken = IERC20(_stakingToken);
 
-        addRewardToken(_rewardToken);
+        _addRewardToken(_rewardToken);
 
         //access[_booster] = true;
 
         emit BoosterUpdated(_booster);
     }
 
-    function addRewardToken(address _rewardToken) internal {
+    function _addRewardToken(address _rewardToken) internal {
         require(_rewardToken != address(0), "invalid _rewardToken!");
         if (isRewardToken[_rewardToken]) {
             return;
@@ -135,11 +135,16 @@ contract SWPxBaseRewardPoolV1 is IBaseRewardPoolV1, OwnableUpgradeable {
         emit RewardTokenAdded(_rewardToken);
     }
 
+    function addRewardToken(address _rewardToken) external {
+        require(msg.sender == owner() || msg.sender == operator, "!auth");
+        _addRewardToken(_rewardToken);
+    }
+
     function removeRewardToken(uint _index) external {
         require(msg.sender == owner() || msg.sender == operator, "!auth");
         require(_index < rewardTokens.length, "_invalid index");
         isRewardToken[rewardTokens[_index]] = false;
-        rewardTokens[_index] = rewardTokens[rewardTokens.length -1];
+        rewardTokens[_index] = rewardTokens[rewardTokens.length - 1];
         rewardTokens.pop();
     }
 
@@ -318,7 +323,7 @@ contract SWPxBaseRewardPoolV1 is IBaseRewardPoolV1, OwnableUpgradeable {
     ) external payable override {
         require(access[msg.sender], "!auth");
 
-        addRewardToken(_rewardToken);
+        _addRewardToken(_rewardToken);
 
         if (AddressLib.isPlatformToken(_rewardToken)) {
             require(_rewards == msg.value, "invalid amount");

@@ -619,7 +619,7 @@
         },
         "VlQuoV2": {
             "address": "0x1787b212A96eBA9EAa8c55B30D4dB6e5bc6EBD8d",
-            "impl": "0xcA57285cFB1E1ce095F6f210B4695fB1869C451c"
+            "impl": "0x6bbaf39dd89A59Aa62BE6634EE0a05d8a2c6892e"
         }
     },
     "sonic": {
@@ -648,7 +648,7 @@
         },
         "QSWPxBalanceRewardPool": {
             "address": "0xd940aEa46851E6Dc4DBf564C0B8b3D7691Cb5d54",
-            "impl": "0x7b6bb9Ccd8B0fAa968054D8e2adc7274830A6969"
+            "impl": "0x4deC9F1ef743Cb819bee14861c16D77e0594E175"
         },
         "SQMilesPts": {
             "address": "0xc0325375D8C4a88f4e03fF293037a4262ded3343",
@@ -685,6 +685,14 @@
         "ICOPublicSale": {
             "address": "0x1761d1CBfb597CCBF88EB57dbC49002c1cb92EFD",
             "impl": "0xD060421075293e9b9572c626a446d99f9986D75C"
+        },
+        "VlSQuoV2": {
+            "address": "0x761b6C73831685d2b38b9CaC3eE6E0f18E539C02",
+            "impl": "0xFeE4aa5a857772427F5178dD973Dc701f550a809"
+        },
+        "VlSQuoRewardPool": {
+            "address": "0x34a03F63Ef4144BEb8A726e16868f692Ea71C8e7",
+            "impl": "0x03ac59ffa25227747d299B200179201738D4F18e"
         }
     },
     "blaze": {
