@@ -452,12 +452,18 @@ contract ThenaVoterProxy17 is
     }
 
     /// @dev Function for users to submit their vote. Only the last vote will be counted.
-    function vote(address[] calldata _pools, uint256[] calldata _weights) external {
+    function vote(
+        address[] calldata _pools,
+        uint256[] calldata _weights
+    ) external {
         // Check input
         require(_pools.length == _weights.length, "Invalid input length");
-        require(_pools.length > 0 && _pools.length < 50, "You must vote for 1 to 50 pools");
+        require(
+            _pools.length > 0 && _pools.length < 50,
+            "You must vote for 1 to 50 pools"
+        );
         uint256 weightsSum = 0;
-        for (uint256 i = 0 ; i < _weights.length ; i++) {
+        for (uint256 i = 0; i < _weights.length; i++) {
             require(_weights[i] > 0, "Invalid weight: cannot be == 0");
             weightsSum += _weights[i];
         }
@@ -483,7 +489,11 @@ contract ThenaVoterProxy17 is
         uint256 totalPower = 0; // prevent rounding errors
         for (uint256 i = 0; i < _pools.length; i++) {
             // Check if the pool is valid. Can use the CA instead of a pool to specify a delegated vote
-            require(_pools[i] == address(this) || IVoterV3(THENA_VOTER_V3).gauges(_pools[i]) != address(0), "Pool is either invalid or doesn't have a gauge");
+            require(
+                _pools[i] == address(this) ||
+                    IVoterV3(THENA_VOTER_V3).gauges(_pools[i]) != address(0),
+                "Pool is either invalid or doesn't have a gauge"
+            );
 
             // Calculate the actual vote value in terms of vlQuo
             uint256 vlQuoVotePower = (_weights[i] * vlQuoBalance) / weightsSum;
@@ -496,7 +506,12 @@ contract ThenaVoterProxy17 is
             epoch.poolWeights[_pools[i]] += vlQuoVotePower;
             epoch.votes[_pools[i]][msg.sender] = vlQuoVotePower;
 
-            emit VoteUpdated($data.currentEpoch, msg.sender, _pools[i], vlQuoVotePower);
+            emit VoteUpdated(
+                $data.currentEpoch,
+                msg.sender,
+                _pools[i],
+                vlQuoVotePower
+            );
         }
 
         // Add the user into the userWithVotes array
@@ -512,60 +527,79 @@ contract ThenaVoterProxy17 is
 
     /// @dev Function for delegation amin to submit vote with delegated power. Only the last vote will be counted.
 
-    function voteByDelegationAdmin(address[] calldata _pools, uint256[] calldata _weights) external onlyDelegationAdmins {
-         // Check input
-        // require(_pools.length == _weights.length, "Invalid input length");
-        // require(_pools.length > 0 && _pools.length < 50, "You must vote for 1 to 50 pools");
-        // uint256 weightsSum = 0;
-        // for (uint256 i = 0 ; i < _weights.length ; i++) {
-        //     require(_weights[i] > 0, "Invalid weight: cannot be == 0");
-        //     weightsSum += _weights[i];
-        // }
+    function voteByDelegationAdmin(
+        address[] calldata _pools,
+        uint256[] calldata _weights
+    ) external onlyDelegationAdmins {
+        // Check input
+        require(_pools.length == _weights.length, "Invalid input length");
+        require(
+            _pools.length > 0 && _pools.length < 50,
+            "You must vote for 1 to 50 pools"
+        );
+        uint256 weightsSum = 0;
+        for (uint256 i = 0; i < _weights.length; i++) {
+            require(_weights[i] > 0, "Invalid weight: cannot be == 0");
+            weightsSum += _weights[i];
+        }
 
-        // // Update the current voting epoch if needed
-        // _updateCurrentVotingEpochIfNeeded();
+        // Update the current voting epoch if needed
+        _updateCurrentVotingEpochIfNeeded();
 
-        // // Load storage data
-        // UserVotesStorage storage $ = _getUserVotesStorage();
-        // DataStorage storage $data = _getDataStorage();
-        // Epoch storage epoch = $.epochs[$data.currentEpoch];
+        // Load storage data
+        UserVotesStorage storage $ = _getUserVotesStorage();
+        DataStorage storage $data = _getDataStorage();
+        Epoch storage epoch = $.epochs[$data.currentEpoch];
 
+        // If the delegate pool has votes for this epoch, reset everything
+        uint256 votedWeight = epoch.userWeights[msg.sender];
+        if (votedWeight > 0) {
+            _resetVote($data.currentEpoch, msg.sender);
+            //becasuse total weight remain unchange when delegation admin vote
+            //but decrease when reset vote
+            //so it should be recovered
+            epoch.totalWeight += votedWeight;
+        }
 
-        // //reset vote
-        
-        // uint delegatedPower = epoch.poolWeights[address(this)];
-        // for (uint256 i = 0; i < _pools.length; i++) {
-        //     // Check if the pool is valid. Can use the CA instead of a pool to specify a delegated vote
-        //     require(IVoterV3(THENA_VOTER_V3).gauges(_pools[i]) != address(0), "Pool is either invalid or doesn't have a gauge");
+        uint delegatedPower = epoch.poolWeights[address(this)];
+        for (uint256 i = 0; i < _pools.length; i++) {
+            // Check if the pool is valid. Can use the CA instead of a pool to specify a delegated vote
+            require(
+                IVoterV3(THENA_VOTER_V3).gauges(_pools[i]) != address(0),
+                "Pool is either invalid or doesn't have a gauge"
+            );
 
-        //     // Calculate the actual vote value in terms of vlQuo
-        
-        //     uint256 vlQuoVotePower = (_weights[i] * delegatedPower) / weightsSum;
+            // Calculate the actual vote value in terms of vlQuo
 
-        //     if (epoch.poolWeights[_pools[i]] == 0) {
-        //         // Add the pool to the list of pools with votes
-        //         epoch.poolsWithVotes.push(_pools[i]);
-        //     }
+            uint256 vlQuoVotePower = (_weights[i] * delegatedPower) /
+                weightsSum;
 
-        //     epoch.poolWeights[_pools[i]] += vlQuoVotePower;
-        //     epoch.votes[_pools[i]][msg.sender] = vlQuoVotePower;
+            if (epoch.poolWeights[_pools[i]] == 0) {
+                // Add the pool to the list of pools with votes
+                epoch.poolsWithVotes.push(_pools[i]);
+            }
 
-        //     emit VoteUpdated($data.currentEpoch, msg.sender, _pools[i], vlQuoVotePower);
+            epoch.poolWeights[_pools[i]] += vlQuoVotePower;
+            epoch.votes[_pools[i]][msg.sender] = vlQuoVotePower;
 
-        // }
+            emit VoteUpdated(
+                $data.currentEpoch,
+                msg.sender,
+                _pools[i],
+                vlQuoVotePower
+            );
+        }
 
-        //    // Add the user into the userWithVotes array
-        // epoch.userIndexInArray[msg.sender] = epoch.usersWithVotes.length;
-        // epoch.usersWithVotes.push(msg.sender);
-        // epoch.userWeights[msg.sender] = totalPower;
-        // $.claimableEpochs[msg.sender].push($data.currentEpoch);
+        // Add the user into the userWithVotes array
+        epoch.userIndexInArray[msg.sender] = epoch.usersWithVotes.length;
+        epoch.usersWithVotes.push(msg.sender);
+        epoch.userWeights[msg.sender] = delegatedPower;
+        // $.claimableEpochs[msg.sender].push($data.currentEpoch); //delegate pool should not claim rewards
 
-        // // Increment totals and dates
-        // epoch.totalWeight += totalPower;
-        // epoch.lastVotedAt = block.timestamp;
+        // Increment totals and dates
+        //epoch.totalWeight += totalPower; //total weight was added when user vote for delegated
+        epoch.lastVotedAt = block.timestamp;
     }
-
-
 
     function _removeEpochFromClaimableArray(
         uint256 _epoch,
@@ -661,6 +695,8 @@ contract ThenaVoterProxy17 is
         return (poolsArg, weightsArg);
     }
 
+    /// @dev previous function will cast an empty vote when a new epoch has just started
+    /// so cast final vote from the last epoch
     function castVote() external {
         _updateCurrentVotingEpochIfNeeded();
 
@@ -672,10 +708,14 @@ contract ThenaVoterProxy17 is
             IVoterV3(THENA_VOTER_V3).reset($data.veTheTokenId);
         }
 
-        (
-            address[] memory poolsArg,
-            uint256[] memory weightsArg
-        ) = getVoteToBeCasted($data.currentEpoch);
+        address[] memory poolsArg;
+        uint256[] memory weightsArg;
+        
+        if(epoch.totalWeight == 0) { //nobody has voted in this epoch yet
+            // get vote weights from prev epoch
+            (poolsArg, weightsArg) = getVoteToBeCasted($data.currentEpoch - WEEK);
+        }
+        else (poolsArg, weightsArg) = getVoteToBeCasted($data.currentEpoch);
 
         IVoterV3(THENA_VOTER_V3).vote($data.veTheTokenId, poolsArg, weightsArg);
 
@@ -890,7 +930,8 @@ contract ThenaVoterProxy17 is
             !$data.claimEnabled &&
             msg.sender != MAINTAINER &&
             msg.sender != TREASURY &&
-            msg.sender != owner()
+            msg.sender != owner() &&
+            !$data.delegationAdmins[msg.sender]
         ) {
             revert(
                 "Claiming is temporarily disabled during reward distribution. Please try again later."
