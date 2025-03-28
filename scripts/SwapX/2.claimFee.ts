@@ -48,14 +48,14 @@ async function main() {
   const contract = new web3.eth.Contract(SWPxVoterProxy);
 
   const txData = contract.methods
-  .claimFee(fees, tokens)
+  .claimFees(fees, tokens)
   .encodeABI();
   console.log(txData);
 
   //using ETH
   const txObj = {
     nonce: txCount,
-    gas: web3.utils.toHex(1000000),
+    gas: web3.utils.toHex(10000000),
     gasPrice: await web3.eth.getGasPrice(),
     data: txData,
     to: swpxVoterProxy,

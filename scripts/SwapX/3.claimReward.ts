@@ -19,47 +19,17 @@ const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 const swpxVoterProxy = "0xf928eb071248B8f79D435c6D0BfB0AbAA6803c06";
 
-const bribes = [
-  "0xdE9e9B9F2FE180A40908aCbb144b15ac6bA54E54",
-  "0x959664AEF4656c425E362df9B705293dcB9f8f4d",
-  "0xd2Fb9082591df7bE105B38a4c76264f190a30dc2",
-  "0x167B0cFbE74F5271d192DB81552f3b5a7c13861f",
-  "0xf3c2BbC729e9a171905cfD5861239F16A75a8d40",
-  "0xB23298b45a669128E290289Af13e3217b07eE0a7",
-];
 const tokens = [
-  [
-    "0x29219dd400f2Bf60E5a23d13Be72B486D4038894",
-    "0xA04BC7140c26fc9BB1F36B1A604C7A5a88fb0E70",
-    "0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38",
-  ],
-  [
-    "0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38",
-    "0x29219dd400f2Bf60E5a23d13Be72B486D4038894",
-    "0xA04BC7140c26fc9BB1F36B1A604C7A5a88fb0E70",
-  ],
-  [
-    "0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38",
-    "0xA04BC7140c26fc9BB1F36B1A604C7A5a88fb0E70",
-    "0x29219dd400f2Bf60E5a23d13Be72B486D4038894",
-  ],
-  [
-    "0x29219dd400f2Bf60E5a23d13Be72B486D4038894",
-    "0x50c42dEAcD8Fc9773493ED674b675bE577f2634b",
-    "0xA04BC7140c26fc9BB1F36B1A604C7A5a88fb0E70",
-    "0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38",
-  ],
-  [
-    "0x29219dd400f2Bf60E5a23d13Be72B486D4038894",
-    "0x50c42dEAcD8Fc9773493ED674b675bE577f2634b",
-    "0xA04BC7140c26fc9BB1F36B1A604C7A5a88fb0E70",
-    "0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38",
-  ],
-  [
-    "0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38",
-    "0x50c42dEAcD8Fc9773493ED674b675bE577f2634b",
-    "0xA04BC7140c26fc9BB1F36B1A604C7A5a88fb0E70",
-  ],
+  "0x039e2fb66102314ce7b64ce5ce3e5183bc94ad38",
+  "0x29219dd400f2bf60e5a23d13be72b486d4038894",
+  "0xa04bc7140c26fc9bb1f36b1a604c7a5a88fb0e70",
+  "0x50c42deacd8fc9773493ed674b675be577f2634b",
+];
+const amounts = [
+  "3358217840145852139366",
+  "2872814847",
+  "4611692230000324827418",
+  "334774951898054808",
 ];
 async function main() {
   const SWPxVoterProxy = JSON.parse(
@@ -73,7 +43,9 @@ async function main() {
 
   const contract = new web3.eth.Contract(SWPxVoterProxy);
 
-  const txData = contract.methods.claimBribes(bribes, tokens).encodeABI();
+  const txData = contract.methods
+    .deployerClaimReward(tokens, amounts)
+    .encodeABI();
   console.log(txData);
 
   //using ETH
