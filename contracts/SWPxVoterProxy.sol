@@ -10,6 +10,7 @@ import "./Interfaces/SWPX/ISWPxVoterProxy.sol";
 import "./Interfaces/SWPX/IRevenueSharingPool.sol";
 import "./Interfaces/Pancake/IMasterChef.sol";
 import "./Interfaces/SWPX/IVotingEscrowV1_1.sol";
+import "./Interfaces/ISwapXVoterV3.sol";
 
 import "./lib/TransferHelper.sol";
 
@@ -43,6 +44,7 @@ contract SWPxVoterProxy is
     uint256 private constant WEEK = 604800;
     // 2 years
     uint256 private constant MAX_LOCK_DURATION = 63_072_000; // 2 years
+    address public constant VOTER_V3 = 0xC1AE2779903cfB84CB9DEe5c03EcEAc32dc407F2;
 
     event SWPxLockMinted(uint256 tokenId);
     event SWPxLocked(uint256 amount);
@@ -238,4 +240,26 @@ contract SWPxVoterProxy is
         }
         return this.onERC721Received.selector;
     }
+
+    //claims function
+
+    /// @notice claim bribes rewards given a TokenID
+    function claimBribes(
+        address[] memory _bribes,
+        address[][] memory _tokens
+    ) external onlyOwner 
+    {
+        require(lockedTokenId !=  0, "can not claim without lockedTokenId");
+        ISwapXVoterV3(VOTER_V3).claimBribes(_bribes, _tokens, lockedTokenId);
+    }
+
+    /// @notice claim fees rewards given a TokenID
+    function claimFees(
+        address[] memory _fees,
+        address[][] memory _tokens
+    ) external onlyOwner{
+        require(lockedTokenId !=  0, "can not claim without lockedTokenId");
+        ISwapXVoterV3(VOTER_V3).claimFees(_fees, _tokens, lockedTokenId);
+    }
+
 }
