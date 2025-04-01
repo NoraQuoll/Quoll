@@ -17,28 +17,34 @@ contract ThenaDelegatePool is ManagerUpgradeable {
     using SafeMath for uint256;
     using TransferHelper for address;
 
-    address public quo;
-    address public voterProxy;
-
-    IVirtualBalanceRewardPool public rewardPool;
-    INativeZapper public nativeZapper;
-
-    address public feeCollector;
-    uint256 public constant DENOMINATOR = 10000;
-    uint256 public protocolFee;
-
-    address[] public votePools;
-    mapping(address => bool) public isVotePool;
-    mapping(address => uint256) public votingWeights;
-    uint256 public totalWeight;
-
-    // -----------------------------------------------------------------------------------------------------------------
     // 7 days, to use as denominator in lock calculation
     uint256 private constant WEEK = 604800;
     address private constant THENA_VOTER_V3 =
         0x3A1D0952809F4948d15EBCe8d345962A282C4fCb;
+    uint256 public constant DENOMINATOR = 10000;
 
+    address public quo;
+    address public voterProxy;
+    address public feeCollector;
+    INativeZapper public nativeZapper;
+    IVirtualBalanceRewardPool public rewardPool;
+    address[] public votePools;
+
+    uint256 public totalWeight;
+    uint256 public protocolFee;
+    uint256 public lastHarvest; //last epoch harvested
+
+    mapping(address => bool) public isVotePool;
+    mapping(address => uint256) public votingWeights;
+
+    event WeightUpdate(address _lp, uint256 _weight);
+    event PoolDeleted(address _lp);
     event QuoHarvested(uint256 _amount, uint256 _fee);
+
+    modifier onlyVoterProxy() {
+        require(msg.sender == voterProxy, "Only voter proxy");
+        _;
+    }
 
     function initialize() public initializer {
         __ManagerUpgradeable_init();
@@ -46,124 +52,120 @@ contract ThenaDelegatePool is ManagerUpgradeable {
 
     function setParams(
         address _quo,
+        address _thenaVoterProxy,
         address _rewardPool,
         address _nativeZapper,
-        address _feeCollector,
-        address _thenaVoterProxy
+        address _feeCollector
     ) external onlyOwner {
         require(voterProxy == address(0), "params have already been set");
-
         require(_quo != address(0), "invalid _quo!");
         require(_rewardPool != address(0), "invalid _rewardPool!");
         require(_nativeZapper != address(0), "invalid _nativeZapper!");
         require(_feeCollector != address(0), "invalid _feeCollector!");
 
         quo = _quo;
-        rewardPool = IVirtualBalanceRewardPool(_rewardPool);
+        voterProxy = _thenaVoterProxy;
         nativeZapper = INativeZapper(_nativeZapper);
         feeCollector = _feeCollector;
-        voterProxy = _thenaVoterProxy;
-
         protocolFee = 500;
+        rewardPool = IVirtualBalanceRewardPool(_rewardPool);
+        lastHarvest = block.timestamp;
     }
 
-    modifier onlyVoterProxy() {
-        require(msg.sender == voterProxy, "Only BribeManager");
-        _;
-    }
-
+    //thena voting rewards can be claimed atfter the next Epochs ends
     modifier harvest() {
-        // handle bribes reward
-        uint256[] memory claimableEpochs = IThenaVoterProxy(voterProxy)
-            .getClaimableEpochsForUser(address(this));
-        for (uint epoch = 0; epoch < claimableEpochs.length; epoch++) {
-            (
-                ,
-                address[][] memory rewardTokensList,
-                uint256[][] memory earnedRewards
-            ) = IThenaVoterProxy(voterProxy).claimableByUser(
-                    claimableEpochs[epoch],
-                    address(this)
-                );
-            uint256 quoAmount = 0;
-            for (uint256 i = 0; i < rewardTokensList.length; i++) {
-                for (uint256 j = 0; j < rewardTokensList[i].length; j++) {
-                    address rewardToken = rewardTokensList[i][j];
-                    uint256 earnedReward = earnedRewards[i][j];
-                    if (rewardToken == address(0) || earnedReward == 0) {
-                        continue;
-                    }
-                    if (rewardToken == quo) {
-                        quoAmount = quoAmount.add(earnedReward);
-                        continue;
-                    }
-                    if (AddressLib.isPlatformToken(rewardToken)) {
-                        quoAmount = quoAmount.add(
-                            nativeZapper.swapToken{value: earnedReward}(
-                                rewardToken,
-                                quo,
-                                earnedReward,
-                                address(this)
-                            )
-                        );
-                    } else {
-                        _approveTokenIfNeeded(
-                            rewardToken,
-                            address(nativeZapper),
-                            earnedReward
-                        );
-                        quoAmount = quoAmount.add(
-                            nativeZapper.swapToken(
-                                rewardToken,
-                                quo,
-                                earnedReward,
-                                address(this)
-                            )
-                        );
-                    }
-                }
-            }
-            if (quoAmount > 0) {
-                uint256 fee;
-                if (protocolFee > 0 && feeCollector != address(0)) {
-                    fee = protocolFee.mul(quoAmount).div(DENOMINATOR);
-                    quo.safeTransferToken(feeCollector, fee);
-                }
-                emit QuoHarvested(quoAmount, fee);
-                quoAmount = quoAmount.sub(fee);
-                _approveTokenIfNeeded(quo, address(rewardPool), quoAmount);
-                rewardPool.queueNewRewards(quo, quoAmount);
-            }
-        }
+        uint256 currentEpoch = IThenaVoterProxy(voterProxy).getCurrentEpoch();
+        if (currentEpoch - lastHarvest > WEEK) {
+            uint256[] memory epochs = IThenaVoterProxy(voterProxy)
+                .getClaimableEpochsForUser(address(this));
+            // harvest all reward and swap to QUO
 
-        IThenaVoterProxy(voterProxy).claimAllEpochs();
+            for (
+                uint256 epochIndex = 0;
+                epochIndex < epochs.length;
+                epochIndex++
+            ) {
+                (
+                    address[] memory pools,
+                    address[][] memory rewardTokensList,
+                    uint256[][] memory earnedRewards
+                ) = IThenaVoterProxy(voterProxy).claimableByUser(
+                        epochs[epochIndex],
+                        msg.sender
+                    );
+                uint256 quoAmount = 0;
+                for (uint256 i = 0; i < rewardTokensList.length; i++) {
+                    for (uint256 j = 0; j < rewardTokensList[i].length; j++) {
+                        address rewardToken = rewardTokensList[i][j];
+                        uint256 earnedReward = earnedRewards[i][j];
+                        if (rewardToken == address(0) || earnedReward == 0) {
+                            continue;
+                        }
+                        if (rewardToken == quo) {
+                            quoAmount = quoAmount.add(earnedReward);
+                            continue;
+                        }
+                        if (AddressLib.isPlatformToken(rewardToken)) {
+                            quoAmount = quoAmount.add(
+                                nativeZapper.swapToken{value: earnedReward}(
+                                    rewardToken,
+                                    quo,
+                                    earnedReward,
+                                    address(this)
+                                )
+                            );
+                        } else {
+                            _approveTokenIfNeeded(
+                                rewardToken,
+                                address(nativeZapper),
+                                earnedReward
+                            );
+                            quoAmount = quoAmount.add(
+                                nativeZapper.swapToken(
+                                    rewardToken,
+                                    quo,
+                                    earnedReward,
+                                    address(this)
+                                )
+                            );
+                        }
+                    }
+                }
+                if (quoAmount > 0) {
+                    uint256 fee;
+                    if (protocolFee > 0 && feeCollector != address(0)) {
+                        fee = protocolFee.mul(quoAmount).div(DENOMINATOR);
+                        quo.safeTransferToken(feeCollector, fee);
+                    }
+                    emit QuoHarvested(quoAmount, fee);
+                    quoAmount = quoAmount.sub(fee);
+                    _approveTokenIfNeeded(quo, address(rewardPool), quoAmount);
+                    rewardPool.queueNewRewards(quo, quoAmount);
+                }
+            }
+
+            lastHarvest = currentEpoch;
+        }
         _;
     }
 
-    function setProtocolFee(uint256 _protocolFee) external onlyOwner {
-        require(_protocolFee < DENOMINATOR, "invalid _protocolFee!");
-        protocolFee = _protocolFee;
-    }
-
-    function setFeeCollector(address _feeCollector) external onlyOwner {
-        require(_feeCollector != address(0), "invalid _feeCollector!");
-        feeCollector = _feeCollector;
-    }
-
-    function updateWeights(address[] memory _lps, uint256[] memory _weights) external onlyManager{
+    function updateWeights(
+        address[] memory _lps,
+        uint256[] memory _weights
+    ) external onlyManager {
         require(_lps.length == _weights.length, "length mismatch");
-        for(uint256 i = 0 ; i < _lps.length; i++){
+        for (uint256 i = 0; i < _lps.length; i++) {
             address _lp = _lps[i];
             uint256 _weight = _weights[i];
             _updateWeight(_lp, _weight);
         }
     }
-    
-    function updateWeight(address _lp, uint256 _weight)external onlyManager{
+
+    function updateWeight(address _lp, uint256 _weight) external onlyManager {
         _updateWeight(_lp, _weight);
     }
 
-    function _updateWeight(address _lp, uint256 _weight) internal  {
+    function _updateWeight(address _lp, uint256 _weight) internal {
         require(_lp != address(this), "??");
         if (!isVotePool[_lp]) {
             require(
@@ -175,7 +177,7 @@ contract ThenaDelegatePool is ManagerUpgradeable {
         }
         totalWeight = totalWeight.sub(votingWeights[_lp]).add(_weight);
         votingWeights[_lp] = _weight;
-        _updateVote();
+        emit WeightUpdate(_lp, _weight);
     }
 
     function deletePool(address _lp) external onlyOwner {
@@ -200,6 +202,7 @@ contract ThenaDelegatePool is ManagerUpgradeable {
         totalWeight = totalWeight - votingWeights[_lp];
         votingWeights[_lp] = 0;
         _updateVote();
+        emit PoolDeleted(_lp);
     }
 
     function getPoolsLength() external view returns (uint256) {
@@ -210,13 +213,16 @@ contract ThenaDelegatePool is ManagerUpgradeable {
         return rewardPool.getRewardTokens();
     }
 
+    ///@dev return amount total amount vlQuo delegated
     function totalSupply() public view returns (uint256) {
         return rewardPool.totalSupply();
     }
 
+    ///@dev return the weight of user vote for delegate vote pool
     function balanceOf(address account) public view returns (uint256) {
         return rewardPool.balanceOf(account);
     }
+
 
     function earned(
         address _account,
@@ -225,8 +231,69 @@ contract ThenaDelegatePool is ManagerUpgradeable {
         return rewardPool.earned(_account, _rewardToken);
     }
 
-    function harvestManually() external harvest {
-        return;
+    function harvestManually(
+        uint256 _epoch
+    )
+        external
+        onlyOwner
+        returns (
+            address[] memory _pools,
+            address[][] memory rewardTokensList,
+            uint256[][] memory earnedRewards
+        )
+    {
+        (_pools, rewardTokensList, earnedRewards) = IThenaVoterProxy(voterProxy)
+            .claimableByUser(_epoch, address(this));
+        IThenaVoterProxy(voterProxy).claimAll(_epoch);
+        uint256 quoAmount = 0;
+        for (uint256 i = 0; i < rewardTokensList.length; i++) {
+            for (uint256 j = 0; j < rewardTokensList[i].length; j++) {
+                address rewardToken = rewardTokensList[i][j];
+                uint256 earnedReward = earnedRewards[i][j];
+                if (rewardToken == address(0) || earnedReward == 0) {
+                    continue;
+                }
+                if (rewardToken == quo) {
+                    quoAmount = quoAmount.add(earnedReward);
+                    continue;
+                }
+                if (AddressLib.isPlatformToken(rewardToken)) {
+                    quoAmount = quoAmount.add(
+                        nativeZapper.swapToken{value: earnedReward}(
+                            rewardToken,
+                            quo,
+                            earnedReward,
+                            address(this)
+                        )
+                    );
+                } else {
+                    _approveTokenIfNeeded(
+                        rewardToken,
+                        address(nativeZapper),
+                        earnedReward
+                    );
+                    quoAmount = quoAmount.add(
+                        nativeZapper.swapToken(
+                            rewardToken,
+                            quo,
+                            earnedReward,
+                            address(this)
+                        )
+                    );
+                }
+            }
+        }
+        if (quoAmount > 0) {
+            uint256 fee;
+            if (protocolFee > 0 && feeCollector != address(0)) {
+                fee = protocolFee.mul(quoAmount).div(DENOMINATOR);
+                quo.safeTransferToken(feeCollector, fee);
+            }
+            emit QuoHarvested(quoAmount, fee);
+            quoAmount = quoAmount.sub(fee);
+            _approveTokenIfNeeded(quo, address(rewardPool), quoAmount);
+            rewardPool.queueNewRewards(quo, quoAmount);
+        }
     }
 
     function stakeFor(
@@ -240,20 +307,38 @@ contract ThenaDelegatePool is ManagerUpgradeable {
     function withdrawFor(
         address _for,
         uint256 _amount
-    ) external onlyVoterProxy harvest harvest {
+    ) external onlyVoterProxy harvest {
         rewardPool.withdrawFor(_for, _amount);
+        _updateVote();
+    }
+
+
+    function getReward() external {
+        rewardPool.getReward(msg.sender);
+    }
+    //voter proxy will call this function in the first vote each new epoch
+    //to keep the delegated vote weight from the previous epoch
+    function updateVote() external onlyVoterProxy {
         _updateVote();
     }
 
     function _updateVote() internal {
         uint256 length = votePools.length;
-        uint256[] memory voteWeights = new uint256[](length);
-        for (uint256 index = 0; index < length; index++) {
-            voteWeights[index] =
-                (votingWeights[votePools[index]] * 100) /
-                totalWeight;
+        if (length > 0) {
+            uint256[] memory voteWeights = new uint256[](length);
+            for (uint256 index = 0; index < length; index++) {
+                address pool = votePools[index];
+                voteWeights[index] = votingWeights[pool].mul(DENOMINATOR).div(
+                    totalWeight
+                );
+            }
+            
+            IThenaVoterProxy(voterProxy).voteByDelegatePool(
+                votePools,
+                voteWeights
+            );
+             
         }
-        IThenaVoterProxy(voterProxy).voteByDelegationAdmin(votePools, voteWeights);
     }
 
     function _approveTokenIfNeeded(

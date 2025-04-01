@@ -16,11 +16,14 @@ interface IThenaVoterProxy {
     function lockThe() external;
     function unlockThe(bool withdraw) external;
 
+    function getCurrentEpoch() external view returns (uint256);
     function vote(address[] calldata _pools, uint256[] calldata _weights) external;
-    function voteByDelegationAdmin(address[] calldata _pools, uint256[] calldata _weights) external;
+    function voteByDelegatePool(address[] calldata _pools, uint256[] calldata _weights) external;
     function claimAllEpochs() external;
-
+    function resetVote() external;
+    function claimAll(uint256 _epoch) external;
     function claimableByUser(uint256 _epoch, address _user) external view returns (address[] memory _pools, address[][] memory _tokens, uint256[][] memory _amounts);
     function getClaimableEpochsForUser(address _user) external view returns (uint256[] memory);
+    function getCurrentUserTotalVote(address _user) external view returns (uint256);
     function rewards(uint256 _epoch) external view returns (address[] memory _pool, address[][] memory _tokens, uint256[][] memory _amounts) ;
 }
