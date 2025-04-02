@@ -33,5 +33,6 @@ interface ISwapXVoterV3 {
         address[][] memory _tokens
     ) external ;
 
+    function reset(uint256 _tokenId) external;
 
 }
