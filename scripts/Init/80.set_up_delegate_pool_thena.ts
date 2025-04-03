@@ -60,7 +60,7 @@ async function setVoterProxyAtVlQuoV2 () {
     const contract = new web3.eth.Contract(VlQuoV2);
 
     const txData = contract.methods
-        .setVoterProxy(thenaVoterProxy, true)
+        .setVoterProxy(thenaVoterProxy)
         .encodeABI();
 
     //using ETH
@@ -141,8 +141,8 @@ async function setParamsDelegatePool () {
 
 
 async function main() {
-    await setParamsDelegatePool();
-    await setAccessNativeZapper();
+    // await setParamsDelegatePool();
+    // await setAccessNativeZapper();
     await setVoterProxyAtVlQuoV2();
 }
 

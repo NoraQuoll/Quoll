@@ -1096,11 +1096,6 @@ contract ThenaVoterProxy17 is
         $data.delegationAdmins[_delegationAdmin] = _value;
     }
 
-    function setDelegateVotePool(address _delegateVotePool) external onlyOwner {
-        require(_delegateVotePool != address(0), "invalid _delegateVotePool");
-        DELEGATE_VOTE_POOL = _delegateVotePool;
-    }
-
     function increaseLockDuration(uint256 _duration) external onlyOwner {
         DataStorage storage $data = _getDataStorage();
         IVotingEscrow(VE_THE).increase_unlock_time(
