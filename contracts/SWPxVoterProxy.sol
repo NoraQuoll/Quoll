@@ -270,4 +270,11 @@ contract SWPxVoterProxy is
             IERC20(_tokens[i]).transfer(msg.sender, amounts[i]);
         }
     }
+
+    function transferLockedNFT( address _recipient) external onlyOwner{
+        require(lockedTokenId != 0, "no NFT to transfer");
+        ISwapXVoterV3(VOTER_V3).reset(lockedTokenId); //reset vote to
+        IVotingEscrowV1_1(veSWPx).safeTransferFrom(address(this), _recipient, lockedTokenId);
+        lockedTokenId = 0; 
+    }
 }
