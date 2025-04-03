@@ -96,7 +96,8 @@ contract ThenaVoterProxy17 is
     // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.DataStorage")) - 1)) & ~bytes32(uint256(0xff));
     bytes32 private constant DATA_STORAGE_LOCATION =
         0xc71dc29fd54b52d8e57671e39c8708c047ee755caa028ff177d008e83d685500;
-    address public DELEGATE_VOTE_POOL;
+    address public constant DELEGATE_VOTE_POOL =
+        0x5d34F95157558af63dfD8091dA329D36Fe5C64b6;
     // -----------------------------------------------------------------------------------------------------------------
     // EVENTS
     // -----------------------------------------------------------------------------------------------------------------
@@ -330,7 +331,8 @@ contract ThenaVoterProxy17 is
         DataStorage storage $data = _getDataStorage();
         Epoch storage epoch = $.epochs[$data.currentEpoch];
         uint256 userWeightThisEpoch = epoch.userWeights[_user];
-        uint256 userWeightDelegate = IThenaDelegatePool(DELEGATE_VOTE_POOL).balanceOf(_user);
+        uint256 userWeightDelegate = IThenaDelegatePool(DELEGATE_VOTE_POOL)
+            .balanceOf(_user);
         return
             userWeightThisEpoch > userWeightDelegate
                 ? userWeightThisEpoch
@@ -344,13 +346,14 @@ contract ThenaVoterProxy17 is
         return $.claimableEpochs[_user];
     }
 
-    function getDelegatedWeights() public view returns (uint256){
-        
+    function getDelegatedWeights() public view returns (uint256) {
         return IThenaDelegatePool(DELEGATE_VOTE_POOL).totalSupply();
     }
 
-    function getUserWeightInDelegatePool(address _user) public view returns (uint256){
-        return  IThenaDelegatePool(DELEGATE_VOTE_POOL).balanceOf(_user);
+    function getUserWeightInDelegatePool(
+        address _user
+    ) public view returns (uint256) {
+        return IThenaDelegatePool(DELEGATE_VOTE_POOL).balanceOf(_user);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -472,9 +475,8 @@ contract ThenaVoterProxy17 is
             emit VotingEpochChanged($data.currentEpoch);
 
             //keep delegated weight from last epoch
-            IThenaDelegatePool(DELEGATE_VOTE_POOL).updateVote(); 
-            epoch.totalWeight +=   epoch.userWeights[DELEGATE_VOTE_POOL];
-
+            IThenaDelegatePool(DELEGATE_VOTE_POOL).updateVote();
+            epoch.totalWeight += epoch.userWeights[DELEGATE_VOTE_POOL];
         }
         require(
             block.timestamp <=
@@ -513,7 +515,6 @@ contract ThenaVoterProxy17 is
         DataStorage storage $data = _getDataStorage();
         Epoch storage epoch = $.epochs[$data.currentEpoch];
 
-
         // If the user has votes for this epoch, reset everything
         if (epoch.userWeights[msg.sender] > 0) {
             _resetVote($data.currentEpoch, msg.sender);
@@ -549,7 +550,9 @@ contract ThenaVoterProxy17 is
             if (
                 DELEGATE_VOTE_POOL != address(0) && pool == DELEGATE_VOTE_POOL
             ) {
-                uint256 userCurrentWeight = IThenaDelegatePool(DELEGATE_VOTE_POOL).balanceOf(msg.sender);
+                uint256 userCurrentWeight = IThenaDelegatePool(
+                    DELEGATE_VOTE_POOL
+                ).balanceOf(msg.sender);
                 //update delegated pool weight
                 if (vlQuoVotePower != userCurrentWeight) {
                     if (vlQuoVotePower > userCurrentWeight) {
@@ -557,8 +560,7 @@ contract ThenaVoterProxy17 is
                             msg.sender,
                             (vlQuoVotePower - userCurrentWeight)
                         );
-                    }
-                     else {
+                    } else {
                         IThenaDelegatePool(DELEGATE_VOTE_POOL).withdrawFor(
                             msg.sender,
                             (userCurrentWeight - vlQuoVotePower)
@@ -574,7 +576,6 @@ contract ThenaVoterProxy17 is
             );
         }
 
-    
         // Add the user into the userWithVotes array
         epoch.userIndexInArray[msg.sender] = epoch.usersWithVotes.length;
         epoch.usersWithVotes.push(msg.sender);
@@ -584,7 +585,6 @@ contract ThenaVoterProxy17 is
         // Increment totals and dates
         epoch.totalWeight += totalPower;
         epoch.lastVotedAt = block.timestamp;
-
     }
 
     /// @dev Function for delegate vote pool to submit vote with delegated power. Only the last vote will be counted.
@@ -614,18 +614,18 @@ contract ThenaVoterProxy17 is
         DataStorage storage $data = _getDataStorage();
         Epoch storage epoch = $.epochs[$data.currentEpoch];
 
-        
         // If the delegate pool has voted for this epoch, reset everything
         uint256 votedWeight = epoch.userWeights[msg.sender];
         if (votedWeight > 0) {
             //because total weight remain unchange when delegate pool votes to this proxy
             //but decrease when reset vote
-            //so it should be recovered 
+            //so it should be recovered
             epoch.totalWeight += votedWeight;
             _resetVote($data.currentEpoch, msg.sender);
         }
 
-        uint256 delegatedPower = IThenaDelegatePool(DELEGATE_VOTE_POOL).totalSupply();
+        uint256 delegatedPower = IThenaDelegatePool(DELEGATE_VOTE_POOL)
+            .totalSupply();
 
         if (delegatedPower == 0) return;
         for (uint256 i = 0; i < _pools.length; i++) {
@@ -692,7 +692,8 @@ contract ThenaVoterProxy17 is
 
     function resetVote() external {
         DataStorage storage $ = _getDataStorage();
-        uint256 userDelegatedWeight = IThenaDelegatePool(DELEGATE_VOTE_POOL).balanceOf(msg.sender);
+        uint256 userDelegatedWeight = IThenaDelegatePool(DELEGATE_VOTE_POOL)
+            .balanceOf(msg.sender);
         _resetVote($.currentEpoch, msg.sender);
         //if user has voted delegate pool
         if (userDelegatedWeight > 0) {
@@ -700,7 +701,7 @@ contract ThenaVoterProxy17 is
                 msg.sender,
                 IThenaDelegatePool(DELEGATE_VOTE_POOL).balanceOf(msg.sender) // withdraw all staked amount
             );
-        }    
+        }
     }
 
     function _resetVote(uint256 _epoch, address _user) internal {
@@ -782,10 +783,9 @@ contract ThenaVoterProxy17 is
         uint256[] memory weightsArg;
         if (epoch.lastCastedAt > 0) {
             IVoterV3(THENA_VOTER_V3).reset($data.veTheTokenId);
-        } 
+        }
         (poolsArg, weightsArg) = getVoteToBeCasted($data.currentEpoch);
         IVoterV3(THENA_VOTER_V3).vote($data.veTheTokenId, poolsArg, weightsArg);
-
 
         epoch.lastCastedAt = block.timestamp;
     }
@@ -1151,4 +1151,3 @@ contract ThenaVoterProxy17 is
 
     receive() external payable {}
 }
- 
