@@ -14,7 +14,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   const web3 = new Web3(process.env.RPC!);
 
-  const operator = "0x8dFd655247c138A2b4053090e54FF2ba89905d9B"; //thena delegate pool contract address
+  const operator = "0x5d34F95157558af63dfD8091dA329D36Fe5C64b6"; //thena delegate pool contract address
   const data = await deploy("ThenaVirtualBalanceRewardPool", {
     from: deployer,
     args: [],

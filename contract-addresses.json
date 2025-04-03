@@ -422,7 +422,7 @@
         },
         "VlQuoV2": {
             "address": "0xD653FDD560Fd8d936fFe5f8Feeb9EF68fd5743e9",
-            "impl": "0x79184898D69cF6748A613b5DeB38c50dD7FD920D"
+            "impl": "0x73f366C4F0DAc057ABb93558064801e6E43fB71C"
         },
         "PTSconverter": {
             "address": "0xF49f0A8AF5d9BB380AF2c2724b9EA3f9e75732c4",
@@ -467,6 +467,14 @@
         "QCakeBalanceRewardPool": {
             "address": "0xcCac06A4ee305050f84578F60DCd39935696C36A",
             "impl": "0x877Ed2994D7D0a2C9E74c80208648264Bb67b438"
+        },
+        "ThenaDelegatePool": {
+            "address": "0x5d34F95157558af63dfD8091dA329D36Fe5C64b6",
+            "impl": "0xD60D5e1E03955629cF836E1bdc097239a57004c4"
+        },
+        "ThenaVirtualBalanceRewardPool": {
+            "address": "0xcDc6A14D995BC755B3DA8736308C0d0c34DA06eE",
+            "impl": "0xf4e5687a097fF07aBEF73D8f34f382E166E55868"
         }
     },
     "arb": {
