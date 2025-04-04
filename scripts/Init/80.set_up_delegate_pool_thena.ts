@@ -18,13 +18,13 @@ const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
 /*Token contracts*/
 const quo = "0x08b450e4a48C04CDF6DB2bD4cf24057f7B9563fF";
-const vlQuoV2 = "0x584F3fa0466f369d1Ba5635dFcF507aA956274c7";
+const vlQuoV2 = "0xc634c0A24BFF88c015Ff32145CE0F8d578B02F60";
 
 //Other contract
 const thenaVoterProxy = "0xc0cd42017380cf4dc76adb8535cdF76b8f3fE398";
 const nativeZapper = "0x61C855f3a9A1B3FeFD065DbE53c9DAf630F29Df8"
-const thenaDelegatePool = "0xA94ad5201d4AEFe96d970a3c614199aBC685D782";
-const treasury = "";
+const thenaDelegatePool = "0x5d34F95157558af63dfD8091dA329D36Fe5C64b6";
+const treasury = "0x5c137f6a5c4983d49efa2d5e02d1313fda1b27ab";
 
 /**
  * CONTRACT ABI
@@ -60,7 +60,7 @@ async function setVoterProxyAtVlQuoV2 () {
     const contract = new web3.eth.Contract(VlQuoV2);
 
     const txData = contract.methods
-        .setVoterProxy(vlQuoV2, true)
+        .setVoterProxy(thenaVoterProxy)
         .encodeABI();
 
     //using ETH
@@ -141,9 +141,9 @@ async function setParamsDelegatePool () {
 
 
 async function main() {
-    setParamsDelegatePool();
-    setAccessNativeZapper();
-    setVoterProxyAtVlQuoV2();
+    // await setParamsDelegatePool();
+    // await setAccessNativeZapper();
+    await setVoterProxyAtVlQuoV2();
 }
 
 // We recommend this pattern to be able to use async/await everywhere

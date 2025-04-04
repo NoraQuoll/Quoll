@@ -79,6 +79,7 @@ const config: HardhatUserConfig = {
       sonic: process.env.ETH_API_KEY!,
       bscTestnet: process.env.ETH_API_KEY!,
       arbitrumOne: process.env.ETH_API_KEY!,
+      bsc: process.env.ETH_API_KEY!,
     },
     customChains: [
       {
