@@ -17,11 +17,11 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-const thenaDelegatePool = "0xf928eb071248B8f79D435c6D0BfB0AbAA6803c06";
+const thenaDelegatePool = "0x5d34F95157558af63dfD8091dA329D36Fe5C64b6";
 
 const pools = [
-    "0xdE9e9B9F2FE180A40908aCbb144b15ac6bA54E54",
-    "0x959664AEF4656c425E362df9B705293dcB9f8f4d",
+    "0x01DD2d28eeB95D740acb5344b1e2C99b61CC3e64",
+    "0x10bf6e7B28b1cfFb1c047D7F815953931e5Ee947",
 ];
 const weights = [50, 50];
 
