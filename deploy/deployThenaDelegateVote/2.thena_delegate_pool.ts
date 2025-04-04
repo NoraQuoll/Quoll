@@ -23,10 +23,10 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     proxy: {
       proxyContract: "OptimizedTransparentProxy",
       owner: deployer,
-    execute: {
-        methodName: "initialize",
-        args: [],
-      },
+      // execute: {
+      //   methodName: "initialize",
+      //   args: [],
+      // },
     },
   });
 
@@ -38,7 +38,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     data.implementation!
   );
 
-  
   // verify proxy contract
   try {
     // verify
@@ -50,7 +49,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     console.log(e);
   }
 
-  // verify impl contract 
+  // verify impl contract
   try {
     // verify
     await hre.run("verify:verify", {
@@ -60,7 +59,6 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   } catch (e) {
     console.log(e);
   }
-
 };
 
 deploy.tags = ["ThenaDelegatePool"];
