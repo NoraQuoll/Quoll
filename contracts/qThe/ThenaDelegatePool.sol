@@ -72,6 +72,11 @@ contract ThenaDelegatePool is ManagerUpgradeable {
         lastHarvest = block.timestamp;
     }
 
+    function setRewardPool(address _rewardPool) external onlyOwner {
+        require(_rewardPool != address(0), "invalid _rewardPool!");
+        rewardPool = IVirtualBalanceRewardPool(_rewardPool);
+    }
+    
     //thena voting rewards can be claimed atfter the next Epochs ends
     modifier harvest() {
         uint256 currentEpoch = IThenaVoterProxy(voterProxy).getCurrentEpoch();
