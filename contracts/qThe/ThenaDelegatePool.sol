@@ -11,6 +11,7 @@ import "../Interfaces/INativeZapper.sol";
 import "../Interfaces/IVirtualBalanceRewardPool.sol";
 import "../Interfaces/IThenaVoterProxy.sol";
 import "../Interfaces/Thena/IVoterV3.sol";
+import "../Interfaces/IPancakePath.sol";
 
 contract ThenaDelegatePool is ManagerUpgradeable {
     using SafeERC20 for IERC20;
@@ -40,6 +41,11 @@ contract ThenaDelegatePool is ManagerUpgradeable {
     event WeightUpdate(address _lp, uint256 _weight);
     event PoolDeleted(address _lp);
     event QuoHarvested(uint256 _amount, uint256 _fee);
+    event RewardHarvested(
+        address rewardToken,
+        uint256 earnedReward,
+        uint256 fee
+    );
 
     modifier onlyVoterProxy() {
         require(msg.sender == voterProxy, "Only voter proxy");
@@ -76,15 +82,14 @@ contract ThenaDelegatePool is ManagerUpgradeable {
         require(_rewardPool != address(0), "invalid _rewardPool!");
         rewardPool = IVirtualBalanceRewardPool(_rewardPool);
     }
-    
+
     //thena voting rewards can be claimed atfter the next Epochs ends
     modifier harvest() {
         uint256 currentEpoch = IThenaVoterProxy(voterProxy).getCurrentEpoch();
         if (currentEpoch - lastHarvest > WEEK) {
+            //get claimable epochs
             uint256[] memory epochs = IThenaVoterProxy(voterProxy)
                 .getClaimableEpochsForUser(address(this));
-            // harvest all reward and swap to QUO
-
             for (
                 uint256 epochIndex = 0;
                 epochIndex < epochs.length;
@@ -96,56 +101,43 @@ contract ThenaDelegatePool is ManagerUpgradeable {
                     uint256[][] memory earnedRewards
                 ) = IThenaVoterProxy(voterProxy).claimableByUser(
                         epochs[epochIndex],
-                        msg.sender
+                        address(this)
                     );
-                uint256 quoAmount = 0;
+                //claim reward of each epoch from voter proxy
+                IThenaVoterProxy(voterProxy).claimAll(epochs[epochIndex]);
                 for (uint256 i = 0; i < rewardTokensList.length; i++) {
                     for (uint256 j = 0; j < rewardTokensList[i].length; j++) {
                         address rewardToken = rewardTokensList[i][j];
                         uint256 earnedReward = earnedRewards[i][j];
-                        if (rewardToken == address(0) || earnedReward == 0) {
-                            continue;
-                        }
-                        if (rewardToken == quo) {
-                            quoAmount = quoAmount.add(earnedReward);
-                            continue;
-                        }
-                        if (AddressLib.isPlatformToken(rewardToken)) {
-                            quoAmount = quoAmount.add(
-                                nativeZapper.swapToken{value: earnedReward}(
-                                    rewardToken,
-                                    quo,
-                                    earnedReward,
-                                    address(this)
-                                )
-                            );
-                        } else {
+                        // queue reward immediately
+                        if (earnedReward > 0) {
+                            uint256 fee;
+                            if (protocolFee > 0 && feeCollector != address(0)) {
+                                fee = protocolFee.mul(earnedReward).div(
+                                    DENOMINATOR
+                                );
+                                rewardToken.safeTransferToken(
+                                    feeCollector,
+                                    fee
+                                );
+                            }
+                            uint256 amountToQueue = earnedReward.sub(fee);
                             _approveTokenIfNeeded(
                                 rewardToken,
-                                address(nativeZapper),
-                                earnedReward
+                                address(rewardPool),
+                                amountToQueue
                             );
-                            quoAmount = quoAmount.add(
-                                nativeZapper.swapToken(
-                                    rewardToken,
-                                    quo,
-                                    earnedReward,
-                                    address(this)
-                                )
+                            rewardPool.queueNewRewards(
+                                rewardToken,
+                                amountToQueue
+                            );
+                            emit RewardHarvested(
+                                rewardToken,
+                                earnedReward,
+                                fee
                             );
                         }
                     }
-                }
-                if (quoAmount > 0) {
-                    uint256 fee;
-                    if (protocolFee > 0 && feeCollector != address(0)) {
-                        fee = protocolFee.mul(quoAmount).div(DENOMINATOR);
-                        quo.safeTransferToken(feeCollector, fee);
-                    }
-                    emit QuoHarvested(quoAmount, fee);
-                    quoAmount = quoAmount.sub(fee);
-                    _approveTokenIfNeeded(quo, address(rewardPool), quoAmount);
-                    rewardPool.queueNewRewards(quo, quoAmount);
                 }
             }
 
@@ -228,7 +220,6 @@ contract ThenaDelegatePool is ManagerUpgradeable {
         return rewardPool.balanceOf(account);
     }
 
-
     function earned(
         address _account,
         address _rewardToken
@@ -249,55 +240,31 @@ contract ThenaDelegatePool is ManagerUpgradeable {
     {
         (_pools, rewardTokensList, earnedRewards) = IThenaVoterProxy(voterProxy)
             .claimableByUser(_epoch, address(this));
+
+        //claim reward from proxy
         IThenaVoterProxy(voterProxy).claimAll(_epoch);
-        uint256 quoAmount = 0;
         for (uint256 i = 0; i < rewardTokensList.length; i++) {
             for (uint256 j = 0; j < rewardTokensList[i].length; j++) {
                 address rewardToken = rewardTokensList[i][j];
                 uint256 earnedReward = earnedRewards[i][j];
-                if (rewardToken == address(0) || earnedReward == 0) {
-                    continue;
-                }
-                if (rewardToken == quo) {
-                    quoAmount = quoAmount.add(earnedReward);
-                    continue;
-                }
-                if (AddressLib.isPlatformToken(rewardToken)) {
-                    quoAmount = quoAmount.add(
-                        nativeZapper.swapToken{value: earnedReward}(
-                            rewardToken,
-                            quo,
-                            earnedReward,
-                            address(this)
-                        )
-                    );
-                } else {
+
+                // queue reward immediately
+                if (earnedReward > 0) {
+                    uint256 fee;
+                    if (protocolFee > 0 && feeCollector != address(0)) {
+                        fee = protocolFee.mul(earnedReward).div(DENOMINATOR);
+                        rewardToken.safeTransferToken(feeCollector, fee);
+                    }
+                    uint256 amountToQueue = earnedReward.sub(fee);
                     _approveTokenIfNeeded(
                         rewardToken,
-                        address(nativeZapper),
-                        earnedReward
+                        address(rewardPool),
+                        amountToQueue
                     );
-                    quoAmount = quoAmount.add(
-                        nativeZapper.swapToken(
-                            rewardToken,
-                            quo,
-                            earnedReward,
-                            address(this)
-                        )
-                    );
+                    rewardPool.queueNewRewards(rewardToken, amountToQueue);
+                    emit RewardHarvested(rewardToken, earnedReward, fee);
                 }
             }
-        }
-        if (quoAmount > 0) {
-            uint256 fee;
-            if (protocolFee > 0 && feeCollector != address(0)) {
-                fee = protocolFee.mul(quoAmount).div(DENOMINATOR);
-                quo.safeTransferToken(feeCollector, fee);
-            }
-            emit QuoHarvested(quoAmount, fee);
-            quoAmount = quoAmount.sub(fee);
-            _approveTokenIfNeeded(quo, address(rewardPool), quoAmount);
-            rewardPool.queueNewRewards(quo, quoAmount);
         }
     }
 
@@ -317,10 +284,10 @@ contract ThenaDelegatePool is ManagerUpgradeable {
         _updateVote();
     }
 
-
     function getReward() external {
         rewardPool.getReward(msg.sender);
     }
+
     //voter proxy will call this function in the first vote each new epoch
     //to keep the delegated vote weight from the previous epoch
     function updateVote() external onlyVoterProxy {
@@ -337,12 +304,11 @@ contract ThenaDelegatePool is ManagerUpgradeable {
                     totalWeight
                 );
             }
-            
+
             IThenaVoterProxy(voterProxy).voteByDelegatePool(
                 votePools,
                 voteWeights
             );
-             
         }
     }
 
