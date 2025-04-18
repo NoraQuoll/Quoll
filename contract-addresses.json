@@ -470,7 +470,7 @@
         },
         "ThenaDelegatePool": {
             "address": "0x5d34F95157558af63dfD8091dA329D36Fe5C64b6",
-            "impl": "0xDE85AAD11b1e9C88206073f2b58b96B98f9f354C"
+            "impl": "0x9AE2677aA9282538F134c18179CB32FCA6D73447"
         },
         "ThenaVirtualBalanceRewardPool": {
             "address": "0xcDc6A14D995BC755B3DA8736308C0d0c34DA06eE",
@@ -644,7 +644,7 @@
         },
         "SWPxVoterProxy": {
             "address": "0xf928eb071248B8f79D435c6D0BfB0AbAA6803c06",
-            "impl": "0xF139c5a04D12261E30BD7A72e1E72781Cb914AED"
+            "impl": "0x9b22Cfa039871CA6148159bf2095D932fc4438d5"
         },
         "SWPxReferralCampaignLens": {
             "address": "0x388D157F0BFdc1d30357AF63a8be10BfF8474f4e",

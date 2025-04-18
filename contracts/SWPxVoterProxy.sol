@@ -249,7 +249,7 @@ contract SWPxVoterProxy is
         address[] memory _bribes,
         address[][] memory _tokens
     ) external onlyOwner {
-        require(lockedTokenId != 0, "can not claim without lockedTokenId");
+        // require(lockedTokenId != 0, "can not claim without lockedTokenId");
         ISwapXVoterV3(VOTER_V3).claimBribes(_bribes, _tokens, lockedTokenId);
     }
 
@@ -258,8 +258,8 @@ contract SWPxVoterProxy is
         address[] memory _fees,
         address[][] memory _tokens
     ) external onlyOwner {
-        require(lockedTokenId != 0, "can not claim without lockedTokenId");
-        ISwapXVoterV3(VOTER_V3).claimFees(_fees, _tokens, lockedTokenId);
+        // require(lockedTokenId != 0, "can not claim without lockedTokenId");
+        ISwapXVoterV3(VOTER_V3).claimFees(_fees, _tokens);
     }
 
     function deployerClaimReward(
@@ -271,10 +271,14 @@ contract SWPxVoterProxy is
         }
     }
 
-    function transferLockedNFT( address _recipient) external onlyOwner{
+    function transferLockedNFT(address _recipient) external onlyOwner {
         require(lockedTokenId != 0, "no NFT to transfer");
         ISwapXVoterV3(VOTER_V3).reset(lockedTokenId); //reset vote to
-        IVotingEscrowV1_1(veSWPx).safeTransferFrom(address(this), _recipient, lockedTokenId);
-        lockedTokenId = 0; 
+        IVotingEscrowV1_1(veSWPx).safeTransferFrom(
+            address(this),
+            _recipient,
+            lockedTokenId
+        );
+        lockedTokenId = 0;
     }
 }
