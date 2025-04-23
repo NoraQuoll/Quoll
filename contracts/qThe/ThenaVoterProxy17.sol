@@ -356,6 +356,16 @@ contract ThenaVoterProxy17 is
         return IThenaDelegatePool(DELEGATE_VOTE_POOL).balanceOf(_user);
     }
 
+    function getUserVoterForPoolAtEpoch(
+        uint256 _epoch,
+        address _user,
+        address _pool
+    ) public view returns (uint256) {
+        UserVotesStorage storage $ = _getUserVotesStorage();
+        Epoch storage epoch = $.epochs[_epoch];
+        return epoch.votes[_pool][_user];
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     // Functions related to veTHE
     // -----------------------------------------------------------------------------------------------------------------
@@ -809,6 +819,8 @@ contract ThenaVoterProxy17 is
         Epoch storage epoch = $.epochs[$data.currentEpoch];
         return epoch.lastVotedAt > epoch.lastCastedAt;
     }
+
+
 
     // -----------------------------------------------------------------------------------------------------------------
     // Functions related to rewards
