@@ -364,6 +364,7 @@ describe("Thena Delegate Vote Pool", function () {
             bsc_usd,
             wbnbholder,
             wethHolder,
+            quollDeployer,
             quo,
             delegatePoolVirtualBalanceRewardPoolInstance,
             tokenId,
@@ -630,8 +631,84 @@ describe("Thena Delegate Vote Pool", function () {
 
     //     })
     // });
-    describe("Reset Delegate Vote Weight", function () {
-        it("should withdraw if not vote for delegate in new epoch", async function () {
+    // describe("Reset Delegate Vote Weight", function () {
+    //     it("should withdraw if not vote for delegate in new epoch", async function () {
+    //         const {
+    //             owner,
+    //             user1,
+    //             user2,
+    //             user3,
+    //             user4,
+    //             user5,
+    //             user6,
+    //             user7,
+    //             user1HolderVlquo,
+    //             user2HolderVlquo,
+    //             vlQuoV2,
+    //             barmy,
+    //             thenaVoterProxy,
+    //             thenaDelegatePoolIns,
+    //             minter,
+    //             voterv3,
+    //             rewardToken,
+    //             wbnb,
+    //             weth,
+    //             bsc_usd,
+    //             wbnbholder,
+    //             wethHolder,                
+    //             quo,
+    //             delegatePoolVirtualBalanceRewardPoolInstance
+    //         } = await deployFixture();
+
+    //         // const pool1 = await voterv3.pools(1);
+    //         // const pool2 = await voterv3.pools(2);
+    //         const pool1 = "0x01DD2d28eeB95D740acb5344b1e2C99b61CC3e64";
+    //         const pool2 = "0x10bf6e7B28b1cfFb1c047D7F815953931e5Ee947";
+    //         const pool3 = "0x936D06D7BF9Bd851c6cbEE3C18DA654659F4eBFD";
+
+    //         //increase time to new epoch
+    //         await increase(86400 * 14);
+    //         await minter.update_period();
+    //         await voterv3._epochTimestamp();
+    //         await thenaVoterProxy.connect(barmy).updateCurrentVotingEpoch();
+    //         const currentEpoch = await thenaVoterProxy.getCurrentEpoch();
+    //         // console.log('this case, delegate pool will vote for pool1 by its voting power');
+    //         // await thenaDelegatePoolIns.updateWeights([pool1], [100]);
+
+    //         console.log('user 1 vote delegate pool')
+    //         await thenaVoterProxy.connect(user1HolderVlquo).vote([thenaDelegatePoolIns.address], [50]);
+    //         console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user1HolderVlquo.address));
+    //         console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
+            
+    //         console.log('user 1 vote for other pool -> reset delegate pool')
+    //         await thenaVoterProxy.connect(user1HolderVlquo).vote([pool1], [50]);
+    //         console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user1HolderVlquo.address));
+    //         console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
+            
+
+           
+    //         console.log('user 1 vote delegate pool')
+    //         await thenaVoterProxy.connect(user1HolderVlquo).vote([thenaDelegatePoolIns.address], [50]);
+    //         console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user1HolderVlquo.address));
+    //         console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
+            
+    //         console.log('INCREASE TWO EPOCHS\n');
+    //         await increase(86400 * 14);
+    //         await minter.update_period();
+    //         await thenaVoterProxy.connect(barmy).updateCurrentVotingEpoch();
+    //         const nextEpoch = await thenaVoterProxy.getCurrentEpoch();
+
+    //         console.log(await thenaVoterProxy.getVotesForUserAtEpoch(nextEpoch, user1HolderVlquo.address));
+    //         console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
+    //         console.log('user 1 vote other pool')
+    //         await thenaVoterProxy.connect(user1HolderVlquo).vote([pool1], [50]);
+    //         console.log(await thenaVoterProxy.getVotesForUserAtEpoch(nextEpoch, user1HolderVlquo.address));
+    //         console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
+
+    //     })
+    // });
+    describe("Reset Delegate Vote By Owner", function () {
+        it("should owner reset user delegate vote", async function () {
             const {
                 owner,
                 user1,
@@ -656,6 +733,7 @@ describe("Thena Delegate Vote Pool", function () {
                 wbnbholder,
                 wethHolder,                
                 quo,
+                quollDeployer,
                 delegatePoolVirtualBalanceRewardPoolInstance
             } = await deployFixture();
 
@@ -678,30 +756,11 @@ describe("Thena Delegate Vote Pool", function () {
             await thenaVoterProxy.connect(user1HolderVlquo).vote([thenaDelegatePoolIns.address], [50]);
             console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user1HolderVlquo.address));
             console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
-            
-            console.log('user 1 vote for other pool -> reset delegate pool')
-            await thenaVoterProxy.connect(user1HolderVlquo).vote([pool1], [50]);
-            console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user1HolderVlquo.address));
-            console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
-            
 
-           
-            console.log('user 1 vote delegate pool')
-            await thenaVoterProxy.connect(user1HolderVlquo).vote([thenaDelegatePoolIns.address], [50]);
-            console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user1HolderVlquo.address));
-            console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
+            console.log('reset user vote');
+            await thenaDelegatePoolIns.connect(quollDeployer).resetDelegateVoteByOwner([user1HolderVlquo.address]);
             
-            console.log('INCREASE TWO EPOCHS\n');
-            await increase(86400 * 14);
-            await minter.update_period();
-            await thenaVoterProxy.connect(barmy).updateCurrentVotingEpoch();
-            const nextEpoch = await thenaVoterProxy.getCurrentEpoch();
-
-            console.log(await thenaVoterProxy.getVotesForUserAtEpoch(nextEpoch, user1HolderVlquo.address));
-            console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
-            console.log('user 1 vote other pool')
-            await thenaVoterProxy.connect(user1HolderVlquo).vote([pool1], [50]);
-            console.log(await thenaVoterProxy.getVotesForUserAtEpoch(nextEpoch, user1HolderVlquo.address));
+            console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user1HolderVlquo.address));
             console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
 
         })

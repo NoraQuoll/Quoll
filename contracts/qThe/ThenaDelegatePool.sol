@@ -284,6 +284,19 @@ contract ThenaDelegatePool is ManagerUpgradeable {
         _updateVote();
     }
 
+    function resetDelegateVoteByOwner(
+        address[] calldata _users
+    ) external onlyOwner {
+        for (uint256 i = 0; i < _users.length; i++) {
+            address user = _users[i];
+            uint256 balance = balanceOf(user);
+            if (balance > 0) {
+                rewardPool.withdrawFor(user, balance);
+            }
+        }
+        _updateVote();
+    }
+
     function getReward() external {
         rewardPool.getReward(msg.sender);
     }

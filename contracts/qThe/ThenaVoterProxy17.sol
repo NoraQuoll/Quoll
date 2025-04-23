@@ -193,7 +193,7 @@ contract ThenaVoterProxy17 is
     // -----------------------------------------------------------------------------------------------------------------
     // Constructor
     // -----------------------------------------------------------------------------------------------------------------
-    function initialize() public reinitializer(18) {
+    function initialize() public reinitializer(17) {
         // DataStorage storage $data = _getDataStorage();
         // Do nothing
     }
