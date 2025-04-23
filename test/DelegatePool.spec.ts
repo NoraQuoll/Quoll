@@ -320,8 +320,8 @@ describe("Thena Delegate Vote Pool", function () {
         // await nativeZapper.setAccess(thenaDelegatePoolIns.address, true);
 
 
-        // const ThenaVoterProxy17 = await ethers.getContractFactory("ThenaVoterProxy17");
-        // const thenaVoterProxy17 = await ThenaVoterProxy17.deploy();
+        const ThenaVoterProxy17 = await ethers.getContractFactory("ThenaVoterProxy17");
+        const thenaVoterProxy17 = await ThenaVoterProxy17.deploy();
 
         const RewardToken = await ethers.getContractFactory("MockERC20");
         const rewardToken = await RewardToken.deploy();
@@ -332,7 +332,7 @@ describe("Thena Delegate Vote Pool", function () {
         await vlQuoV2.connect(quollDeployer).setVoterProxy(thenaVoterProxy.address);
 
         //upgrade barmy's contract ThenaVoterProxy16 -> ThenaVoterProxy17
-        //await proxyAmin.connect(barmy).upgradeAndCall(thenaVoterProxy.address, thenaVoterProxy17.address, "0x");
+        await proxyAmin.connect(barmy).upgradeAndCall(thenaVoterProxy.address, thenaVoterProxy17.address, "0x");
         //set delegate pool address
         //await thenaVoterProxy.connect(barmy).setDelegateVotePool(thenaDelegatePoolIns.address);
 
@@ -525,8 +525,113 @@ describe("Thena Delegate Vote Pool", function () {
     //     })
     // });
    
-    describe("Reward user", function () {
-        it("should reward user voted for delegated pool", async function () {
+    // describe("Reward user", function () {
+    //     it("should reward user voted for delegated pool", async function () {
+    //         const {
+    //             owner,
+    //             user1,
+    //             user2,
+    //             user3,
+    //             user4,
+    //             user5,
+    //             user6,
+    //             user7,
+    //             user1HolderVlquo,
+    //             user2HolderVlquo,
+    //             vlQuoV2,
+    //             barmy,
+    //             thenaVoterProxy,
+    //             thenaDelegatePoolIns,
+    //             minter,
+    //             voterv3,
+    //             rewardToken,
+    //             wbnb,
+    //             weth,
+    //             bsc_usd,
+    //             wbnbholder,
+    //             wethHolder,                
+    //             quo,
+    //             delegatePoolVirtualBalanceRewardPoolInstance
+    //         } = await deployFixture();
+
+    //         // const pool1 = await voterv3.pools(1);
+    //         // const pool2 = await voterv3.pools(2);
+    //         const pool1 = "0x01DD2d28eeB95D740acb5344b1e2C99b61CC3e64";
+    //         const pool2 = "0x10bf6e7B28b1cfFb1c047D7F815953931e5Ee947";
+    //         const pool3 = await voterv3.pools(3);
+
+    //         //increase time to new epoch
+    //         await increase(86400 * 14);
+    //         await minter.update_period();
+    //         await voterv3._epochTimestamp();
+    //         await thenaVoterProxy.connect(barmy).updateCurrentVotingEpoch();
+    //         const currentEpoch = await thenaVoterProxy.getCurrentEpoch();
+    //         // console.log('this case, delegate pool will vote for pool1 by its voting power');
+    //         // await thenaDelegatePoolIns.updateWeights([pool1], [100]);
+
+    //         console.log('user 1 vote delegate pool')
+    //         await thenaVoterProxy.connect(user1HolderVlquo).vote([thenaDelegatePoolIns.address], [50]);
+    //         console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user1HolderVlquo.address));
+    //         console.log('user 2 vote delegate pool')
+    //         await thenaVoterProxy.connect(user2HolderVlquo).vote([thenaDelegatePoolIns.address], [50]);
+    //         console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user2HolderVlquo.address));
+            
+    //         console.log('wbnb reward in pool', await wbnb.balanceOf(delegatePoolVirtualBalanceRewardPoolInstance.address));
+    //         console.log('weth reward in pool', await weth.balanceOf( delegatePoolVirtualBalanceRewardPoolInstance.address));
+    //         console.log('bsc_usd reward in pool', await bsc_usd.balanceOf( delegatePoolVirtualBalanceRewardPoolInstance.address));
+
+            
+    //         console.log('vote to cast: pool1');
+    //         console.log('delegate pool is also listed here but then will be skipped by thena voter');
+    //         console.log(await thenaVoterProxy.getVoteToBeCasted(currentEpoch));
+
+
+    //         await thenaVoterProxy.castVote();
+
+    //         console.log('vote casted')
+    //         const tokenId = await thenaVoterProxy.getVeTheTokenId();
+    //         console.log('pool 1', await voterv3.votes(tokenId, pool1));
+    //         console.log('pool 2=0', await voterv3.votes(tokenId, pool2));
+    //         console.log('pool 3=0', await voterv3.votes(tokenId, pool3));
+
+    //         //register reward
+    //         console.log('\nregister reward token for pool 1')
+    //         const balance = wbnb.balanceOf(wbnbholder.address);
+    //         await wbnb.connect(wbnbholder).transfer(thenaVoterProxy.address, balance);
+    //         await thenaVoterProxy.connect(barmy).setQuollRewardsDistributor(wbnbholder.address);
+    //         await thenaVoterProxy.connect(wbnbholder).registerReward(currentEpoch, pool1, wbnb.address, balance);
+            
+    //         const wethBal = weth.balanceOf(wethHolder.address);
+    //         await weth.connect(wethHolder).transfer(thenaVoterProxy.address, wethBal);
+    //         await thenaVoterProxy.connect(barmy).setQuollRewardsDistributor(wethHolder.address);
+    //         await thenaVoterProxy.connect(wethHolder).registerReward(currentEpoch, pool1, weth.address, wethBal);
+
+    //         // user claim reward from delegated vote pool
+    //         console.log('user claim reward after 2 weeks');
+    //         await increase(86400 * 14);
+    //         await minter.update_period();
+    //         await thenaVoterProxy.connect(barmy).updateCurrentVotingEpoch();
+    //         await thenaDelegatePoolIns.harvestManually(currentEpoch);
+
+    //        console.log('wbnb reward in pool', await wbnb.balanceOf(delegatePoolVirtualBalanceRewardPoolInstance.address));
+    //        console.log('weth reward in pool', await weth.balanceOf( delegatePoolVirtualBalanceRewardPoolInstance.address));
+    //        console.log('bsc_usd reward in pool', await bsc_usd.balanceOf( delegatePoolVirtualBalanceRewardPoolInstance.address));
+
+    //        console.log('user 1 earn wbnb', await thenaDelegatePoolIns.earned(user1HolderVlquo.address, wbnb.address));
+    //        console.log('user 1 earn weth', await thenaDelegatePoolIns.earned(user1HolderVlquo.address, weth.address));
+    //        console.log('user 1 earn bsc_usd', await thenaDelegatePoolIns.earned(user2HolderVlquo.address, bsc_usd.address));
+           
+    //        console.log('user 2 earn wbnb', await thenaDelegatePoolIns.earned(user2HolderVlquo.address, wbnb.address));
+    //        console.log('user 2 earn weth', await thenaDelegatePoolIns.earned(user2HolderVlquo.address, weth.address));
+    //        console.log('user 2 earn bsc_usd', await thenaDelegatePoolIns.earned(user2HolderVlquo.address, bsc_usd.address));
+            
+    //        await thenaDelegatePoolIns.connect(user1HolderVlquo).getReward();
+    //        await thenaDelegatePoolIns.connect(user2HolderVlquo).getReward();
+
+    //     })
+    // });
+    describe("Reset Delegate Vote Weight", function () {
+        it("should withdraw if not vote for delegate in new epoch", async function () {
             const {
                 owner,
                 user1,
@@ -558,7 +663,7 @@ describe("Thena Delegate Vote Pool", function () {
             // const pool2 = await voterv3.pools(2);
             const pool1 = "0x01DD2d28eeB95D740acb5344b1e2C99b61CC3e64";
             const pool2 = "0x10bf6e7B28b1cfFb1c047D7F815953931e5Ee947";
-            const pool3 = await voterv3.pools(3);
+            const pool3 = "0x936D06D7BF9Bd851c6cbEE3C18DA654659F4eBFD";
 
             //increase time to new epoch
             await increase(86400 * 14);
@@ -572,64 +677,35 @@ describe("Thena Delegate Vote Pool", function () {
             console.log('user 1 vote delegate pool')
             await thenaVoterProxy.connect(user1HolderVlquo).vote([thenaDelegatePoolIns.address], [50]);
             console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user1HolderVlquo.address));
-            console.log('user 2 vote delegate pool')
-            await thenaVoterProxy.connect(user2HolderVlquo).vote([thenaDelegatePoolIns.address], [50]);
-            console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user2HolderVlquo.address));
+            console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
             
-            console.log('wbnb reward in pool', await wbnb.balanceOf(delegatePoolVirtualBalanceRewardPoolInstance.address));
-            console.log('weth reward in pool', await weth.balanceOf( delegatePoolVirtualBalanceRewardPoolInstance.address));
-            console.log('bsc_usd reward in pool', await bsc_usd.balanceOf( delegatePoolVirtualBalanceRewardPoolInstance.address));
-
+            console.log('user 1 vote for other pool -> reset delegate pool')
+            await thenaVoterProxy.connect(user1HolderVlquo).vote([pool1], [50]);
+            console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user1HolderVlquo.address));
+            console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
             
-            console.log('vote to cast: pool1');
-            console.log('delegate pool is also listed here but then will be skipped by thena voter');
-            console.log(await thenaVoterProxy.getVoteToBeCasted(currentEpoch));
 
-
-            await thenaVoterProxy.castVote();
-
-            console.log('vote casted')
-            const tokenId = await thenaVoterProxy.getVeTheTokenId();
-            console.log('pool 1', await voterv3.votes(tokenId, pool1));
-            console.log('pool 2=0', await voterv3.votes(tokenId, pool2));
-            console.log('pool 3=0', await voterv3.votes(tokenId, pool3));
-
-            //register reward
-            console.log('\nregister reward token for pool 1')
-            const balance = wbnb.balanceOf(wbnbholder.address);
-            await wbnb.connect(wbnbholder).transfer(thenaVoterProxy.address, balance);
-            await thenaVoterProxy.connect(barmy).setQuollRewardsDistributor(wbnbholder.address);
-            await thenaVoterProxy.connect(wbnbholder).registerReward(currentEpoch, pool1, wbnb.address, balance);
+           
+            console.log('user 1 vote delegate pool')
+            await thenaVoterProxy.connect(user1HolderVlquo).vote([thenaDelegatePoolIns.address], [50]);
+            console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user1HolderVlquo.address));
+            console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
             
-            const wethBal = weth.balanceOf(wethHolder.address);
-            await weth.connect(wethHolder).transfer(thenaVoterProxy.address, wethBal);
-            await thenaVoterProxy.connect(barmy).setQuollRewardsDistributor(wethHolder.address);
-            await thenaVoterProxy.connect(wethHolder).registerReward(currentEpoch, pool1, weth.address, wethBal);
-
-            // user claim reward from delegated vote pool
-            console.log('user claim reward after 2 weeks');
+            console.log('INCREASE TWO EPOCHS\n');
             await increase(86400 * 14);
             await minter.update_period();
             await thenaVoterProxy.connect(barmy).updateCurrentVotingEpoch();
-            await thenaDelegatePoolIns.harvestManually(currentEpoch);
+            const nextEpoch = await thenaVoterProxy.getCurrentEpoch();
 
-           console.log('wbnb reward in pool', await wbnb.balanceOf(delegatePoolVirtualBalanceRewardPoolInstance.address));
-           console.log('weth reward in pool', await weth.balanceOf( delegatePoolVirtualBalanceRewardPoolInstance.address));
-           console.log('bsc_usd reward in pool', await bsc_usd.balanceOf( delegatePoolVirtualBalanceRewardPoolInstance.address));
-
-           console.log('user 1 earn wbnb', await thenaDelegatePoolIns.earned(user1HolderVlquo.address, wbnb.address));
-           console.log('user 1 earn weth', await thenaDelegatePoolIns.earned(user1HolderVlquo.address, weth.address));
-           console.log('user 1 earn bsc_usd', await thenaDelegatePoolIns.earned(user2HolderVlquo.address, bsc_usd.address));
-           
-           console.log('user 2 earn wbnb', await thenaDelegatePoolIns.earned(user2HolderVlquo.address, wbnb.address));
-           console.log('user 2 earn weth', await thenaDelegatePoolIns.earned(user2HolderVlquo.address, weth.address));
-           console.log('user 2 earn bsc_usd', await thenaDelegatePoolIns.earned(user2HolderVlquo.address, bsc_usd.address));
-            
-           await thenaDelegatePoolIns.connect(user1HolderVlquo).getReward();
-           await thenaDelegatePoolIns.connect(user2HolderVlquo).getReward();
+            console.log(await thenaVoterProxy.getVotesForUserAtEpoch(nextEpoch, user1HolderVlquo.address));
+            console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
+            console.log('user 1 vote other pool')
+            await thenaVoterProxy.connect(user1HolderVlquo).vote([pool1], [50]);
+            console.log(await thenaVoterProxy.getVotesForUserAtEpoch(nextEpoch, user1HolderVlquo.address));
+            console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
 
         })
-    })
+    });
 
     // describe("Keep delegated vote weight", function () {
     //     it("should keep delegated weight in new epoch", async function () {

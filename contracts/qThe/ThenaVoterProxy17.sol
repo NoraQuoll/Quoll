@@ -193,7 +193,7 @@ contract ThenaVoterProxy17 is
     // -----------------------------------------------------------------------------------------------------------------
     // Constructor
     // -----------------------------------------------------------------------------------------------------------------
-    function initialize() public reinitializer(17) {
+    function initialize() public reinitializer(18) {
         // DataStorage storage $data = _getDataStorage();
         // Do nothing
     }
@@ -502,9 +502,12 @@ contract ThenaVoterProxy17 is
             "You must vote for 1 to 50 pools"
         );
         uint256 weightsSum = 0;
+        uint256 delegateWeightInVote = 0;
         for (uint256 i = 0; i < _weights.length; i++) {
             require(_weights[i] > 0, "Invalid weight: cannot be == 0");
             weightsSum += _weights[i];
+            if( _pools[i] == DELEGATE_VOTE_POOL) 
+                delegateWeightInVote = _weights[i];
         }
 
         // Update the current voting epoch if needed
@@ -518,7 +521,10 @@ contract ThenaVoterProxy17 is
         // If the user has votes for this epoch, reset everything
         if (epoch.userWeights[msg.sender] > 0) {
             _resetVote($data.currentEpoch, msg.sender);
-        }
+        } 
+
+        if (delegateWeightInVote==0) _resetVoteForDelegatePool(msg.sender);
+        
 
         uint256 vlQuoBalance = IVlQuoV2(VL_QUO).balanceOf(msg.sender);
         require(vlQuoBalance > 0, "You need vlQUO to vote");
@@ -692,14 +698,21 @@ contract ThenaVoterProxy17 is
 
     function resetVote() external {
         DataStorage storage $ = _getDataStorage();
-        uint256 userDelegatedWeight = IThenaDelegatePool(DELEGATE_VOTE_POOL)
-            .balanceOf(msg.sender);
         _resetVote($.currentEpoch, msg.sender);
+        //Reset vote for delegate
+       _resetVoteForDelegatePool( msg.sender);
+        
+    }
+
+    function _resetVoteForDelegatePool(address _user ) internal {
+        
+        uint256 userDelegatedWeight = IThenaDelegatePool(DELEGATE_VOTE_POOL)
+            .balanceOf(_user);
         //if user has voted delegate pool
         if (userDelegatedWeight > 0) {
             IThenaDelegatePool(DELEGATE_VOTE_POOL).withdrawFor(
-                msg.sender,
-                IThenaDelegatePool(DELEGATE_VOTE_POOL).balanceOf(msg.sender) // withdraw all staked amount
+                _user,
+                IThenaDelegatePool(DELEGATE_VOTE_POOL).balanceOf(_user) // withdraw all staked amount
             );
         }
     }
