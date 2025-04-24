@@ -303,7 +303,7 @@ contract ThenaDelegatePool is ManagerUpgradeable {
 
     //voter proxy will call this function in the first vote each new epoch
     //to keep the delegated vote weight from the previous epoch
-    function updateVote() external onlyVoterProxy {
+    function updateVote() external harvest onlyVoterProxy {
         _updateVote();
     }
 

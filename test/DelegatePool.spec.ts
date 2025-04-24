@@ -766,8 +766,66 @@ describe("Thena Delegate Vote Pool", function () {
     //     })
     // });
 
-    describe("Find list user", function () {
-        it("Find list user remove vote for delegate this epoch", async function () {
+    // describe("Find list user", function () {
+    //     it("Find list user remove vote for delegate this epoch", async function () {
+    //         const {
+    //             owner,
+    //             user1,
+    //             user2,
+    //             user3,
+    //             user4,
+    //             user5,
+    //             user6,
+    //             user7,
+    //             user1HolderVlquo,
+    //             user2HolderVlquo,
+    //             vlQuoV2,
+    //             barmy,
+    //             thenaVoterProxy,
+    //             thenaDelegatePoolIns,
+    //             minter,
+    //             voterv3,
+    //             rewardToken,
+    //             wbnb,
+    //             weth,
+    //             bsc_usd,
+    //             wbnbholder,
+    //             wethHolder,                
+    //             quo,
+    //             quollDeployer,
+    //             delegatePoolVirtualBalanceRewardPoolInstance
+    //         } = await deployFixture();
+
+    //         //get all user that vote in the this current epoch
+        
+    //         const currentEpoch =  1744848000
+    //         const users = await thenaVoterProxy.getUsersWithVotes(currentEpoch);
+            
+    //         //do they vote for delegate ? if not -> reset 
+    //         let usersNotVoteDelegateThisEpoch = [];
+    //         let afftectedUser = [];
+    //         for (const user of users) {
+    //            let delegate = await thenaVoterProxy.getUserVoterForPoolAtEpoch(currentEpoch, user, thenaDelegatePoolIns.address);
+    //            if (delegate == 0n) {
+    //                 usersNotVoteDelegateThisEpoch.push(user);
+    //                 const balance = await thenaVoterProxy.getUserWeightInDelegatePool(user);
+    //                 if (balance > 0) afftectedUser.push(user);
+    //            }
+    //         }
+
+    //         console.log('List user vote other pools BUT NOT delegate LAST epoch')
+    //         console.log('Number: ', usersNotVoteDelegateThisEpoch.length);
+    //         console.log(usersNotVoteDelegateThisEpoch);   
+            
+    //         console.log('Affected')
+    //         console.log('Number: ', afftectedUser.length);
+    //         console.log(afftectedUser);   
+
+    //     })
+    // });
+
+    describe("Reset Delegate Vote By Owner", function () {
+        it("should owner reset user delegate vote", async function () {
             const {
                 owner,
                 user1,
@@ -796,33 +854,37 @@ describe("Thena Delegate Vote Pool", function () {
                 delegatePoolVirtualBalanceRewardPoolInstance
             } = await deployFixture();
 
-            //get all user that vote in the this current epoch
-        
-            const currentEpoch =  1744848000
-            const users = await thenaVoterProxy.getUsersWithVotes(currentEpoch);
-            
-            //do they vote for delegate ? if not -> reset 
-            let usersNotVoteDelegateThisEpoch = [];
-            let afftectedUser = [];
-            for (const user of users) {
-               let delegate = await thenaVoterProxy.getUserVoterForPoolAtEpoch(currentEpoch, user, thenaDelegatePoolIns.address);
-               if (delegate == 0n) {
-                    usersNotVoteDelegateThisEpoch.push(user);
-                    const balance = await thenaVoterProxy.getUserWeightInDelegatePool(user);
-                    if (balance > 0) afftectedUser.push(user);
-               }
-            }
+            // const pool1 = await voterv3.pools(1);
+            // const pool2 = await voterv3.pools(2);
+            const pool1 = "0x01DD2d28eeB95D740acb5344b1e2C99b61CC3e64";
+            const pool2 = "0x10bf6e7B28b1cfFb1c047D7F815953931e5Ee947";
+            const pool3 = "0x936D06D7BF9Bd851c6cbEE3C18DA654659F4eBFD";
+            console.log(await thenaDelegatePoolIns.earned("0x9A74E09e09e9989C84751533BE5729f23D2Fe636", "0x2170ed0880ac9a755fd29b2688956bd959f933f8"))
+            //increase time to new epoch
+            await increase(86400 * 14);
+            await minter.update_period();
+            await voterv3._epochTimestamp();
+            await thenaVoterProxy.connect(barmy).updateCurrentVotingEpoch();
+            const currentEpoch = await thenaVoterProxy.getCurrentEpoch();
+            console.log(await thenaDelegatePoolIns.earned("0x9A74E09e09e9989C84751533BE5729f23D2Fe636", "0x2170ed0880ac9a755fd29b2688956bd959f933f8"))
 
-            console.log('List user vote other pools BUT NOT delegate LAST epoch')
-            console.log('Number: ', usersNotVoteDelegateThisEpoch.length);
-            console.log(usersNotVoteDelegateThisEpoch);   
+            // console.log('this case, delegate pool will vote for pool1 by its voting power');
+            // await thenaDelegatePoolIns.updateWeights([pool1], [100]);
+
+            // console.log('user 1 vote delegate pool')
+            // await thenaVoterProxy.connect(user1HolderVlquo).vote([thenaDelegatePoolIns.address], [50]);
+            // console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user1HolderVlquo.address));
+            // console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
+
+            // console.log('reset user vote');
+            // await thenaDelegatePoolIns.connect(quollDeployer).resetDelegateVoteByOwner([user1HolderVlquo.address]);
             
-            console.log('Affected')
-            console.log('Number: ', afftectedUser.length);
-            console.log(afftectedUser);   
+            // console.log(await thenaVoterProxy.getVotesForUserAtEpoch(currentEpoch, user1HolderVlquo.address));
+            // console.log(await thenaVoterProxy.getUserWeightInDelegatePool(user1HolderVlquo.address));
 
         })
     });
+
 
     // describe("Keep delegated vote weight", function () {
     //     it("should keep delegated weight in new epoch", async function () {
