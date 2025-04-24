@@ -470,7 +470,7 @@
         },
         "ThenaDelegatePool": {
             "address": "0x5d34F95157558af63dfD8091dA329D36Fe5C64b6",
-            "impl": "0x3DE0CA61900De4bE54E2E113513f51a5236eE2Ab"
+            "impl": "0x6fA81530150fAC11bf094C7FD6a4e7B3Dab72af8"
         },
         "ThenaVirtualBalanceRewardPool": {
             "address": "0xcDc6A14D995BC755B3DA8736308C0d0c34DA06eE",
