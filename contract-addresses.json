@@ -474,7 +474,7 @@
         },
         "ThenaVirtualBalanceRewardPool": {
             "address": "0xcDc6A14D995BC755B3DA8736308C0d0c34DA06eE",
-            "impl": "0xf4e5687a097fF07aBEF73D8f34f382E166E55868"
+            "impl": "0xC70191D28A433d0Edc3E564C5743ACb9de497656"
         }
     },
     "arb": {
