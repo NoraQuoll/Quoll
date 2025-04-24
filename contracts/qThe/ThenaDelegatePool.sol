@@ -86,7 +86,7 @@ contract ThenaDelegatePool is ManagerUpgradeable {
     //thena voting rewards can be claimed atfter the next Epochs ends
     modifier harvest() {
         uint256 currentEpoch = IThenaVoterProxy(voterProxy).getCurrentEpoch();
-        if (currentEpoch - lastHarvest > WEEK) {
+        if (currentEpoch - lastHarvest >= WEEK) {
             //get claimable epochs
             uint256[] memory epochs = IThenaVoterProxy(voterProxy)
                 .getClaimableEpochsForUser(address(this));
