@@ -172,7 +172,6 @@ contract ThenaVirtualBalanceRewardPool is
 
         emit Withdrawn(_account, _amount);
 
-        getReward(_account);
     }
 
     function getReward(address _account)
