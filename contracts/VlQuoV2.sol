@@ -522,18 +522,18 @@ contract VlQuoV2 is
         _totalSupply = _totalSupply.sub(_amount);
         uint256 newBal = _balances[_user].sub(_amount);
         _balances[_user] = newBal;
-        require(
-            bribeManager.getUserTotalVote(_user) <= newBal,
-            "Too much vote cast"
-        );
+        // require(
+        //     bribeManager.getUserTotalVote(_user) <= newBal,
+        //     "Too much vote cast"
+        // );
 
-        if (address(thenaVoterProxy) != address(0)) {
-            require(
-                thenaVoterProxy.getCurrentUserTotalVote(_user) <= newBal,
-                "Too much vote cast"
-            );
-        }
-        
+        // if (address(thenaVoterProxy) != address(0)) {
+        //     require(
+        //         thenaVoterProxy.getCurrentUserTotalVote(_user) <= newBal,
+        //         "Too much vote cast"
+        //     );
+        // }
+
         emit BalanceUpdated(_user, newBal);
     }
 

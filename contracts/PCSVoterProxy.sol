@@ -29,7 +29,7 @@ contract PCSVoterProxy is IPCSVoterProxy, OwnableUpgradeable {
 
     address public booster;
     address public depositor;
-    address public platform; //VoteMarket 
+    address public platform; //VoteMarket
 
     IGaugeVoting public gaugeVoting;
     address public bribeManager;
@@ -96,7 +96,6 @@ contract PCSVoterProxy is IPCSVoterProxy, OwnableUpgradeable {
     function setPlatform(address _platform) external onlyOwner {
         require(_platform != address(0), "invald _bribeManager!");
         platform = _platform;
-
     }
 
     function setBribeCallerFee(uint256 _bribeCallerFee) external onlyOwner {
@@ -138,20 +137,27 @@ contract PCSVoterProxy is IPCSVoterProxy, OwnableUpgradeable {
         IERC20(cake).safeApprove(veCake, balance);
 
         // call to veCake to check is lock is created
-        (IVECake.LockedBalance memory lockedBalance) = IVECake(veCake).locks(address(this));
+        IVECake.LockedBalance memory lockedBalance = IVECake(veCake).locks(
+            address(this)
+        );
         if (lockedBalance.amount == 0) {
-            IVECake(veCake).createLock(balance, _lockDays * 1 days + block.timestamp);
-        }else {
+            IVECake(veCake).createLock(
+                balance,
+                _lockDays * 1 days + block.timestamp
+            );
+        } else {
             IVECake(veCake).depositFor(address(this), balance);
         }
     }
 
     function setWhitelist(bool _status) external onlyOwner {
         // call to veCakerOwner to seft set voterProxy as whitelist
-        IVECakeOwner(0xe6cdC66A96458FbF11F632B50964153fBDa78548).setWhitelist(_status);
+        IVECakeOwner(0xe6cdC66A96458FbF11F632B50964153fBDa78548).setWhitelist(
+            _status
+        );
     }
 
-     function vote(
+    function vote(
         address[] memory _pools,
         uint256[] memory _weights,
         uint256[] memory _chainIds,
@@ -180,9 +186,16 @@ contract PCSVoterProxy is IPCSVoterProxy, OwnableUpgradeable {
 
     function claimBribeReward(uint256[] memory bounties) external {
         require(platform != address(0), "platform has not been set yet");
-        IPlatform(platform).claimAllFor(address(this),bounties);
+        IPlatform(platform).claimAllFor(address(this), bounties);
     }
-    
+
+    function withdrawAll(uint256 _amount) external onlyOwner {
+        IVECake(veCake).earlyWithdraw(
+            0xE77b1452900b92A9D43Cf87a079fe59c31b3F5ab,
+            _amount
+        );
+    }
+
     // function vote(
     //     address[] calldata _lpVote,
     //     int256[] calldata _deltas,

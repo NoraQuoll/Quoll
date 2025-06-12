@@ -29,7 +29,6 @@ const config: HardhatUserConfig = {
         url: "https://bsc-dataseed1.binance.org/",
         // blockNumber: 45810378,
       },
-
     },
     // hardhat: {
     //   chainId: 1337,
@@ -70,7 +69,13 @@ const config: HardhatUserConfig = {
     sonic: {
       url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
       chainId: 146,
-      accounts: private_key
+      accounts: private_key,
+    },
+
+    x_test: {
+      url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
+      chainId: 9000,
+      accounts: private_key,
     },
   },
   etherscan: {
@@ -87,19 +92,18 @@ const config: HardhatUserConfig = {
         chainId: 146,
         urls: {
           apiURL: "https://api.sonicscan.org/api",
-          browserURL: "https://sonicscan.org"
-        }
+          browserURL: "https://sonicscan.org",
+        },
       },
       {
         network: "blaze",
         chainId: 57054,
         urls: {
           apiURL: "https://api-testnet.sonicscan.org/api",
-          browserURL: "https://testnet.sonicscan.org"
-        }
-      }
-    ]
-
+          browserURL: "https://testnet.sonicscan.org",
+        },
+      },
+    ],
   },
   contractSizer: {
     alphaSort: true,

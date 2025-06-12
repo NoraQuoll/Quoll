@@ -50,4 +50,8 @@ interface IVECake {
     ) external view returns (Point memory);
 
     function balanceOf(address user) external view returns (uint256);
+
+    function withdrawAll(address _to) external;
+
+    function earlyWithdraw(address _to, uint256 _amount) external;
 }

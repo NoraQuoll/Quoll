@@ -12,6 +12,8 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
+  console.log({ network });
+
   const web3 = new Web3(process.env.RPC!);
 
   const data = await deploy("MockERC20", {

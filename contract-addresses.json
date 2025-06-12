@@ -422,7 +422,7 @@
         },
         "VlQuoV2": {
             "address": "0xD653FDD560Fd8d936fFe5f8Feeb9EF68fd5743e9",
-            "impl": "0x73f366C4F0DAc057ABb93558064801e6E43fB71C"
+            "impl": "0x2424Fb6B240C046eaCcC30d2B9e97d2630e6515A"
         },
         "PTSconverter": {
             "address": "0xF49f0A8AF5d9BB380AF2c2724b9EA3f9e75732c4",
@@ -450,7 +450,7 @@
         },
         "PCSVoterProxy": {
             "address": "0x39088C414beca8977cC90247FE887Ea8b2E2dC6f",
-            "impl": "0x08c79B06826604D86AEAed44AC85df9f5E1F2f5E"
+            "impl": "0xE6ddd0aD74107B6004A4FE63189dC00469abdAbA"
         },
         "PCSReferralCampaignLens": {
             "address": "0x2484feB840fCdb505fc0739d86518CAc1F14e7B3",
@@ -470,7 +470,7 @@
         },
         "ThenaDelegatePool": {
             "address": "0x5d34F95157558af63dfD8091dA329D36Fe5C64b6",
-            "impl": "0x6fA81530150fAC11bf094C7FD6a4e7B3Dab72af8"
+            "impl": "0xD73Ad121CB9EAaa1941d525276aD60Df538f9858"
         },
         "ThenaVirtualBalanceRewardPool": {
             "address": "0xcDc6A14D995BC755B3DA8736308C0d0c34DA06eE",
@@ -733,6 +733,12 @@
         "VlSQuoRewardPool": {
             "address": "0x89cDC2cC4b5c386dC0E0F58B0cC1bf38305F6fde",
             "impl": "0xE1811660077e669e9491ac8E03249525221EFACd"
+        }
+    },
+    "x_test": {
+        "MockERC20": {
+            "address": "0xB722c0D853dB769FdAF16AE82F3Da1be5fAa90c0",
+            "impl": ""
         }
     }
 }

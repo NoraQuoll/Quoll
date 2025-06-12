@@ -56,6 +56,10 @@ contract ThenaDelegatePool is ManagerUpgradeable {
         __ManagerUpgradeable_init();
     }
 
+    function setProtocolFee(uint256 _protocolFee) external onlyOwner {
+        protocolFee = _protocolFee;
+    }
+
     function setParams(
         address _quo,
         address _thenaVoterProxy,
