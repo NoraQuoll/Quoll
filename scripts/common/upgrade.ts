@@ -13,9 +13,9 @@ const user_pk = process.env.PK;
 
 const user = web3.eth.accounts.privateKeyToAccount(user_pk!).address;
 
-const upgradesContract = ["0x277Cd4b508aFbb75d182870409bBf610AFab5c7b"];
+const upgradesContract = ["0x7f676d86c367c1dCd5780381af48a3555367d748"];
 async function main() {
-  const proxyAdmin = "0x3Bb551605ee030C19E6E57DcA54a18e3CEEE0177";
+  const proxyAdmin = "0x887a9c74EC188829d09c2Eaf77d41fB9DD97bFc5";
 
   const ProxyAdmin: any = [
     {
@@ -149,7 +149,7 @@ async function main() {
         // "0x91c0855ca33807619599c50867e4D9E0FC5c617a",
         // current
         // "0xb91d28e498c65bc39d86197a4ef2a188a426844a"
-        "0x8405CC7285b2E59639FF4a95629BC39E42C62107"
+        "0xDFdf026A38012c6bC1f49AC8EFc3A57Aa9DBf8f6"
       )
       .encodeABI();
     console.log(txData);
@@ -161,7 +161,7 @@ async function main() {
       data: txData,
       to: proxyAdmin,
       from: user,
-      gasPrice: await web3.eth.getGasPrice()
+      gasPrice: await web3.eth.getGasPrice(),
     };
 
     const signedTx = await web3.eth.accounts.signTransaction(txObj, user_pk!);

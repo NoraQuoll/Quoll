@@ -56,6 +56,7 @@ const config: HardhatUserConfig = {
     bsc: {
       url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
       accounts: private_key,
+      chainId: 56,
     },
     arb: {
       url: process.env.RPC, //"https://data-seed-prebsc-1-s3.binance.org:8545",
@@ -101,6 +102,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api-testnet.sonicscan.org/api",
           browserURL: "https://testnet.sonicscan.org",
+        },
+      },
+      {
+        network: "bsc",
+        chainId: 56,
+        urls: {
+          apiURL: "https://api.etherscan.io/v2/api?chainid=56",
+          browserURL: "https://bscscan.com/",
         },
       },
     ],

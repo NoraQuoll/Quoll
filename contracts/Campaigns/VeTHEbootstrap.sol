@@ -53,6 +53,10 @@ contract VeTHEbootstrap is ManagerUpgradeable {
         pause = _pause;
     }
 
+    function setVoterProxy(address _voterProxy) public onlyManager {
+        voterProxy = _voterProxy;
+    }
+
     function convert(
         uint256[] memory tokenIds,
         string memory _linkReferral,
